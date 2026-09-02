@@ -1,0 +1,21 @@
+.nearby-search {
+  display: grid;
+  min-height: 88rpx;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 28rpx;
+  color: var(--roamly-muted);
+}
+
+.nearby-filter-row {
+  display: flex;
+  gap: 14rpx;
+  overflow-x: auto;
+  padding: 28rpx 0 22rpx;
+  white-space: nowrap;
+}
+
+.nearby-placeholder {
+  overflow: hidden;
+}

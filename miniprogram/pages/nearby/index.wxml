@@ -1,0 +1,26 @@
+<app-navbar title="附近" back="{{false}}" />
+<view class="page page-enter">
+  <view
+    class="nearby-search roamly-panel pressable"
+    bind:tap="openShopList"
+    aria-role="button"
+    aria-label="搜索附近商户"
+  >
+    <t-icon name="search" size="38rpx" />
+    <text>搜索附近的店</text>
+    <t-icon name="location" size="34rpx" color="#ff5f57" />
+  </view>
+  <view class="nearby-filter-row">
+    <view class="chip chip--active">综合</view>
+    <view class="chip">距离</view>
+    <view class="chip">评分</view>
+    <view class="chip">热门</view>
+  </view>
+  <view class="nearby-placeholder roamly-panel">
+    <app-empty
+      description="附近商户将在这里展示"
+      action-text="浏览全部商户"
+      bind:action="openShopList"
+    />
+  </view>
+</view>

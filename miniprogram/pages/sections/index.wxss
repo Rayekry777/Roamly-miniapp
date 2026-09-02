@@ -1,0 +1,38 @@
+.sections-hero {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 30rpx;
+}
+
+.sections-hero__icon {
+  display: flex;
+  width: 92rpx;
+  height: 92rpx;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28rpx;
+  background: rgba(130, 117, 255, 0.12);
+  color: var(--roamly-accent);
+}
+
+.sections-hero__content {
+  min-width: 0;
+}
+
+.sections-hero__title {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.sections-hero__description {
+  margin-top: 8rpx;
+  color: var(--roamly-muted);
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.sections-placeholder {
+  overflow: hidden;
+}

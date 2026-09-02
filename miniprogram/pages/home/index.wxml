@@ -7,6 +7,6 @@
   <block wx:else>
     <view class="section"><view class="section-title"><text>探索分类</text><text class="section-link" bind:tap="openShops">全部 ›</text></view><view class="type-grid"><view wx:for="{{types}}" wx:key="id" class="type-item pressable" data-id="{{item.id}}" data-name="{{item.name}}" bind:tap="openShops"><view class="type-icon"><app-image src="{{item.icon}}" kind="category" mode="aspectFit" /></view><text>{{item.name}}</text></view></view></view>
     <view class="section"><view class="section-title"><text>附近好店</text><text class="section-link" bind:tap="openShops">查看更多 ›</text></view><view class="stack"><shop-card wx:for="{{shops}}" wx:key="id" shop="{{item}}" bind:select="openShop"/><app-empty wx:if="{{!shops.length}}" description="附近暂时还没有店铺" /></view></view>
-    <view class="section"><view class="section-title"><text>热门笔记</text><text class="section-link" bind:tap="openDiscover">去探店 ›</text></view><view class="stack"><blog-card wx:for="{{blogs}}" wx:key="id" blog="{{item}}" bind:select="openBlog"/></view></view>
+    <view class="section"><view class="section-title"><text>热门笔记</text><text class="section-link" bind:tap="openSections">看分区 ›</text></view><view class="stack"><blog-card wx:for="{{blogs}}" wx:key="id" blog="{{item}}" bind:select="openBlog"/></view></view>
   </block>
 </view>

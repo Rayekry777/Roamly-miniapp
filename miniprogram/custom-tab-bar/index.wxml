@@ -1,19 +1,45 @@
 <view class="tabbar">
-  <view class="tabbar__item {{value === items[0].value ? 'tabbar__item--active' : ''}}" data-value="{{items[0].value}}" bind:tap="onSelect">
+  <view
+    class="tabbar__item {{value === items[0].value ? 'tabbar__item--active' : ''}}"
+    data-value="{{items[0].value}}"
+    bind:tap="onSelect"
+  >
     <t-icon name="{{items[0].icon}}" size="44rpx" />
     <text>{{items[0].label}}</text>
   </view>
-  <view class="tabbar__item {{value === items[1].value ? 'tabbar__item--active' : ''}}" data-value="{{items[1].value}}" bind:tap="onSelect">
+  <view
+    class="tabbar__item {{value === items[1].value ? 'tabbar__item--active' : ''}}"
+    data-value="{{items[1].value}}"
+    bind:tap="onSelect"
+  >
     <t-icon name="{{items[1].icon}}" size="44rpx" />
     <text>{{items[1].label}}</text>
   </view>
-  <view class="tabbar__publish pressable" bind:tap="publish" aria-role="button" aria-label="发布探店笔记">
-    <view class="tabbar__publish-button"><t-icon name="add" size="54rpx" color="#fff" /></view>
+  <view
+    class="tabbar__publish pressable"
+    bind:tap="publish"
+    aria-role="button"
+    aria-label="发布动态"
+  >
+    <view class="tabbar__publish-button">
+      <t-icon name="add" size="54rpx" color="#fff" />
+    </view>
     <text>发布</text>
   </view>
-  <view class="tabbar__placeholder" aria-hidden="true" />
-  <view class="tabbar__item {{value === items[2].value ? 'tabbar__item--active' : ''}}" data-value="{{items[2].value}}" bind:tap="onSelect">
+  <view
+    class="tabbar__item {{value === items[2].value ? 'tabbar__item--active' : ''}}"
+    data-value="{{items[2].value}}"
+    bind:tap="onSelect"
+  >
     <t-icon name="{{items[2].icon}}" size="44rpx" />
     <text>{{items[2].label}}</text>
+  </view>
+  <view
+    class="tabbar__item {{value === items[3].value ? 'tabbar__item--active' : ''}}"
+    data-value="{{items[3].value}}"
+    bind:tap="onSelect"
+  >
+    <t-icon name="{{items[3].icon}}" size="44rpx" />
+    <text>{{items[3].label}}</text>
   </view>
 </view>

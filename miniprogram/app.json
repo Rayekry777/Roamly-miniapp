@@ -1,14 +1,23 @@
 {
   "pages": [
     "pages/home/index",
-    "pages/discover/index",
-    "pages/following/index",
+    "pages/sections/index",
+    "pages/nearby/index",
     "pages/me/index"
   ],
   "subpackages": [
-    { "root": "package-shop", "pages": ["pages/list/index", "pages/detail/index"] },
-    { "root": "package-blog", "pages": ["pages/detail/index", "pages/publish/index", "pages/mine/index"] },
-    { "root": "package-user", "pages": ["pages/login/index", "pages/profile/index"] }
+    {
+      "root": "package-shop",
+      "pages": ["pages/list/index", "pages/detail/index"]
+    },
+    {
+      "root": "package-blog",
+      "pages": ["pages/detail/index", "pages/publish/index", "pages/mine/index"]
+    },
+    {
+      "root": "package-user",
+      "pages": ["pages/login/index", "pages/profile/index"]
+    }
   ],
   "window": {
     "navigationBarTitleText": "Roamly",
@@ -24,12 +33,14 @@
     "backgroundColor": "#ffffff",
     "list": [
       { "pagePath": "pages/home/index", "text": "首页" },
-      { "pagePath": "pages/discover/index", "text": "探店" },
-      { "pagePath": "pages/following/index", "text": "关注" },
+      { "pagePath": "pages/sections/index", "text": "分区" },
+      { "pagePath": "pages/nearby/index", "text": "附近" },
       { "pagePath": "pages/me/index", "text": "我的" }
     ]
   },
-  "permission": { "scope.userLocation": { "desc": "用于查询您附近的商户并计算距离" } },
+  "permission": {
+    "scope.userLocation": { "desc": "用于查询您附近的商户并计算距离" }
+  },
   "requiredPrivateInfos": ["getLocation"],
   "lazyCodeLoading": "requiredComponents",
   "renderer": "webview",
