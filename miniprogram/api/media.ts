@@ -1,7 +1,18 @@
 import { getEnvironment } from "../config/env";
+import { authStore } from "../store/auth";
 import type { ErrorResult, MediaAsset, Result } from "../types";
+import { navigateToLogin } from "../utils/navigation";
 import { ApiError, request } from "../utils/request";
 import { session } from "../utils/session";
+
+interface MediaAssetWire {
+  id: string;
+  path: string;
+  width?: number;
+  height?: number;
+  mimeType: string;
+  size: number;
+}
 
 export function uploadMediaImage(
   filePath: string,
@@ -21,8 +32,14 @@ export function uploadMediaImage(
       success(response) {
         try {
           const result = JSON.parse(response.data) as
-            | Result<MediaAsset>
+            | Result<MediaAssetWire>
             | ErrorResult;
+          if (response.statusCode === 401) {
+            authStore.clear();
+            navigateToLogin();
+            reject(new ApiError("登录已过期，请重新登录", 401, "UNAUTHORIZED"));
+            return;
+          }
           if (response.statusCode < 200 || response.statusCode >= 300) {
             const error = result as ErrorResult;
             reject(
@@ -34,7 +51,24 @@ export function uploadMediaImage(
             );
             return;
           }
-          resolve(result as Result<MediaAsset>);
+          const success = result as Result<MediaAssetWire>;
+          if (success.data && !success.data.path) {
+            reject(new ApiError("上传响应缺少资源路径", response.statusCode));
+            return;
+          }
+          resolve({
+            ...success,
+            data: success.data
+              ? {
+                  id: success.data.id,
+                  url: success.data.path,
+                  width: success.data.width,
+                  height: success.data.height,
+                  mimeType: success.data.mimeType,
+                  size: success.data.size,
+                }
+              : null,
+          });
         } catch {
           reject(new ApiError("上传响应格式错误", response.statusCode));
         }
@@ -54,4 +88,5 @@ export const deleteMediaImage = (mediaId: string): Promise<Result<null>> =>
   request(`/v1/media/images/${mediaId}`, {
     method: "DELETE",
     dedupe: false,
+    showError: false,
   });

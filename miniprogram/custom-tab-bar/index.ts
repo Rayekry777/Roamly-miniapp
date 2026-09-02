@@ -26,7 +26,7 @@ Component({
     },
     publish() {
       if (requireLogin())
-        wx.navigateTo({ url: "/package-blog/pages/publish/index" });
+        wx.navigateTo({ url: "/package-post/pages/publish/index" });
     },
   },
 });

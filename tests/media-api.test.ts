@@ -18,7 +18,7 @@ describe("media asset API", () => {
             message: "操作成功",
             data: {
               id: "9223372036854775807",
-              url: "/blogs/example.webp",
+              path: "/blogs/example.webp",
               width: 1200,
               height: 900,
               mimeType: "image/webp",
@@ -34,6 +34,7 @@ describe("media asset API", () => {
     const result = await uploadMediaImage("temp/example.webp");
 
     expect(result.data?.id).toBe("9223372036854775807");
+    expect(result.data?.url).toBe("/blogs/example.webp");
     expect(vi.mocked(wx.uploadFile).mock.calls[0]?.[0]).toMatchObject({
       url: "http://127.0.0.1:8081/v1/media/images",
       filePath: "temp/example.webp",

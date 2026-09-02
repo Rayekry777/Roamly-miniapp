@@ -1,9 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import {
-  postDetailUrl,
-  sectionDetailUrl,
-} from "../miniprogram/utils/routes";
+import { postDetailUrl, sectionDetailUrl } from "../miniprogram/utils/routes";
 
 describe("home feed contract", () => {
   it("renders independent recommendation and following entry points", () => {
@@ -53,7 +50,10 @@ describe("home feed contract", () => {
 
     expect(appConfig.subpackages).toEqual(
       expect.arrayContaining([
-        { root: "package-post", pages: ["pages/detail/index"] },
+        expect.objectContaining({
+          root: "package-post",
+          pages: expect.arrayContaining(["pages/detail/index"]),
+        }),
         { root: "package-section", pages: ["pages/detail/index"] },
       ]),
     );

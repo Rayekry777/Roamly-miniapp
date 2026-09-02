@@ -53,11 +53,15 @@ Page({
     });
 
     if (!this.initialized) return;
-    if (this.data.mode === "FOLLOWING" && loggedIn) {
+    if (this.data.mode === "RECOMMENDED") {
+      if (feedStore.shouldLoad("RECOMMENDED")) {
+        void this.loadFeed("RECOMMENDED");
+      }
+    } else if (loggedIn) {
       if (feedStore.shouldLoad("FOLLOWING")) {
         void this.loadFeed("FOLLOWING");
       }
-    } else if (this.data.mode === "FOLLOWING") {
+    } else {
       feedStore.setMode("RECOMMENDED");
       this.setData({ mode: "RECOMMENDED" });
       this.syncCurrentFeed();
@@ -139,7 +143,7 @@ Page({
           cityCode: this.cityCode,
           cursor:
             !refresh && current.items.length > 0
-              ? current.nextCursor ?? undefined
+              ? (current.nextCursor ?? undefined)
               : undefined,
           offset:
             !refresh && current.items.length > 0

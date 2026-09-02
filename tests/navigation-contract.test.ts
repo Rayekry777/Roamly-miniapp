@@ -41,7 +41,7 @@ describe("five-entry navigation contract", () => {
     expect(appConfig.tabBar.list.some((item) => item.text === "发布")).toBe(
       false,
     );
-    expect(tabBarLogic).toContain("/package-blog/pages/publish/index");
+    expect(tabBarLogic).toContain("/package-post/pages/publish/index");
   });
 
   it("provides complete skeleton files for new tab pages", () => {

@@ -16,7 +16,7 @@
     },
     {
       "root": "package-post",
-      "pages": ["pages/detail/index"]
+      "pages": ["pages/detail/index", "pages/publish/index"]
     },
     {
       "root": "package-section",

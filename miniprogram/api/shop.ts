@@ -56,6 +56,30 @@ export async function searchShops(data: {
   return { ...result, data: result.data?.items || [] };
 }
 
+export async function listShopOptions(data: {
+  cityCode: string;
+  keyword?: string;
+  page?: number;
+  size?: number;
+}): Promise<Result<PageResult<Shop>>> {
+  const query: {
+    cityCode: string;
+    page: number;
+    size: number;
+    keyword?: string;
+  } = {
+    cityCode: data.cityCode,
+    page: data.page || 1,
+    size: data.size || 10,
+  };
+  if (data.keyword?.trim()) query.keyword = data.keyword.trim();
+  return request("/v1/shops", {
+    data: query,
+    auth: "public",
+    showError: false,
+  });
+}
+
 export const getShop = (id: string): Promise<Result<Shop>> =>
   request(`/v1/shops/${id}`, { auth: "public" });
 export const listVouchers = (shopId: string): Promise<Result<Voucher[]>> =>

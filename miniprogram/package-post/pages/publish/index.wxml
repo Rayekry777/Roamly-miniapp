@@ -1,0 +1,176 @@
+<app-navbar title="发布动态" emit-back bind:back="leave">
+  <t-button
+    slot="right"
+    theme="primary"
+    variant="text"
+    loading="{{draft.submitting}}"
+    disabled="{{draft.submitting}}"
+    bind:tap="submit"
+  >
+    发布
+  </t-button>
+</app-navbar>
+
+<view class="publish-page page-enter">
+  <view class="publish-intro">
+    <view class="eyebrow">SHARE YOUR ROAM</view>
+    <view class="publish-intro__title">此刻，想分享什么？</view>
+  </view>
+
+  <view id="field-title" class="form-card roamly-panel">
+    <t-input
+      value="{{draft.title}}"
+      borderless
+      maxlength="120"
+      placeholder="标题可选，给这次漫游留个名字"
+      disabled="{{draft.submitting}}"
+      bind:change="onTitle"
+    />
+    <view class="form-divider" />
+    <t-textarea
+      value="{{draft.content}}"
+      placeholder="分享你的发现、心情或日常……"
+      maxlength="5000"
+      autosize="{{ { minHeight: 180 } }}"
+      disabled="{{draft.submitting}}"
+      bind:change="onContent"
+    />
+    <view class="form-count">{{draft.content.length}} / 5000</view>
+  </view>
+
+  <view id="field-media" class="publish-section">
+    <view class="publish-section__heading">
+      <view>
+        <view class="publish-section__title">添加图片</view>
+        <view class="publish-section__description">支持 JPEG、PNG、WebP，单张不超过 10MB</view>
+      </view>
+      <text>{{draft.media.length}} / 9</text>
+    </view>
+    <draft-media-grid
+      media="{{draft.media}}"
+      disabled="{{draft.submitting}}"
+      bind:add="addImages"
+      bind:retry="retryImage"
+      bind:remove="removeImage"
+      bind:move="moveImage"
+    />
+  </view>
+
+  <view class="visit-card roamly-panel">
+    <view class="visit-card__row">
+      <view>
+        <view class="visit-card__title">这是一条探店动态</view>
+        <view class="visit-card__description">开启后需要选择分区和关联商户</view>
+      </view>
+      <t-switch
+        value="{{draft.shopVisit}}"
+        disabled="{{draft.submitting}}"
+        bind:change="onShopVisitChange"
+      />
+    </view>
+    <view wx:if="{{!draft.shopVisit}}" class="daily-hint">
+      <t-icon name="location-1" size="34rpx" />
+      <view>
+        <view>将发布到「漫游日常」</view>
+        <text>普通动态不关联分区和商户</text>
+      </view>
+    </view>
+  </view>
+
+  <block wx:if="{{draft.shopVisit}}">
+    <view id="field-section" class="publish-section">
+      <view class="publish-section__heading">
+        <view>
+          <view class="publish-section__title">选择探店分区</view>
+          <view class="publish-section__description">仅展示允许探店发布的官方分区</view>
+        </view>
+        <text class="required-mark">必选</text>
+      </view>
+      <view wx:if="{{optionLoading}}" class="option-state">正在加载分区…</view>
+      <view wx:elif="{{optionError}}" class="option-state option-state--error">
+        {{optionError}}
+      </view>
+      <view wx:else class="section-options">
+        <view
+          wx:for="{{sections}}"
+          wx:key="id"
+          class="section-option pressable {{selectedSectionId === item.id ? 'section-option--active' : ''}}"
+          data-id="{{item.id}}"
+          bind:tap="selectSection"
+        >
+          <app-image custom-class="section-option__icon" src="{{item.icon}}" kind="category" mode="aspectFit" />
+          <text>{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view id="field-shop" class="publish-section">
+      <view class="publish-section__heading">
+        <view>
+          <view class="publish-section__title">关联商户</view>
+          <view class="publish-section__description">商户决定这条动态所属的城市</view>
+        </view>
+        <text class="required-mark">必选</text>
+      </view>
+
+      <view wx:if="{{draft.shop}}" class="selected-shop roamly-panel">
+        <app-image custom-class="selected-shop__cover" src="{{draft.shop.cover}}" />
+        <view class="selected-shop__body">
+          <view class="selected-shop__name">{{draft.shop.name}}</view>
+          <view class="selected-shop__address">{{draft.shop.address || "地址信息暂缺"}}</view>
+        </view>
+        <view class="selected-shop__clear" bind:tap="clearShop">更换</view>
+      </view>
+
+      <view class="shop-search roamly-panel">
+        <t-icon name="search" size="34rpx" color="#8f8d99" />
+        <t-input
+          value="{{keyword}}"
+          borderless
+          placeholder="搜索当前城市的商户"
+          disabled="{{draft.submitting}}"
+          bind:change="onKeyword"
+        />
+      </view>
+      <view wx:if="{{shopLoading}}" class="option-state">正在查找商户…</view>
+      <view wx:elif="{{shopError}}" class="option-state option-state--error">
+        {{shopError}}
+      </view>
+      <view wx:elif="{{!shops.length}}" class="option-state">当前没有匹配商户</view>
+      <view wx:else class="shop-options">
+        <view
+          wx:for="{{shops}}"
+          wx:key="id"
+          class="shop-option pressable {{selectedShopId === item.id ? 'shop-option--active' : ''}}"
+          data-id="{{item.id}}"
+          bind:tap="selectShop"
+        >
+          <app-image custom-class="shop-option__cover" src="{{item.cover}}" />
+          <view class="shop-option__body">
+            <view class="shop-option__name">{{item.name}}</view>
+            <view class="shop-option__address">{{item.address || "地址信息暂缺"}}</view>
+          </view>
+          <t-icon
+            name="{{selectedShopId === item.id ? 'check-circle-filled' : 'chevron-right'}}"
+            size="32rpx"
+            color="{{selectedShopId === item.id ? '#ff5f57' : '#a3a1ad'}}"
+          />
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <t-button
+    theme="primary"
+    shape="round"
+    block
+    size="large"
+    loading="{{draft.submitting}}"
+    disabled="{{draft.submitting}}"
+    bind:tap="submit"
+  >
+    发布动态
+  </t-button>
+</view>
+
+<success-motion id="publish-motion" message="发布成功" />

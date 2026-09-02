@@ -1,0 +1,14 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "app-image": "/components/app-image/index",
+    "app-navbar": "/components/app-navbar/index",
+    "draft-media-grid": "/components/draft-media-grid/index",
+    "success-motion": "/components/success-motion/index",
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-switch": "tdesign-miniprogram/switch/switch",
+    "t-textarea": "tdesign-miniprogram/textarea/textarea"
+  }
+}

@@ -98,7 +98,10 @@ export class FeedStore {
   }
 
   optimisticallySetLiked(postId: string, liked: boolean): () => void {
-    const previous = this.capturePostFields(postId, ["likedByMe", "likedCount"]);
+    const previous = this.capturePostFields(postId, [
+      "likedByMe",
+      "likedCount",
+    ]);
     this.mapPosts((post) =>
       post.id === postId
         ? {
@@ -138,6 +141,10 @@ export class FeedStore {
       })),
     };
     this.mode = "RECOMMENDED";
+  }
+
+  resetFeed(mode: HomeFeedMode): void {
+    this.feeds[mode] = EMPTY_FEED_STATE();
   }
 
   reset(): void {
@@ -207,7 +214,10 @@ interface PostFieldSnapshot {
   values: Partial<PostCard>;
 }
 
-export function mergePosts(current: PostCard[], incoming: PostCard[]): PostCard[] {
+export function mergePosts(
+  current: PostCard[],
+  incoming: PostCard[],
+): PostCard[] {
   const byId = new Map(current.map((post) => [post.id, post]));
   incoming.forEach((post) => byId.set(post.id, post));
   return [...byId.values()];

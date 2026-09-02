@@ -1,0 +1,62 @@
+<view class="draft-media">
+  <view wx:for="{{displayMedia}}" wx:key="localPath" class="draft-media__item">
+    <image
+      class="draft-media__image"
+      src="{{item.displayUrl}}"
+      mode="aspectFill"
+      data-index="{{index}}"
+      bind:tap="onPreview"
+    />
+    <view wx:if="{{item.status !== 'DONE'}}" class="draft-media__status">
+      <text>{{item.status === "FAILED" ? item.error || "上传失败" : "上传中"}}</text>
+      <view
+        wx:if="{{item.status === 'FAILED'}}"
+        class="draft-media__retry"
+        data-path="{{item.localPath}}"
+        catch:tap="onRetry"
+      >
+        重试
+      </view>
+    </view>
+    <view
+      class="draft-media__remove"
+      data-path="{{item.localPath}}"
+      catch:tap="onRemove"
+      aria-role="button"
+      aria-label="删除图片"
+    >
+      <t-icon name="close" size="26rpx" />
+    </view>
+    <view class="draft-media__order">
+      <view
+        wx:if="{{index > 0}}"
+        data-path="{{item.localPath}}"
+        catch:tap="onMoveLeft"
+        aria-role="button"
+        aria-label="图片前移"
+      >
+        <t-icon name="chevron-left" size="28rpx" />
+      </view>
+      <view
+        wx:if="{{index < displayMedia.length - 1}}"
+        data-path="{{item.localPath}}"
+        catch:tap="onMoveRight"
+        aria-role="button"
+        aria-label="图片后移"
+      >
+        <t-icon name="chevron-right" size="28rpx" />
+      </view>
+    </view>
+  </view>
+
+  <view
+    wx:if="{{displayMedia.length < 9}}"
+    class="draft-media__add pressable"
+    bind:tap="onAdd"
+    aria-role="button"
+    aria-label="添加图片"
+  >
+    <t-icon name="add" size="52rpx" color="#8f8d99" />
+    <text>{{displayMedia.length}} / 9</text>
+  </view>
+</view>

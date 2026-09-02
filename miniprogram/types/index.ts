@@ -109,6 +109,7 @@ export interface UploadedImage {
 }
 
 export * from "./city";
+export * from "./draft";
 export * from "./media";
 export * from "./post";
 export * from "./section";

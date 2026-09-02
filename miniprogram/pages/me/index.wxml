@@ -1,9 +1,64 @@
-<app-navbar title="我的漫游" back="{{false}}"><view wx:if="{{loggedIn}}" slot="right" class="logout pressable" bind:tap="logout"><t-icon name="logout" size="40rpx"/></view></app-navbar>
+<app-navbar title="我的漫游" back="{{false}}">
+  <view
+    wx:if="{{loggedIn}}"
+    slot="right"
+    class="logout pressable"
+    bind:tap="logout"
+  >
+    <t-icon name="logout" size="40rpx" />
+  </view>
+</app-navbar>
+
 <view class="page page-enter">
-  <view wx:if="{{!loggedIn}}" class="login-state roamly-panel"><app-empty description="登录后查看个人资料、签到和探店笔记" action-text="去登录" bind:action="login"/></view>
+  <view wx:if="{{!loggedIn}}" class="login-state roamly-panel">
+    <app-empty
+      description="登录后查看个人资料、签到和动态"
+      action-text="去登录"
+      bind:action="login"
+    />
+  </view>
   <block wx:else>
-    <view class="profile roamly-panel"><view class="profile__main"><view class="profile__avatar"><app-image src="{{user.icon}}" kind="avatar"/></view><view><view class="profile__name">{{user.nickName || 'Roamly 用户'}}</view><view class="muted">ID {{user.id || '--'}}</view></view></view><view class="profile__stats"><view><text class="strong">{{signs}}</text><text>连续签到</text></view><view><text class="strong">{{user.id ? '已加入' : '--'}}</text><text>Roamly</text></view></view></view>
-    <view class="menu roamly-panel"><view class="menu__item pressable" bind:tap="sign"><t-icon name="calendar-event" size="42rpx"/><text>每日签到</text><text class="menu-status">{{signed ? '今日已签到' : '去签到'}}</text><t-icon name="chevron-right"/></view><view class="menu__item pressable" bind:tap="publish"><t-icon name="edit-2" size="42rpx"/><text>发布探店笔记</text><t-icon name="chevron-right"/></view><view class="menu__item pressable" bind:tap="myBlogs"><t-icon name="file" size="42rpx"/><text>我的笔记</text><t-icon name="chevron-right"/></view></view>
+    <view class="profile roamly-panel">
+      <view class="profile__main">
+        <view class="profile__avatar">
+          <app-image src="{{user.icon}}" kind="avatar" />
+        </view>
+        <view>
+          <view class="profile__name">{{user.nickName || "Roamly 用户"}}</view>
+          <view class="muted">ID {{user.id || "--"}}</view>
+        </view>
+      </view>
+      <view class="profile__stats">
+        <view>
+          <text class="strong">{{signs}}</text>
+          <text>连续签到</text>
+        </view>
+        <view>
+          <text class="strong">{{user.id ? "已加入" : "--"}}</text>
+          <text>Roamly</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="menu roamly-panel">
+      <view class="menu__item pressable" bind:tap="sign">
+        <t-icon name="calendar-event" size="42rpx" />
+        <text>每日签到</text>
+        <text class="menu-status">{{signed ? "今日已签到" : "去签到"}}</text>
+        <t-icon name="chevron-right" />
+      </view>
+      <view class="menu__item pressable" bind:tap="publish">
+        <t-icon name="edit-2" size="42rpx" />
+        <text>发布动态</text>
+        <t-icon name="chevron-right" />
+      </view>
+      <view class="menu__item pressable" bind:tap="myBlogs">
+        <t-icon name="file" size="42rpx" />
+        <text>我的笔记</text>
+        <t-icon name="chevron-right" />
+      </view>
+    </view>
   </block>
 </view>
-<success-motion id="sign-motion" message="签到成功"/>
+
+<success-motion id="sign-motion" message="签到成功" />

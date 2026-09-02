@@ -13,7 +13,12 @@ import { request } from "../utils/request";
 export const createPost = (
   data: PostCreateRequest,
 ): Promise<Result<IdResponse>> =>
-  request("/v1/posts", { method: "POST", data, dedupe: false });
+  request("/v1/posts", {
+    method: "POST",
+    data,
+    dedupe: false,
+    showError: false,
+  });
 
 export const getPost = (postId: string): Promise<Result<PostDetail>> =>
   request(`/v1/posts/${postId}`, { auth: "optional" });
