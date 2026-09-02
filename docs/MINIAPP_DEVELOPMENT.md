@@ -57,25 +57,25 @@ implementationStatus: 未实现
 
 ### 4.2 目标页面
 
-| 路由 | 用途 | 鉴权 | 状态 |
-|---|---|---|---|
-| `/pages/home/index` | 推荐/关注信息流 | 推荐公开，关注登录 | 目标重构 |
-| `/pages/sections/index` | 官方分区列表 | 公开，可选登录态 | 未实现 |
-| `/pages/nearby/index` | 附近商户 | 公开 | 未实现 |
-| `/pages/me/index` | 用户中心 | 可匿名外壳 | 目标重构 |
-| `/package-post/pages/detail/index` | 动态详情和评论串 | 公开，可选登录态 | 未实现 |
-| `/package-post/pages/publish/index` | 统一发布器 | 登录 | 未实现 |
-| `/package-post/pages/mine/index` | 我的动态 | 登录 | 未实现 |
-| `/package-section/pages/detail/index` | 分区最新/热门动态 | 公开 | 未实现 |
-| `/package-shop/pages/list/index` | 商户筛选列表 | 公开 | 目标重构 |
-| `/package-shop/pages/detail/index` | 商户聚合详情 | 公开 | 目标重构 |
-| `/package-shop/pages/reviews/index` | 商户点评列表 | 公开，写入登录 | 未实现 |
-| `/package-voucher/pages/product/index` | 团购商品详情 | 公开 | 未实现 |
-| `/package-voucher/pages/wallet/index` | 用户券包 | 登录 | 未实现 |
-| `/package-order/pages/list/index` | 我的订单 | 登录 | 未实现 |
-| `/package-order/pages/detail/index` | 订单详情 | 登录 | 未实现 |
-| `/package-user/pages/login/index` | 手机验证码登录 | 公开 | 已实现 |
-| `/package-user/pages/profile/index` | 用户主页 | 公开 | 目标重构 |
+| 路由                                   | 用途              | 鉴权               | 状态   |
+| -------------------------------------- | ----------------- | ------------------ | ------ |
+| `/pages/home/index`                    | 推荐/关注信息流   | 推荐公开，关注登录 | 未实现 |
+| `/pages/sections/index`                | 官方分区列表      | 公开，可选登录态   | 未实现 |
+| `/pages/nearby/index`                  | 附近商户          | 公开               | 未实现 |
+| `/pages/me/index`                      | 用户中心          | 可匿名外壳         | 未实现 |
+| `/package-post/pages/detail/index`     | 动态详情和评论串  | 公开，可选登录态   | 未实现 |
+| `/package-post/pages/publish/index`    | 统一发布器        | 登录               | 未实现 |
+| `/package-post/pages/mine/index`       | 我的动态          | 登录               | 未实现 |
+| `/package-section/pages/detail/index`  | 分区最新/热门动态 | 公开               | 未实现 |
+| `/package-shop/pages/list/index`       | 商户筛选列表      | 公开               | 未实现 |
+| `/package-shop/pages/detail/index`     | 商户聚合详情      | 公开               | 未实现 |
+| `/package-shop/pages/reviews/index`    | 商户点评列表      | 公开，写入登录     | 未实现 |
+| `/package-voucher/pages/product/index` | 团购商品详情      | 公开               | 未实现 |
+| `/package-voucher/pages/wallet/index`  | 用户券包          | 登录               | 未实现 |
+| `/package-order/pages/list/index`      | 我的订单          | 登录               | 未实现 |
+| `/package-order/pages/detail/index`    | 订单详情          | 登录               | 未实现 |
+| `/package-user/pages/login/index`      | 手机验证码登录    | 公开               | 已实现 |
+| `/package-user/pages/profile/index`    | 用户主页          | 公开               | 未实现 |
 
 迁移关系：
 
@@ -111,29 +111,29 @@ pages      页面状态机、生命周期和交互编排
 
 ```ts
 interface Result<T> {
-  code: string
-  message: string
-  data: T | null
+  code: string;
+  message: string;
+  data: T | null;
 }
 
 interface ErrorResult {
-  code: string
-  message: string
-  fieldErrors?: Array<{ field: string; message: string }>
+  code: string;
+  message: string;
+  fieldErrors?: Array<{ field: string; message: string }>;
 }
 
 interface PageResult<T> {
-  items: T[]
-  page: number
-  size: number
-  total: number
+  items: T[];
+  page: number;
+  size: number;
+  total: number;
 }
 
 interface CursorPageResult<T> {
-  items: T[]
-  nextCursor: number | null
-  nextOffset: number
-  hasMore: boolean
+  items: T[];
+  nextCursor: number | null;
+  nextOffset: number;
+  hasMore: boolean;
 }
 ```
 
@@ -143,64 +143,64 @@ interface CursorPageResult<T> {
 
 ```ts
 interface City {
-  code: string
-  name: string
+  code: string;
+  name: string;
 }
 
 interface SectionSummary {
-  id: string
-  code: string
-  name: string
-  icon?: string
-  allowShopVisit: boolean
-  followedByMe: boolean
+  id: string;
+  code: string;
+  name: string;
+  icon?: string;
+  allowShopVisit: boolean;
+  followedByMe: boolean;
 }
 
 interface UserSummary {
-  id: string
-  nickName: string
-  icon?: string
+  id: string;
+  nickName: string;
+  icon?: string;
 }
 
 interface MediaAsset {
-  id: string
-  url: string
-  width?: number
-  height?: number
-  mimeType: string
-  size: number
+  id: string;
+  url: string;
+  width?: number;
+  height?: number;
+  mimeType: string;
+  size: number;
 }
 
 interface HighlightComment {
-  id: string
-  author: UserSummary
-  content: string
-  likedCount: number
-  replyCount: number
+  id: string;
+  author: UserSummary;
+  content: string;
+  likedCount: number;
+  replyCount: number;
 }
 
 interface PostCard {
-  id: string
-  author: UserSummary
-  section: SectionSummary
-  title?: string
-  contentPreview: string
-  media: MediaAsset[]
-  shopVisit: boolean
-  likedCount: number
-  commentCount: number
-  likedByMe: boolean
-  followingAuthor: boolean
-  highlightComment?: HighlightComment
-  createdTime: string
+  id: string;
+  author: UserSummary;
+  section: SectionSummary;
+  title?: string;
+  contentPreview: string;
+  media: MediaAsset[];
+  shopVisit: boolean;
+  likedCount: number;
+  commentCount: number;
+  likedByMe: boolean;
+  followingAuthor: boolean;
+  highlightComment?: HighlightComment;
+  createdTime: string;
 }
 
 interface PostDetail extends PostCard {
-  content: string
-  shop?: ShopSummary
-  editable: boolean
-  deletable: boolean
-  defaultCommentSort: 'HOT' | 'LATEST'
+  content: string;
+  shop?: ShopSummary;
+  editable: boolean;
+  deletable: boolean;
+  defaultCommentSort: "HOT" | "LATEST";
 }
 ```
 
@@ -266,10 +266,10 @@ assetBaseUrl=https://example.com + /blogs/2026/09/a.webp
 
 ```ts
 interface CityState {
-  selectedCity: City | null
-  longitude?: number
-  latitude?: number
-  locationStatus: 'IDLE' | 'LOCATING' | 'READY' | 'DENIED' | 'FAILED'
+  selectedCity: City | null;
+  longitude?: number;
+  latitude?: number;
+  locationStatus: "IDLE" | "LOCATING" | "READY" | "DENIED" | "FAILED";
 }
 ```
 
@@ -296,14 +296,14 @@ interface CityState {
 
 ```ts
 interface PostDraft {
-  title: string
-  content: string
-  media: UploadedMedia[]
-  shopVisit: boolean
-  section: SectionSummary | null
-  shop: ShopSummary | null
-  submitting: boolean
-  updatedAt: number
+  title: string;
+  content: string;
+  media: UploadedMedia[];
+  shopVisit: boolean;
+  section: SectionSummary | null;
+  shop: ShopSummary | null;
+  submitting: boolean;
+  updatedAt: number;
 }
 ```
 
@@ -318,14 +318,14 @@ interface PostDraft {
 ### 9.1 页面状态
 
 ```ts
-type HomeFeedMode = 'RECOMMENDED' | 'FOLLOWING'
+type HomeFeedMode = "RECOMMENDED" | "FOLLOWING";
 
 interface HomePageState {
-  mode: HomeFeedMode
-  sections: SectionSummary[]
-  recommended: FeedState
-  following: FeedState
-  sectionLoading: boolean
+  mode: HomeFeedMode;
+  sections: SectionSummary[];
+  recommended: FeedState;
+  following: FeedState;
+  sectionLoading: boolean;
 }
 ```
 
@@ -521,22 +521,22 @@ interface HomePageState {
 
 ## 17. 公共组件契约
 
-| 组件 | 职责 | 主要事件 |
-|---|---|---|
-| `post-card` | 首页/分区/用户动态卡片 | `openpost/openauthor/opensection/like/comment/follow` |
-| `post-media-grid` | 1～9 张图片布局和预览 | `preview` |
-| `section-chip` | 单个分区标签 | `select/follow` |
-| `section-scroll` | 横向分区入口 | `select` |
-| `highlight-comment` | 首页热门评论摘要 | `open` |
-| `comment-thread` | 根评论及回复串 | `reply/like/delete/loadmore` |
-| `comment-item` | 单条评论展示 | `reply/like/delete` |
-| `reply-composer` | 底部固定回复输入 | `submit/cancel-target` |
-| `shop-link-card` | 动态详情商户连接 | `open` |
-| `voucher-product-card` | 团购商品摘要 | `open/order` |
-| `page-skeleton` | 首屏骨架 | 无 |
-| `app-empty` | 空数据状态 | 可选 `action` |
-| `app-error` | 错误和重试 | `retry` |
-| `login-required` | 私有内容登录引导 | `login` |
+| 组件                   | 职责                   | 主要事件                                              |
+| ---------------------- | ---------------------- | ----------------------------------------------------- |
+| `post-card`            | 首页/分区/用户动态卡片 | `openpost/openauthor/opensection/like/comment/follow` |
+| `post-media-grid`      | 1～9 张图片布局和预览  | `preview`                                             |
+| `section-chip`         | 单个分区标签           | `select/follow`                                       |
+| `section-scroll`       | 横向分区入口           | `select`                                              |
+| `highlight-comment`    | 首页热门评论摘要       | `open`                                                |
+| `comment-thread`       | 根评论及回复串         | `reply/like/delete/loadmore`                          |
+| `comment-item`         | 单条评论展示           | `reply/like/delete`                                   |
+| `reply-composer`       | 底部固定回复输入       | `submit/cancel-target`                                |
+| `shop-link-card`       | 动态详情商户连接       | `open`                                                |
+| `voucher-product-card` | 团购商品摘要           | `open/order`                                          |
+| `page-skeleton`        | 首屏骨架               | 无                                                    |
+| `app-empty`            | 空数据状态             | 可选 `action`                                         |
+| `app-error`            | 错误和重试             | `retry`                                               |
+| `login-required`       | 私有内容登录引导       | `login`                                               |
 
 组件不得发起业务请求，乐观更新由页面或 Service 编排。
 
@@ -571,20 +571,20 @@ interface HomePageState {
 
 ## 20. 分阶段实施计划
 
-| 阶段 | 小程序工作 | 完成条件 | 状态 |
-|---:|---|---|---|
-| 0 | 完成本契约并与后端总契约对齐 | 路由、接口、类型和状态一致 | 已实现 |
-| 1 | 建立 City、Section、Media、Post 新类型和 API | 类型检查及 API 单测通过 | 未实现 |
-| 2 | 调整五入口 TabBar，建立分区和附近页骨架 | 导航、登录回跳和分包验证通过 | 未实现 |
-| 3 | 实现首页推荐/关注双状态和 Post 卡片 | 游标、滚动恢复、去重和乐观更新通过 | 未实现 |
-| 4 | 实现统一发布器和临时媒体 | 草稿、探店开关、上传和清理通过 | 未实现 |
-| 5 | 实现分区列表和分区详情 | 最新/热门、关注和城市切换通过 | 未实现 |
-| 6 | 实现动态详情、商户连接和 Threads 评论 | 回复追加、定位、删除和点赞通过 | 未实现 |
-| 7 | 重构附近和商户详情聚合 | 定位降级、筛选和按需加载通过 | 未实现 |
-| 8 | 实现点评发布、编辑和列表 | 唯一点评、图片和评分刷新通过 | 未实现 |
-| 9 | 实现团购详情、订单和券包 | 状态展示、取消和资产权限通过 | 未实现 |
-| 10 | 删除 Blog 兼容类型、页面和旧 API | 后端切换、全量回归和无旧引用 | 未实现 |
-| 11 | 搜索、通知、举报、支付和核销 | 另行设计评审 | 未实现 |
+| 阶段 | 小程序工作                                   | 完成条件                           | 状态   |
+| ---: | -------------------------------------------- | ---------------------------------- | ------ |
+|    0 | 完成本契约并与后端总契约对齐                 | 路由、接口、类型和状态一致         | 已实现 |
+|    1 | 建立 City、Section、Media、Post 新类型和 API | 类型检查及 API 单测通过            | 已实现 |
+|    2 | 调整五入口 TabBar，建立分区和附近页骨架      | 导航、登录回跳和分包验证通过       | 未实现 |
+|    3 | 实现首页推荐/关注双状态和 Post 卡片          | 游标、滚动恢复、去重和乐观更新通过 | 未实现 |
+|    4 | 实现统一发布器和临时媒体                     | 草稿、探店开关、上传和清理通过     | 未实现 |
+|    5 | 实现分区列表和分区详情                       | 最新/热门、关注和城市切换通过      | 未实现 |
+|    6 | 实现动态详情、商户连接和 Threads 评论        | 回复追加、定位、删除和点赞通过     | 未实现 |
+|    7 | 重构附近和商户详情聚合                       | 定位降级、筛选和按需加载通过       | 未实现 |
+|    8 | 实现点评发布、编辑和列表                     | 唯一点评、图片和评分刷新通过       | 未实现 |
+|    9 | 实现团购详情、订单和券包                     | 状态展示、取消和资产权限通过       | 未实现 |
+|   10 | 删除 Blog 兼容类型、页面和旧 API             | 后端切换、全量回归和无旧引用       | 未实现 |
+|   11 | 搜索、通知、举报、支付和核销                 | 另行设计评审                       | 未实现 |
 
 ## 21. 测试与验收
 
@@ -618,6 +618,12 @@ npm run verify
 - 验证无登录、Token 失效、弱网、断网、图片失败和定位拒绝。
 - 检查长文本、9 图、无图、无热门评论、删除评论占位和深层回复布局。
 - 检查首页返回后的滚动位置和发布成功后的首屏刷新。
+
+### 21.3 验证记录
+
+| 日期       | 阶段                                          | 结果                                                                                                                                                                        |
+| ---------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-02 | 阶段 1：City、Section、Media、Post 类型和 API | `npm run verify` 通过：9 个测试文件、29 项测试；覆盖新接口路径、鉴权模式、可选游标清理、普通动态隐藏字段、媒体上传和字符串大 ID。后端目标接口尚未实现，因此未进行真实联调。 |
 
 ## 22. 明确非目标与风险
 

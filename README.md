@@ -29,7 +29,7 @@ Spring Boot 必须监听非回环网卡，Windows 防火墙仅需允许本地子
 - `styles`：主题 Token 与公共布局
 - `package-*`：商户、笔记和用户分包
 
-详细导入、权限、域名、真机调试和体验版步骤见当前工程的 `MINIAPP_DEVELOPMENT.md`。
+详细产品、页面、接口、权限、域名和分阶段实施契约见 [小程序开发与产品契约](docs/MINIAPP_DEVELOPMENT.md)。
 
 ## 会话迁移
 
