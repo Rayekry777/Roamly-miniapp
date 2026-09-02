@@ -1,0 +1,9 @@
+{
+  "component": true,
+  "usingComponents": {
+    "app-image": "/components/app-image/index",
+    "highlight-comment": "/components/highlight-comment/index",
+    "post-media-grid": "/components/post-media-grid/index",
+    "t-icon": "tdesign-miniprogram/icon/icon"
+  }
+}

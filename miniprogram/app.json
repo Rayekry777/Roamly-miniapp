@@ -15,6 +15,14 @@
       "pages": ["pages/detail/index", "pages/publish/index", "pages/mine/index"]
     },
     {
+      "root": "package-post",
+      "pages": ["pages/detail/index"]
+    },
+    {
+      "root": "package-section",
+      "pages": ["pages/detail/index"]
+    },
+    {
       "root": "package-user",
       "pages": ["pages/login/index", "pages/profile/index"]
     }

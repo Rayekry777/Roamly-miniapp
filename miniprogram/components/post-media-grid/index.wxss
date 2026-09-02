@@ -1,0 +1,39 @@
+.media-grid {
+  display: grid;
+  gap: 6rpx;
+  margin-top: 20rpx;
+  overflow: hidden;
+  border-radius: 24rpx;
+}
+
+.media-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.media-grid--double {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.media-grid--multiple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.media-grid__item {
+  position: relative;
+  height: 210rpx;
+  overflow: hidden;
+  background: #f0f0f4;
+}
+
+.media-grid--single .media-grid__item {
+  height: 520rpx;
+}
+
+.media-grid--double .media-grid__item {
+  height: 310rpx;
+}
+
+.media-grid__image {
+  width: 100%;
+  height: 100%;
+}

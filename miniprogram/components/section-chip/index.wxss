@@ -1,0 +1,35 @@
+.section-chip {
+  display: inline-flex;
+  min-width: 150rpx;
+  align-items: center;
+  gap: 12rpx;
+  padding: 14rpx 22rpx 14rpx 14rpx;
+  border: 1rpx solid var(--roamly-border);
+  border-radius: 999rpx;
+  background: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(45, 42, 80, 0.06);
+  vertical-align: middle;
+}
+
+.section-chip__icon {
+  width: 44rpx;
+  height: 44rpx;
+  overflow: hidden;
+  border-radius: 14rpx;
+}
+
+.section-chip__name {
+  max-width: 160rpx;
+  overflow: hidden;
+  color: var(--roamly-text);
+  font-size: 24rpx;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-chip__follow {
+  padding-left: 10rpx;
+  color: var(--roamly-primary);
+  font-size: 21rpx;
+}

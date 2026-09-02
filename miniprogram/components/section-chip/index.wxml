@@ -1,0 +1,15 @@
+<view class="section-chip pressable" bind:tap="onSelect" aria-role="button" aria-label="进入{{section.name}}分区">
+  <view class="section-chip__icon">
+    <app-image src="{{section.icon}}" kind="category" mode="aspectFit" />
+  </view>
+  <text class="section-chip__name">{{section.name}}</text>
+  <view
+    wx:if="{{showFollow}}"
+    class="section-chip__follow"
+    catch:tap="onFollow"
+    aria-role="button"
+    aria-label="{{section.followedByMe ? '取消关注' : '关注'}}{{section.name}}分区"
+  >
+    {{section.followedByMe ? "已关注" : "+ 关注"}}
+  </view>
+</view>

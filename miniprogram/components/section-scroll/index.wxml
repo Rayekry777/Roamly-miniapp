@@ -1,0 +1,10 @@
+<scroll-view class="section-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+  <view class="section-scroll__content">
+    <section-chip
+      wx:for="{{sections}}"
+      wx:key="id"
+      section="{{item}}"
+      bind:select="onSelect"
+    />
+  </view>
+</scroll-view>

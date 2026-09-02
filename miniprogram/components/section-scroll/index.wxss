@@ -1,0 +1,10 @@
+.section-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.section-scroll__content {
+  display: inline-flex;
+  gap: 16rpx;
+  padding: 8rpx 32rpx 20rpx;
+}

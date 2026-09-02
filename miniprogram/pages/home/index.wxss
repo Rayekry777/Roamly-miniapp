@@ -1,6 +1,84 @@
-.avatar-button { width: 72rpx; height: 72rpx; overflow: hidden; margin-left: 24rpx; border-radius: 50%; }
-.search { display: flex; min-height: 92rpx; align-items: center; gap: 18rpx; padding: 0 28rpx; }
-.search text { flex: 1; color: var(--roamly-muted); font-size: 27rpx; }
-.type-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24rpx 12rpx; }
-.type-item { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 14rpx; color: #555362; font-size: 22rpx; }
-.type-icon { width: 92rpx; height: 92rpx; overflow: hidden; border-radius: 30rpx; background: #fff; box-shadow: 0 12rpx 28rpx rgba(45,42,80,.08); }
+.home-page {
+  min-height: 100vh;
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+}
+
+.home-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 54rpx;
+  padding: 18rpx 32rpx 12rpx;
+}
+
+.home-tab {
+  position: relative;
+  padding: 12rpx 8rpx 18rpx;
+  color: var(--roamly-muted);
+  font-size: 30rpx;
+  font-weight: 650;
+}
+
+.home-tab--active {
+  color: var(--roamly-text);
+}
+
+.home-tab--active::after {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 34rpx;
+  height: 6rpx;
+  border-radius: 999rpx;
+  background: var(--roamly-primary);
+  content: "";
+  transform: translateX(-50%);
+}
+
+.home-sections {
+  padding-top: 20rpx;
+}
+
+.home-sections__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 32rpx 12rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.home-sections__hint,
+.home-sections__error {
+  color: var(--roamly-muted);
+  font-size: 21rpx;
+  font-weight: 400;
+}
+
+.home-sections__loading {
+  padding: 12rpx 32rpx 24rpx;
+}
+
+.home-sections__error {
+  padding: 20rpx 32rpx 30rpx;
+  text-align: center;
+}
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 8rpx 24rpx 0;
+}
+
+.feed-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.feed-skeleton__card {
+  min-height: 280rpx;
+  padding: 28rpx;
+  border-radius: 34rpx;
+  background: #fff;
+}

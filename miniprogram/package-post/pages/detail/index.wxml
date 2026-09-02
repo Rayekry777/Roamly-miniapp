@@ -1,0 +1,4 @@
+<app-navbar title="动态详情" />
+<view class="page detail-placeholder">
+  <app-empty description="动态详情与评论串将在后续阶段接入" />
+</view>

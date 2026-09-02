@@ -1,12 +1,90 @@
-<app-navbar title="Roamly" back="{{false}}">
-  <view slot="left" class="avatar-button pressable" bind:tap="openMe"><app-image src="{{avatar}}" kind="avatar" /></view>
-</app-navbar>
-<view class="page page-enter">
-  <view class="search roamly-panel pressable" bind:tap="openShops"><t-icon name="search" size="38rpx"/><text>搜一家喜欢的店</text><t-icon name="location" size="34rpx" color="#ff5f57"/></view>
-  <t-skeleton wx:if="{{loading}}" theme="paragraph" row-col="{{[1,1,1,1]}}" loading />
-  <block wx:else>
-    <view class="section"><view class="section-title"><text>探索分类</text><text class="section-link" bind:tap="openShops">全部 ›</text></view><view class="type-grid"><view wx:for="{{types}}" wx:key="id" class="type-item pressable" data-id="{{item.id}}" data-name="{{item.name}}" bind:tap="openShops"><view class="type-icon"><app-image src="{{item.icon}}" kind="category" mode="aspectFit" /></view><text>{{item.name}}</text></view></view></view>
-    <view class="section"><view class="section-title"><text>附近好店</text><text class="section-link" bind:tap="openShops">查看更多 ›</text></view><view class="stack"><shop-card wx:for="{{shops}}" wx:key="id" shop="{{item}}" bind:select="openShop"/><app-empty wx:if="{{!shops.length}}" description="附近暂时还没有店铺" /></view></view>
-    <view class="section"><view class="section-title"><text>热门笔记</text><text class="section-link" bind:tap="openSections">看分区 ›</text></view><view class="stack"><blog-card wx:for="{{blogs}}" wx:key="id" blog="{{item}}" bind:select="openBlog"/></view></view>
-  </block>
+<app-navbar title="Roamly" back="{{false}}" />
+
+<view class="home-page page-enter">
+  <view class="home-tabs" aria-role="tablist">
+    <view
+      class="home-tab {{mode === 'RECOMMENDED' ? 'home-tab--active' : ''}}"
+      data-mode="RECOMMENDED"
+      bind:tap="switchMode"
+      aria-role="tab"
+      aria-selected="{{mode === 'RECOMMENDED'}}"
+    >
+      推荐
+    </view>
+    <view
+      class="home-tab {{mode === 'FOLLOWING' ? 'home-tab--active' : ''}}"
+      data-mode="FOLLOWING"
+      bind:tap="switchMode"
+      aria-role="tab"
+      aria-selected="{{mode === 'FOLLOWING'}}"
+    >
+      关注
+    </view>
+  </view>
+
+  <view class="home-sections">
+    <view class="home-sections__heading">
+      <text>漫游分区</text>
+      <text class="home-sections__hint">找到同频的人</text>
+    </view>
+    <view wx:if="{{sectionLoading}}" class="home-sections__loading">
+      <t-skeleton theme="avatar" row-col="{{[1]}}" loading />
+    </view>
+    <section-scroll
+      wx:elif="{{sections.length}}"
+      sections="{{sections}}"
+      bind:select="openSection"
+    />
+    <view wx:else class="home-sections__error" bind:tap="retrySections">
+      {{sectionError || "暂无可用分区"}} · 点击重试
+    </view>
+  </view>
+
+  <view class="feed-list">
+    <view wx:if="{{feedLoading && !feedItems.length}}" class="feed-skeleton">
+      <view wx:for="{{[1, 2, 3]}}" wx:key="*this" class="feed-skeleton__card">
+        <t-skeleton theme="avatar" row-col="{{[1, 1, 1, 1]}}" loading />
+      </view>
+    </view>
+
+    <app-empty
+      wx:elif="{{mode === 'FOLLOWING' && !loggedIn}}"
+      description="登录后查看你关注的动态"
+      action-text="去登录"
+      bind:action="loginForFollowing"
+    />
+
+    <app-empty
+      wx:elif="{{feedError && !feedItems.length}}"
+      description="{{feedError}}"
+      action-text="重新加载"
+      bind:action="retryFeed"
+    />
+
+    <app-empty
+      wx:elif="{{!feedItems.length}}"
+      description="{{mode === 'FOLLOWING' ? '关注的人还没有发布动态' : '这里还没有漫游动态'}}"
+    />
+
+    <block wx:else>
+      <post-card
+        wx:for="{{feedItems}}"
+        wx:key="id"
+        post="{{item}}"
+        current-user-id="{{currentUserId}}"
+        liking="{{likingIds[item.id]}}"
+        following="{{followingIds[item.author.id]}}"
+        bind:openpost="openPost"
+        bind:openauthor="openAuthor"
+        bind:opensection="openSection"
+        bind:like="toggleLike"
+        bind:comment="openComment"
+        bind:follow="toggleFollow"
+        bind:openhighlight="openHighlight"
+      />
+      <view class="list-footer">
+        {{feedLoading ? "正在加载更多" : feedHasMore ? "继续上滑加载" : "已经漫游到底了"}}
+      </view>
+    </block>
+  </view>
 </view>

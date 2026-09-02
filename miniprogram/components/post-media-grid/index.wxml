@@ -1,0 +1,13 @@
+<view wx:if="{{displayMedia.length}}" class="media-grid media-grid--{{gridSize}}">
+  <view
+    wx:for="{{displayMedia}}"
+    wx:key="id"
+    class="media-grid__item pressable"
+    data-index="{{index}}"
+    catch:tap="onPreview"
+    aria-role="button"
+    aria-label="预览第{{index + 1}}张图片"
+  >
+    <app-image custom-class="media-grid__image" src="{{item.url}}" />
+  </view>
+</view>
