@@ -6,6 +6,7 @@ import {
   setPostLiked,
 } from "../../services/feed";
 import { authStore } from "../../store/auth";
+import { cityStore } from "../../store/city";
 import { feedStore, type HomeFeedMode } from "../../store/feed";
 import type { PostCard, SectionSummary } from "../../types";
 import {
@@ -47,6 +48,14 @@ Page({
   onShow() {
     syncTabBar(this);
     const loggedIn = authStore.isLoggedIn();
+    const selectedCityCode = cityStore.getState().selectedCity?.code || "";
+    const cityChanged = Boolean(
+      selectedCityCode && selectedCityCode !== this.cityCode,
+    );
+    if (cityChanged) {
+      this.cityCode = selectedCityCode;
+      feedStore.resetFeed("RECOMMENDED");
+    }
     this.setData({
       loggedIn,
       currentUserId: authStore.user?.id || "",
@@ -54,7 +63,7 @@ Page({
 
     if (!this.initialized) return;
     if (this.data.mode === "RECOMMENDED") {
-      if (feedStore.shouldLoad("RECOMMENDED")) {
+      if (cityChanged || feedStore.shouldLoad("RECOMMENDED")) {
         void this.loadFeed("RECOMMENDED");
       }
     } else if (loggedIn) {

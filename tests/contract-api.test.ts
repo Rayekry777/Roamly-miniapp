@@ -40,10 +40,12 @@ describe("new product contract APIs", () => {
 
     expect(requestMock).toHaveBeenNthCalledWith(1, "/v1/sections", {
       auth: "optional",
+      showError: false,
     });
     expect(requestMock).toHaveBeenNthCalledWith(2, "/v1/sections", {
       data: { followedOnly: true },
       auth: "required",
+      showError: false,
     });
   });
 
@@ -57,6 +59,7 @@ describe("new product contract APIs", () => {
     expect(requestMock).toHaveBeenCalledWith("/v1/sections/section-1/posts", {
       data: { cityCode: "HANGZHOU", sort: "HOT", size: 20 },
       auth: "optional",
+      showError: false,
     });
   });
 

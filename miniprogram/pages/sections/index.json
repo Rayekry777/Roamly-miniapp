@@ -1,8 +1,12 @@
 {
   "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
   "usingComponents": {
     "app-empty": "/components/app-empty/index",
+    "app-image": "/components/app-image/index",
     "app-navbar": "/components/app-navbar/index",
-    "t-icon": "tdesign-miniprogram/icon/icon"
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-skeleton": "tdesign-miniprogram/skeleton/skeleton"
   }
 }

@@ -43,7 +43,7 @@ describe("home feed contract", () => {
     );
   });
 
-  it("registers honest placeholders for later detail stages", () => {
+  it("keeps post detail honest and registers the implemented section detail", () => {
     const appConfig = JSON.parse(
       readFileSync("miniprogram/app.json", "utf8"),
     ) as { subpackages: Array<{ root: string; pages: string[] }> };
@@ -57,12 +57,17 @@ describe("home feed contract", () => {
         { root: "package-section", pages: ["pages/detail/index"] },
       ]),
     );
-    for (const path of [
-      "miniprogram/package-post/pages/detail/index.wxml",
-      "miniprogram/package-section/pages/detail/index.wxml",
-    ]) {
-      expect(existsSync(path)).toBe(true);
-      expect(readFileSync(path, "utf8")).toContain("后续阶段接入");
-    }
+    const postDetail = "miniprogram/package-post/pages/detail/index.wxml";
+    const sectionDetail = "miniprogram/package-section/pages/detail/index.wxml";
+    expect(existsSync(postDetail)).toBe(true);
+    expect(readFileSync(postDetail, "utf8")).toContain("后续阶段接入");
+    expect(existsSync(sectionDetail)).toBe(true);
+
+    const sectionView = readFileSync(sectionDetail, "utf8");
+    expect(sectionView).toContain('data-sort="LATEST"');
+    expect(sectionView).toContain('data-sort="HOT"');
+    expect(sectionView).toContain('bind:tap="openCityPicker"');
+    expect(sectionView).toContain('bind:tap="toggleSectionFollow"');
+    expect(sectionView).toContain("<post-card");
   });
 });

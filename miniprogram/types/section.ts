@@ -7,11 +7,12 @@ export interface SectionSummary {
   icon?: string;
   allowShopVisit: boolean;
   followedByMe: boolean;
+  description?: string;
 }
 
 export interface SectionDetail extends SectionSummary {
   description?: string;
   cover?: string;
-  postCount: number;
-  followerCount: number;
+  postCount?: number;
+  followerCount?: number;
 }

@@ -1,6 +1,6 @@
 import type {
   CursorPageResult,
-  PostCard,
+  PostCardResponse,
   Result,
   SectionDetail,
   SectionPostSort,
@@ -27,19 +27,24 @@ export function listSections(
   return request("/v1/sections", {
     ...(options ? { data: options } : {}),
     auth: query.followedOnly ? "required" : "optional",
+    showError: false,
   });
 }
 
 export const getSection = (sectionId: string): Promise<Result<SectionDetail>> =>
-  request(`/v1/sections/${sectionId}`, { auth: "optional" });
+  request(`/v1/sections/${sectionId}`, {
+    auth: "optional",
+    showError: false,
+  });
 
 export function listSectionPosts(
   sectionId: string,
   query: SectionPostQuery,
-): Promise<Result<CursorPageResult<PostCard>>> {
+): Promise<Result<CursorPageResult<PostCardResponse>>> {
   return request(`/v1/sections/${sectionId}/posts`, {
     data: compactCursorQuery(query),
     auth: "optional",
+    showError: false,
   });
 }
 

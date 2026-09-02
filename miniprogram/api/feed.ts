@@ -1,4 +1,4 @@
-import type { CursorPageResult, PostCard, Result } from "../types";
+import type { CursorPageResult, PostCardResponse, Result } from "../types";
 import { request } from "../utils/request";
 
 export interface FeedQuery {
@@ -13,7 +13,7 @@ export interface RecommendedFeedQuery extends FeedQuery {
 
 export const listRecommendedPosts = (
   query: RecommendedFeedQuery,
-): Promise<Result<CursorPageResult<PostCard>>> =>
+): Promise<Result<CursorPageResult<PostCardResponse>>> =>
   request("/v1/feeds/recommended", {
     data: compactFeedQuery(query),
     auth: "optional",
@@ -21,7 +21,7 @@ export const listRecommendedPosts = (
 
 export const listFollowingPosts = (
   query: FeedQuery = {},
-): Promise<Result<CursorPageResult<PostCard>>> =>
+): Promise<Result<CursorPageResult<PostCardResponse>>> =>
   request("/v1/feeds/following", {
     data: compactFeedQuery(query),
   });

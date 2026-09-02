@@ -1,4 +1,164 @@
-<app-navbar title="分区详情" />
-<view class="page detail-placeholder">
-  <app-empty description="分区动态将在后续阶段接入" />
+<app-navbar title="{{section.name || '分区详情'}}" />
+
+<view class="detail-page page-enter">
+  <view wx:if="{{detailLoading && !section}}" class="detail-skeleton">
+    <t-skeleton theme="avatar" row-col="{{[1, 1, 1]}}" loading />
+  </view>
+
+  <app-empty
+    wx:elif="{{detailError && !section}}"
+    description="{{detailError}}"
+    action-text="重新加载"
+    bind:action="retryDetail"
+  />
+
+  <block wx:elif="{{section}}">
+    <view class="section-hero">
+      <view class="section-hero__cover">
+        <app-image src="{{section.cover}}" />
+      </view>
+      <view class="section-hero__shade"></view>
+      <view class="section-hero__content">
+        <view class="section-hero__identity">
+          <view class="section-hero__icon">
+            <app-image src="{{section.icon}}" kind="category" />
+          </view>
+          <view class="section-hero__name-wrap">
+            <view class="section-hero__name">{{section.name}}</view>
+            <view class="section-hero__code"># {{section.code}}</view>
+          </view>
+          <view
+            class="section-hero__follow {{section.followedByMe ? 'section-hero__follow--active' : ''}}"
+            bind:tap="toggleSectionFollow"
+            aria-role="button"
+            aria-disabled="{{sectionFollowing}}"
+            aria-label="{{section.followedByMe ? '取消关注' : '关注'}}{{section.name}}"
+          >
+            {{sectionFollowing ? "处理中" : section.followedByMe ? "已关注" : "+ 关注"}}
+          </view>
+        </view>
+        <view class="section-hero__description">
+          {{section.description || "这个分区还没有补充说明"}}
+        </view>
+        <view class="section-hero__meta">
+          <text wx:if="{{section.postCount !== undefined}}">{{section.postCount}} 条动态</text>
+          <text wx:if="{{section.followerCount !== undefined}}">{{section.followerCount}} 人关注</text>
+          <text wx:if="{{section.allowShopVisit}}">支持探店发布</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{detailError}}" class="inline-error" bind:tap="retryDetail">
+      {{detailError}} · 点击重试
+    </view>
+
+    <view class="feed-toolbar">
+      <view class="feed-tabs" aria-role="tablist">
+        <view
+          class="feed-tab {{sort === 'LATEST' ? 'feed-tab--active' : ''}}"
+          data-sort="LATEST"
+          bind:tap="switchSort"
+          aria-role="tab"
+          aria-selected="{{sort === 'LATEST'}}"
+        >
+          最新
+        </view>
+        <view
+          class="feed-tab {{sort === 'HOT' ? 'feed-tab--active' : ''}}"
+          data-sort="HOT"
+          bind:tap="switchSort"
+          aria-role="tab"
+          aria-selected="{{sort === 'HOT'}}"
+        >
+          热门
+        </view>
+      </view>
+
+      <view
+        wx:if="{{section.code === 'ROAM_DAILY'}}"
+        class="city-trigger pressable"
+        bind:tap="openCityPicker"
+        aria-role="button"
+        aria-label="切换城市"
+      >
+        <t-icon name="location" size="28rpx" />
+        <text>{{cityLoading ? "加载中" : selectedCity.name || "选择城市"}}</text>
+        <t-icon name="chevron-down" size="24rpx" />
+      </view>
+    </view>
+
+    <view class="feed-list">
+      <view wx:if="{{feedLoading && !items.length}}" class="feed-skeleton">
+        <view wx:for="{{[1, 2, 3]}}" wx:key="*this" class="feed-skeleton__card">
+          <t-skeleton theme="avatar" row-col="{{[1, 1, 1, 1]}}" loading />
+        </view>
+      </view>
+
+      <app-empty
+        wx:elif="{{feedError && !items.length}}"
+        description="{{feedError}}"
+        action-text="重新加载"
+        bind:action="retryFeed"
+      />
+
+      <app-empty
+        wx:elif="{{!items.length}}"
+        description="{{sort === 'HOT' ? '这个分区还没有热门动态' : '这个分区还没有新动态'}}"
+      />
+
+      <block wx:else>
+        <view wx:if="{{feedError}}" class="inline-error" bind:tap="retryFeed">
+          {{feedError}} · 点击重试
+        </view>
+        <post-card
+          wx:for="{{items}}"
+          wx:key="id"
+          post="{{item}}"
+          current-user-id="{{currentUserId}}"
+          liking="{{likingIds[item.id]}}"
+          following="{{followingIds[item.author.id]}}"
+          bind:openpost="openPost"
+          bind:openauthor="openAuthor"
+          bind:opensection="openSection"
+          bind:like="toggleLike"
+          bind:comment="openComment"
+          bind:follow="toggleFollow"
+          bind:openhighlight="openHighlight"
+        />
+        <view class="list-footer">
+          {{feedLoading ? "正在加载更多" : feedHasMore ? "继续上滑加载" : "已经漫游到底了"}}
+        </view>
+      </block>
+    </view>
+  </block>
+</view>
+
+<view
+  wx:if="{{cityPickerVisible}}"
+  class="city-picker"
+  catch:tap="closeCityPicker"
+>
+  <view class="city-picker__panel" catch:tap="noop">
+    <view class="city-picker__header">
+      <view>
+        <view class="city-picker__title">切换漫游城市</view>
+        <view class="city-picker__hint">漫游日常将按所选城市刷新</view>
+      </view>
+      <view class="city-picker__close pressable" bind:tap="closeCityPicker">
+        <t-icon name="close" size="36rpx" />
+      </view>
+    </view>
+    <scroll-view class="city-picker__list" scroll-y>
+      <view
+        wx:for="{{cities}}"
+        wx:key="code"
+        class="city-picker__item {{item.code === selectedCity.code ? 'city-picker__item--active' : ''}}"
+        data-code="{{item.code}}"
+        bind:tap="selectCity"
+      >
+        <text>{{item.name}}</text>
+        <t-icon wx:if="{{item.code === selectedCity.code}}" name="check" size="32rpx" />
+      </view>
+    </scroll-view>
+  </view>
 </view>

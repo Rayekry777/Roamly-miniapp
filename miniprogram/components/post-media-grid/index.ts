@@ -1,4 +1,4 @@
-import type { MediaAsset } from "../../types";
+import type { PostMedia } from "../../types";
 import { imageUrl } from "../../utils/media";
 
 Component({
@@ -6,11 +6,11 @@ Component({
     media: { type: Array, value: [] },
   },
   data: {
-    displayMedia: [] as MediaAsset[],
+    displayMedia: [] as PostMedia[],
     gridSize: "empty",
   },
   observers: {
-    media(media: MediaAsset[]) {
+    media(media: PostMedia[]) {
       const displayMedia = (media || []).slice(0, 9);
       const gridSize =
         displayMedia.length === 1
@@ -24,7 +24,7 @@ Component({
   methods: {
     onPreview(event: WechatMiniprogram.TouchEvent) {
       const index = Number(event.currentTarget.dataset.index || 0);
-      const urls = (this.data.displayMedia as MediaAsset[]).map((item) =>
+      const urls = (this.data.displayMedia as PostMedia[]).map((item) =>
         imageUrl(item.url),
       );
       const current = urls[index];

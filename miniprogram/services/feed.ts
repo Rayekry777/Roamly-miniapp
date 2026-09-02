@@ -7,11 +7,8 @@ import { likePost, unlikePost } from "../api/post";
 import { listSections } from "../api/section";
 import { followUser } from "../api/follow";
 import type { HomeFeedMode } from "../store/feed";
-import type {
-  CursorPageResult,
-  PostCard,
-  SectionSummary,
-} from "../types";
+import type { CursorPageResult, PostCard, SectionSummary } from "../types";
+import { adaptPostCard } from "./post-card";
 
 export interface LoadFeedOptions extends FeedQuery {
   cityCode?: string;
@@ -34,7 +31,10 @@ export async function loadFeedPage(
   if (!result.data || !Array.isArray(result.data.items)) {
     throw new Error("信息流接口尚未完成升级，请稍后重试");
   }
-  return result.data;
+  return {
+    ...result.data,
+    items: result.data.items.map(adaptPostCard),
+  };
 }
 
 export async function loadHomeSections(): Promise<SectionSummary[]> {
@@ -42,7 +42,10 @@ export async function loadHomeSections(): Promise<SectionSummary[]> {
   return result.data || [];
 }
 
-export async function setPostLiked(postId: string, liked: boolean): Promise<void> {
+export async function setPostLiked(
+  postId: string,
+  liked: boolean,
+): Promise<void> {
   if (liked) await likePost(postId);
   else await unlikePost(postId);
 }

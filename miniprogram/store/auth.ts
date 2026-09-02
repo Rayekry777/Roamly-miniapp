@@ -1,6 +1,7 @@
 import type { UserDTO } from "../types";
 import { session } from "../utils/session";
 import { feedStore } from "./feed";
+import { sectionStore } from "./section";
 
 class AuthStore {
   token = "";
@@ -26,6 +27,7 @@ class AuthStore {
     this.user = null;
     session.clear();
     feedStore.clearFollowingAndPersonalization();
+    sectionStore.clearPersonalization();
   }
 
   isLoggedIn(): boolean {

@@ -1,4 +1,3 @@
-import type { MediaAsset } from "./media";
 import type { SectionSummary } from "./section";
 
 export type PostCommentSort = "HOT" | "LATEST";
@@ -27,13 +26,37 @@ export interface HighlightComment {
   replyCount: number;
 }
 
+export interface PostMedia {
+  id: string;
+  url: string;
+  width?: number;
+  height?: number;
+  mimeType: string;
+}
+
+export interface PostMediaResponse {
+  id: string;
+  path: string;
+  width?: number;
+  height?: number;
+  mimeType: string;
+}
+
+export interface HighlightCommentResponse {
+  id: string;
+  author: UserSummary;
+  contentPreview: string;
+  likedCount: number;
+  replyCount: number;
+}
+
 export interface PostCard {
   id: string;
   author: UserSummary;
   section: SectionSummary;
   title?: string;
   contentPreview: string;
-  media: MediaAsset[];
+  media: PostMedia[];
   shopVisit: boolean;
   likedCount: number;
   commentCount: number;
@@ -41,6 +64,12 @@ export interface PostCard {
   followingAuthor: boolean;
   highlightComment?: HighlightComment;
   createdTime: string;
+}
+
+export interface PostCardResponse
+  extends Omit<PostCard, "media" | "highlightComment"> {
+  media: PostMediaResponse[];
+  highlightComment?: HighlightCommentResponse;
 }
 
 export interface PostDetail extends PostCard {

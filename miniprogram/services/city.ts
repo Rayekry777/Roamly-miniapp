@@ -11,3 +11,11 @@ export async function ensureSelectedCity(): Promise<City> {
   if (!initialized) throw new Error("当前暂无可用城市");
   return initialized;
 }
+
+export async function loadAvailableCities(): Promise<City[]> {
+  const result = await listCities();
+  if (!Array.isArray(result.data)) {
+    throw new Error("城市列表返回格式异常，请稍后重试");
+  }
+  return result.data;
+}
