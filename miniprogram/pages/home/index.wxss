@@ -1,0 +1,6 @@
+.avatar-button { width: 72rpx; height: 72rpx; overflow: hidden; margin-left: 24rpx; border-radius: 50%; }
+.search { display: flex; min-height: 92rpx; align-items: center; gap: 18rpx; padding: 0 28rpx; }
+.search text { flex: 1; color: var(--roamly-muted); font-size: 27rpx; }
+.type-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24rpx 12rpx; }
+.type-item { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 14rpx; color: #555362; font-size: 22rpx; }
+.type-icon { width: 92rpx; height: 92rpx; overflow: hidden; border-radius: 30rpx; background: #fff; box-shadow: 0 12rpx 28rpx rgba(45,42,80,.08); }

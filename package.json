@@ -1,0 +1,33 @@
+{
+  "name": "roamly-miniapp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Roamly 微信小程序",
+  "scripts": {
+    "build:npm": "node scripts/build-npm.cjs",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint miniprogram tests",
+    "lint:styles": "stylelint \"miniprogram/**/*.wxss\"",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "verify": "npm run type-check && npm run lint && npm run lint:styles && npm run test"
+  },
+  "dependencies": {
+    "lottie-miniprogram": "1.0.12",
+    "tdesign-miniprogram": "1.16.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.35.0",
+    "@types/node": "24.3.0",
+    "eslint": "9.35.0",
+    "globals": "16.3.0",
+    "miniprogram-api-typings": "5.2.3",
+    "miniprogram-ci": "^2.1.31",
+    "prettier": "3.6.2",
+    "stylelint": "16.23.1",
+    "stylelint-config-standard": "39.0.0",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.41.0",
+    "vitest": "3.2.4"
+  }
+}

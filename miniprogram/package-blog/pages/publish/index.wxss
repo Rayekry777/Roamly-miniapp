@@ -1,0 +1,1 @@
+.form { overflow: hidden; padding: 18rpx 24rpx; }.divider { height: 1rpx; margin: 6rpx 0; background: var(--roamly-border); }.optional { margin: 34rpx 0 22rpx; }.hint { margin-bottom: 28rpx; color: var(--roamly-muted); font-size: 21rpx; }.upload-error { display: flex; align-items: center; justify-content: space-between; margin-top: 12rpx; color: #d54941; font-size: 22rpx; }

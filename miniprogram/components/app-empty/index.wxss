@@ -1,0 +1,1 @@
+.empty-wrap { display: flex; min-height: 360rpx; flex-direction: column; align-items: center; justify-content: center; gap: 20rpx; }

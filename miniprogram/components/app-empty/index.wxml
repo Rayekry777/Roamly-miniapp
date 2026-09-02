@@ -1,0 +1,4 @@
+<view class="empty-wrap">
+  <t-empty description="{{description}}" />
+  <t-button wx:if="{{actionText}}" theme="primary" shape="round" bind:tap="onAction">{{actionText}}</t-button>
+</view>

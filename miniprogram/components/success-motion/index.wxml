@@ -1,0 +1,6 @@
+<view wx:if="{{visible}}" class="motion-mask">
+  <view class="motion-card">
+    <canvas id="success-canvas" type="2d" class="motion-canvas" />
+    <view class="motion-message">{{message}}</view>
+  </view>
+</view>

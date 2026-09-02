@@ -1,0 +1,8 @@
+<view class="navbar {{transparent ? 'navbar--transparent' : ''}}" style="padding-top: {{statusBarHeight}}px">
+  <view class="navbar__side">
+    <view wx:if="{{back}}" class="navbar__button pressable" bind:tap="onBack"><t-icon name="chevron-left" size="44rpx" /></view>
+    <slot wx:else name="left" />
+  </view>
+  <view class="navbar__title">{{title}}</view>
+  <view class="navbar__side navbar__side--right"><slot name="right" /></view>
+</view>

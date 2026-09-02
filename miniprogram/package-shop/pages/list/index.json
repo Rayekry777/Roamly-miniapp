@@ -1,0 +1,11 @@
+{
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "app-navbar": "/components/app-navbar/index",
+    "shop-card": "/components/shop-card/index",
+    "app-empty": "/components/app-empty/index",
+    "t-search": "tdesign-miniprogram/search/search",
+    "t-loading": "tdesign-miniprogram/loading/loading"
+  }
+}

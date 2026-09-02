@@ -1,0 +1,23 @@
+page { min-height: 100%; color: var(--roamly-text); background: var(--roamly-bg); font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+.page { min-height: 100vh; padding: 32rpx 32rpx calc(160rpx + env(safe-area-inset-bottom)); box-sizing: border-box; }
+.page-enter { animation: roamly-page-in 320ms ease-out both; }
+.eyebrow { margin: 0; color: var(--roamly-muted); font-size: 20rpx; font-weight: 700; letter-spacing: 3rpx; }
+.section { margin-top: 48rpx; }
+.section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24rpx; font-size: 34rpx; font-weight: 700; }
+.section-link { color: var(--roamly-muted); font-size: 24rpx; font-weight: 400; }
+.card { overflow: hidden; border: 1rpx solid var(--roamly-border); border-radius: var(--roamly-card-radius); background: rgba(255,255,255,.94); box-shadow: var(--roamly-shadow); }
+.stack { display: flex; flex-direction: column; gap: 24rpx; }
+.muted { color: var(--roamly-muted); }
+.center-state { display: flex; min-height: 360rpx; align-items: center; justify-content: center; }
+.safe-bottom { height: calc(24rpx + env(safe-area-inset-bottom)); }
+.pressable { transition: transform 160ms ease, opacity 160ms ease; }
+.pressable:active { transform: scale(.98); opacity: .85; }
+.roamly-panel { border: 1rpx solid var(--roamly-border); border-radius: var(--roamly-card-radius); background: rgba(255,255,255,.94); box-shadow: var(--roamly-shadow); }
+.roamly-input { min-height: 88rpx; border-radius: var(--roamly-control-radius); background: #fff; }
+.primary-action { display: flex; min-height: 88rpx; align-items: center; justify-content: center; border-radius: var(--roamly-control-radius); background: var(--roamly-primary); color: #fff; font-size: 29rpx; font-weight: 700; }
+.primary-action[aria-disabled="true"] { opacity: .5; }
+.chip-row { display: flex; gap: 16rpx; overflow-x: auto; padding: 4rpx 0 20rpx; white-space: nowrap; }
+.chip { flex: none; padding: 14rpx 24rpx; border-radius: 999rpx; background: #fff; color: var(--roamly-muted); font-size: 24rpx; }
+.chip--active { background: var(--roamly-text); color: #fff; }
+.list-footer { padding: 30rpx 0; color: var(--roamly-muted); font-size: 23rpx; text-align: center; }
+@keyframes roamly-page-in { from { transform: translateY(12rpx); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

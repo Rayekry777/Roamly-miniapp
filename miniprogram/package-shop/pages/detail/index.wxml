@@ -1,0 +1,11 @@
+<app-navbar title="{{shop.name || '商户详情'}}"/>
+<view class="page page-enter">
+  <view wx:if="{{loading}}" class="center-state"><t-loading size="52rpx" text="加载商户信息"/></view>
+  <block wx:elif="{{shop}}">
+    <swiper class="gallery" indicator-dots autoplay interval="3500"><swiper-item wx:for="{{images.length ? images : ['']}}" wx:key="*this"><app-image src="{{item}}"/></swiper-item></swiper>
+    <view class="detail roamly-panel"><view class="detail__head"><view><view class="eyebrow">{{shop.area || 'ROAMLY 推荐'}}</view><view class="detail__name">{{shop.name}}</view></view><view class="score">{{shop.score / 10 || '0.0'}}<text>/5</text></view></view><view class="address"><t-icon name="location" size="32rpx"/>{{shop.address || '地址信息暂缺'}}</view><view class="stats"><text>人均 ¥{{shop.avgPrice || '--'}}</text><text>月售 {{shop.sold || 0}}</text><text>{{shop.openHours || '营业时间未知'}}</text></view></view>
+    <view class="section"><view class="section-title"><text>限时优惠</text><text class="section-link">{{vouchers.length}} 张可用</text></view><view class="stack"><view wx:for="{{vouchers}}" wx:key="id" class="voucher roamly-panel"><view class="voucher__price"><text>¥</text>{{item.payValue / 100}}</view><view class="voucher__copy"><text class="strong">{{item.title}}</text><text>{{item.subTitle || '到店可用'}}</text><t-tag wx:if="{{item.type === 1}}" theme="danger" variant="light">限时秒杀</t-tag></view><t-button theme="primary" shape="round" size="small" loading="{{buyingId === item.id}}" data-id="{{item.id}}" bind:tap="buy">抢购</t-button></view><app-empty wx:if="{{!vouchers.length}}" description="暂无可用优惠券"/></view></view>
+  </block>
+  <app-empty wx:else description="商户不存在或已下架"/>
+</view>
+<success-motion id="order-motion" message="{{orderMessage}}"/>

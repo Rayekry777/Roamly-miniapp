@@ -1,0 +1,8 @@
+.shop-card { display: flex; gap: 22rpx; padding: 18rpx; border: 1rpx solid #ececf3; border-radius: 40rpx; background: #fff; box-shadow: 0 14rpx 38rpx rgba(45,42,80,.08); }
+.cover { width: 190rpx; height: 190rpx; overflow: hidden; border-radius: 30rpx; }
+.content { min-width: 0; flex: 1; padding: 8rpx 0; }
+.title { overflow: hidden; margin-bottom: 18rpx; font-size: 30rpx; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.rating { display: flex; align-items: center; gap: 6rpx; color: #555362; font-size: 23rpx; }
+.rating text { margin-left: 8rpx; color: #9b99a6; }
+.meta { overflow: hidden; margin-top: 14rpx; color: #797785; font-size: 23rpx; text-overflow: ellipsis; white-space: nowrap; }
+.pressable { transition: transform 160ms ease, opacity 160ms ease; }.pressable:active { transform: scale(.98); opacity: .86; }

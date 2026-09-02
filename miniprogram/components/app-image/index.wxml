@@ -1,0 +1,1 @@
+<image class="app-image {{customClass}}" src="{{resolved}}" mode="{{mode}}" lazy-load="{{lazy}}" binderror="onError" />

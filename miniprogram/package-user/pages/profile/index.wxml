@@ -1,0 +1,6 @@
+<app-navbar title="用户主页"/>
+<view class="page page-enter">
+  <view wx:if="{{loading}}" class="center-state"><t-loading size="52rpx" text="加载用户资料"/></view>
+  <block wx:elif="{{user}}"><view class="profile roamly-panel"><view class="avatar"><app-image src="{{user.icon}}" kind="avatar"/></view><view class="name">{{user.nickName || 'Roamly 用户'}}</view><view class="bio">{{info.city || '漫游者'}} · {{info.introduce || '还没有写简介'}}</view><t-button theme="primary" shape="round" variant="{{following ? 'outline' : 'base'}}" loading="{{toggling}}" bind:tap="toggleFollow">{{following ? '已关注' : '关注'}}</t-button><view class="stats"><view><text class="strong">{{info.followee || 0}}</text><text>关注</text></view><view><text class="strong">{{info.fans || 0}}</text><text>粉丝</text></view><view><text class="strong">{{blogs.length}}</text><text>笔记</text></view></view></view><view class="section"><view class="section-title">Ta 的笔记</view><view class="stack"><blog-card wx:for="{{blogs}}" wx:key="id" blog="{{item}}" bind:select="openBlog"/></view><app-empty wx:if="{{!blogs.length}}" description="还没有发布笔记"/></view></block>
+  <app-empty wx:else description="用户不存在"/>
+</view>

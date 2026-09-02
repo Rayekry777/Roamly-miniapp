@@ -1,0 +1,11 @@
+.logout { display: flex; width: 72rpx; height: 72rpx; align-items: center; justify-content: center; border-radius: 50%; background: #fff; }
+.login-state { margin-top: 48rpx; padding: 28rpx 0; }
+.profile { padding: 36rpx; }
+.profile__main { display: flex; align-items: center; gap: 26rpx; }
+.profile__avatar { width: 132rpx; height: 132rpx; overflow: hidden; border-radius: 42rpx; }
+.profile__name { margin-bottom: 12rpx; font-size: 38rpx; font-weight: 700; }
+.profile__stats { display: grid; grid-template-columns: 1fr 1fr; margin-top: 30rpx; padding-top: 26rpx; border-top: 1rpx solid var(--roamly-border); text-align: center; }
+.profile__stats .strong { margin-bottom: 6rpx; color: var(--roamly-text); font-size: 30rpx; font-weight: 700; }.profile__stats text { display: block; color: var(--roamly-muted); font-size: 21rpx; }
+.menu { overflow: hidden; margin-top: 30rpx; }
+.menu__item { display: flex; min-height: 104rpx; align-items: center; gap: 22rpx; padding: 0 30rpx; border-bottom: 1rpx solid var(--roamly-border); }
+.menu__item:last-child { border-bottom: 0; }.menu__item text { flex: 1; }.menu__item .menu-status { flex: none; color: var(--roamly-primary); font-size: 22rpx; }
