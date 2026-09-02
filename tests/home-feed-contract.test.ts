@@ -43,7 +43,7 @@ describe("home feed contract", () => {
     );
   });
 
-  it("keeps post detail honest and registers the implemented section detail", () => {
+  it("registers the implemented post and section detail pages", () => {
     const appConfig = JSON.parse(
       readFileSync("miniprogram/app.json", "utf8"),
     ) as { subpackages: Array<{ root: string; pages: string[] }> };
@@ -60,7 +60,7 @@ describe("home feed contract", () => {
     const postDetail = "miniprogram/package-post/pages/detail/index.wxml";
     const sectionDetail = "miniprogram/package-section/pages/detail/index.wxml";
     expect(existsSync(postDetail)).toBe(true);
-    expect(readFileSync(postDetail, "utf8")).toContain("后续阶段接入");
+    expect(readFileSync(postDetail, "utf8")).toContain("<comment-thread");
     expect(existsSync(sectionDetail)).toBe(true);
 
     const sectionView = readFileSync(sectionDetail, "utf8");

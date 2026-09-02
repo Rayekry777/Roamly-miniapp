@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { listShopsByType } from "../miniprogram/api/shop";
+import { getShop, listShopPosts, listShops } from "../miniprogram/api/shop";
 
 const requestMock = vi.hoisted(() => vi.fn());
 
@@ -15,20 +15,40 @@ describe("shop requests", () => {
     });
   });
 
-  it("定位不可用时省略经纬度参数", async () => {
-    await listShopsByType({ typeId: "1", current: 1 });
-
-    expect(requestMock).toHaveBeenCalledWith("/v1/shops", {
-      data: { typeId: "1", page: 1, size: 10 },
-      auth: "public",
+  it("omits coordinates when location is unavailable", async () => {
+    await listShops({
+      cityCode: "330100",
+      typeId: "1",
+      sort: "POPULAR",
     });
-  });
-
-  it("经纬度完整有效时同时发送", async () => {
-    await listShopsByType({ typeId: "2", current: 2, x: 120.123, y: 30.456 });
 
     expect(requestMock).toHaveBeenCalledWith("/v1/shops", {
       data: {
+        cityCode: "330100",
+        sort: "POPULAR",
+        typeId: "1",
+        page: 1,
+        size: 10,
+      },
+      auth: "public",
+      showError: false,
+    });
+  });
+
+  it("sends valid coordinates as a pair", async () => {
+    await listShops({
+      cityCode: "330100",
+      typeId: "2",
+      sort: "DISTANCE",
+      page: 2,
+      longitude: 120.123,
+      latitude: 30.456,
+    });
+
+    expect(requestMock).toHaveBeenCalledWith("/v1/shops", {
+      data: {
+        cityCode: "330100",
+        sort: "DISTANCE",
         typeId: "2",
         page: 2,
         size: 10,
@@ -36,6 +56,54 @@ describe("shop requests", () => {
         latitude: 30.456,
       },
       auth: "public",
+      showError: false,
     });
+  });
+
+  it("omits incomplete or invalid coordinates", async () => {
+    await listShops({
+      cityCode: "330100",
+      sort: "SCORE",
+      longitude: 181,
+      latitude: 30,
+    });
+
+    expect(requestMock).toHaveBeenCalledWith("/v1/shops", {
+      data: {
+        cityCode: "330100",
+        sort: "SCORE",
+        page: 1,
+        size: 10,
+      },
+      auth: "public",
+      showError: false,
+    });
+  });
+
+  it("uses optional coordinates for detail and optional auth for related posts", async () => {
+    await getShop("9223372036854775807", {
+      longitude: 120.1,
+      latitude: 30.2,
+    });
+    await listShopPosts("9223372036854775807");
+
+    expect(requestMock).toHaveBeenNthCalledWith(
+      1,
+      "/v1/shops/9223372036854775807",
+      {
+        data: { longitude: 120.1, latitude: 30.2 },
+        auth: "public",
+        showError: false,
+      },
+    );
+    expect(requestMock).toHaveBeenNthCalledWith(
+      2,
+      "/v1/shops/9223372036854775807/posts",
+      {
+        data: { size: 3 },
+        auth: "optional",
+        showError: false,
+      },
+    );
   });
 });

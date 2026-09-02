@@ -1,0 +1,31 @@
+<view class="reply-composer">
+  <view wx:if="{{targetName}}" class="reply-composer__target">
+    <text>回复 @{{targetName}}</text>
+    <view class="pressable" bind:tap="onCancelReply" aria-role="button" aria-label="取消回复">
+      <t-icon name="close" size="28rpx" />
+    </view>
+  </view>
+  <view class="reply-composer__row">
+    <textarea
+      class="reply-composer__input"
+      value="{{content}}"
+      placeholder="{{targetName ? '写下回复…' : '参与讨论…'}}"
+      maxlength="1000"
+      auto-height
+      fixed
+      focus="{{focused}}"
+      cursor-spacing="24"
+      bindinput="onInput"
+      bindfocus="onFocus"
+      bindblur="onBlur"
+    />
+    <view
+      class="reply-composer__submit pressable"
+      bind:tap="onSubmit"
+      aria-role="button"
+      aria-disabled="{{loading}}"
+    >
+      {{loading ? "发送中" : "发送"}}
+    </view>
+  </view>
+</view>

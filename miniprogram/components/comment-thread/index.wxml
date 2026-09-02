@@ -1,0 +1,46 @@
+<view
+  id="comment-{{thread.root.id}}"
+  class="comment-thread {{highlightedId === thread.root.id ? 'comment-thread--highlighted' : ''}}"
+>
+  <comment-item
+    comment="{{thread.root}}"
+    root="{{true}}"
+    post-author-id="{{postAuthorId}}"
+    current-user-id="{{currentUserId}}"
+    liking="{{likingIds[thread.root.id]}}"
+    deleting="{{deletingIds[thread.root.id]}}"
+    bind:reply="onReply"
+    bind:like="onLike"
+    bind:delete="onDelete"
+  />
+
+  <view wx:if="{{thread.replies.length || thread.hasMoreReplies}}" class="comment-thread__replies">
+    <view class="comment-thread__line"></view>
+    <view
+      wx:for="{{thread.replies}}"
+      wx:key="id"
+      id="comment-{{item.id}}"
+      class="comment-thread__reply {{highlightedId === item.id ? 'comment-thread__reply--highlighted' : ''}}"
+    >
+      <comment-item
+        comment="{{item}}"
+        post-author-id="{{postAuthorId}}"
+        current-user-id="{{currentUserId}}"
+        liking="{{likingIds[item.id]}}"
+        deleting="{{deletingIds[item.id]}}"
+        bind:reply="onReply"
+        bind:like="onLike"
+        bind:delete="onDelete"
+      />
+    </view>
+    <view
+      wx:if="{{thread.hasMoreReplies}}"
+      class="comment-thread__more pressable"
+      bind:tap="onLoadReplies"
+      aria-role="button"
+      aria-disabled="{{thread.repliesLoading}}"
+    >
+      {{thread.repliesLoading ? "正在加载" : "展开更多回复"}}
+    </view>
+  </view>
+</view>

@@ -1,9 +1,21 @@
-import type { Shop } from '../../types'
-import { splitImages } from '../../utils/media'
+import type { Shop } from "../../types";
 
 Component({
-  properties: { shop: { type: Object, value: {} } },
-  data: { cover: '', score: '0.0', distance: '附近好店' },
-  observers: { shop(value: Shop) { if (!value?.id) return; this.setData({ cover: splitImages(value.images)[0] || '', score: ((value.score || 0) / 10).toFixed(1), distance: value.distance ? `${(value.distance / 1000).toFixed(1)}km` : '附近好店' }) } },
-  methods: { onSelect() { this.triggerEvent('select', { id: (this.data.shop as Shop).id }) } }
-})
+  properties: {
+    shop: { type: Object, value: {} },
+  },
+  data: {
+    scoreText: "0.0",
+  },
+  observers: {
+    shop(value: Shop) {
+      if (!value?.id) return;
+      this.setData({ scoreText: value.score.toFixed(1) });
+    },
+  },
+  methods: {
+    onSelect() {
+      this.triggerEvent("select", { id: (this.data.shop as Shop).id });
+    },
+  },
+});

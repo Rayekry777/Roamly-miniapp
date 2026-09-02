@@ -8,6 +8,7 @@
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-button": "tdesign-miniprogram/button/button",
     "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-skeleton": "tdesign-miniprogram/skeleton/skeleton",
     "t-tag": "tdesign-miniprogram/tag/tag"
   }
 }

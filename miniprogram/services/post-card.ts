@@ -1,4 +1,9 @@
-import type { PostCard, PostCardResponse } from "../types";
+import type {
+  PostCard,
+  PostCardResponse,
+  PostDetail,
+  PostDetailResponse,
+} from "../types";
 
 export function adaptPostCard(response: PostCardResponse): PostCard {
   return {
@@ -30,5 +35,34 @@ export function adaptPostCard(response: PostCardResponse): PostCard {
           content: response.highlightComment.contentPreview,
         }
       : undefined,
+  };
+}
+
+export function adaptPostDetail(response: PostDetailResponse): PostDetail {
+  const card = adaptPostCard({
+    ...response,
+    contentPreview: response.content,
+    highlightComment: undefined,
+  });
+  return {
+    ...card,
+    content: response.content,
+    shop: response.shop
+      ? {
+          ...response.shop,
+          id: String(response.shop.id),
+          typeId: response.shop.typeId
+            ? String(response.shop.typeId)
+            : undefined,
+          score:
+            response.shop.score === undefined
+              ? undefined
+              : response.shop.score / 10,
+        }
+      : undefined,
+    editable: response.editable,
+    deletable: response.deletable,
+    defaultCommentSort:
+      response.defaultCommentSort === "LATEST" ? "LATEST" : "HOT",
   };
 }

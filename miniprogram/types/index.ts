@@ -50,28 +50,6 @@ export interface UserInfo {
   credits?: number;
   level?: number;
 }
-export interface ShopType {
-  id: string;
-  name: string;
-  icon?: string;
-  sort?: number;
-}
-export interface Shop {
-  id: string;
-  name: string;
-  typeId: string;
-  images: string;
-  area?: string;
-  address?: string;
-  longitude?: number;
-  latitude?: number;
-  avgPrice?: number;
-  sold?: number;
-  comments?: number;
-  score?: number;
-  openHours?: string;
-  distance?: number;
-}
 export interface Blog {
   id: string;
   shopId?: string;
@@ -109,7 +87,9 @@ export interface UploadedImage {
 }
 
 export * from "./city";
+export * from "./comment";
 export * from "./draft";
 export * from "./media";
 export * from "./post";
 export * from "./section";
+export * from "./shop";

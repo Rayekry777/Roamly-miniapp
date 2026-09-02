@@ -1,0 +1,46 @@
+<view class="comment-item {{root ? 'comment-item--root' : 'comment-item--reply'}}">
+  <view class="comment-item__avatar">
+    <app-image src="{{comment.author.icon}}" kind="avatar" />
+  </view>
+  <view class="comment-item__body">
+    <view class="comment-item__header">
+      <view class="comment-item__identity">
+        <text class="comment-item__name">{{comment.author.nickName || "Roamly 用户"}}</text>
+        <text wx:if="{{comment.author.id === postAuthorId}}" class="comment-item__author-badge">作者</text>
+        <text class="comment-item__time">{{displayTime}}</text>
+      </view>
+      <view
+        wx:if="{{comment.author.id === currentUserId && comment.status !== 'DELETED'}}"
+        class="comment-item__delete pressable"
+        bind:tap="onDelete"
+        aria-role="button"
+        aria-disabled="{{deleting}}"
+        aria-label="删除评论"
+      >
+        {{deleting ? "处理中" : "删除"}}
+      </view>
+    </view>
+
+    <view wx:if="{{comment.status === 'DELETED'}}" class="comment-item__deleted">
+      该评论已删除
+    </view>
+    <view wx:else class="comment-item__content">
+      <text wx:if="{{comment.replyToUser}}" class="comment-item__reply-to">
+        回复 @{{comment.replyToUser.nickName}}
+      </text>
+      {{comment.content}}
+    </view>
+
+    <view wx:if="{{comment.status !== 'DELETED'}}" class="comment-item__actions">
+      <view class="comment-item__action pressable" bind:tap="onReply">回复</view>
+      <view
+        class="comment-item__action pressable {{comment.likedByMe ? 'comment-item__action--liked' : ''}}"
+        bind:tap="onLike"
+        aria-disabled="{{liking}}"
+      >
+        <t-icon name="heart" size="26rpx" />
+        <text>{{comment.likedCount || 0}}</text>
+      </view>
+    </view>
+  </view>
+</view>

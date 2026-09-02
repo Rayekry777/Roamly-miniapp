@@ -1,2 +1,85 @@
-<app-navbar title="{{title}}"/>
-<view class="page page-enter"><t-search value="{{keyword}}" shape="round" placeholder="搜索商户名称" bind:change="onKeyword" bind:submit="search"/><scroll-view class="chip-scroll" scroll-x enhanced show-scrollbar="{{false}}"><view class="chip-row"><view wx:for="{{types}}" wx:key="id" class="chip {{item.id === typeId ? 'chip--active' : ''}} pressable" data-id="{{item.id}}" bind:tap="selectType">{{item.name}}</view></view></scroll-view><view class="stack"><shop-card wx:for="{{shops}}" wx:key="id" shop="{{item}}" bind:select="openShop"/></view><app-empty wx:if="{{!loading && !shops.length}}" description="没有找到相关店铺"/><view wx:if="{{loading}}" class="list-footer"><t-loading size="40rpx"/> 加载中</view><view wx:if="{{finished && shops.length}}" class="list-footer">没有更多店铺了</view></view>
+<app-navbar title="发现好店" />
+
+<view class="page page-enter">
+  <view class="list-heading">
+    <view>
+      <view class="eyebrow">{{cityName || "当前城市"}}</view>
+      <view class="list-heading__title">筛选适合你的去处</view>
+    </view>
+  </view>
+
+  <view class="search-panel roamly-panel">
+    <t-search
+      value="{{keyword}}"
+      shape="round"
+      placeholder="搜索商户名称"
+      bind:change="onKeyword"
+      bind:submit="search"
+    />
+  </view>
+
+  <scroll-view class="chip-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="chip-row">
+      <view
+        class="chip {{!typeId ? 'chip--active' : ''}}"
+        data-id=""
+        bind:tap="selectType"
+      >
+        全部
+      </view>
+      <view
+        wx:for="{{types}}"
+        wx:key="id"
+        class="chip {{item.id === typeId ? 'chip--active' : ''}}"
+        data-id="{{item.id}}"
+        bind:tap="selectType"
+      >
+        {{item.name}}
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="sort-row">
+    <view
+      wx:for="{{sortOptions}}"
+      wx:key="value"
+      class="sort-item {{sort === item.value ? 'sort-item--active' : ''}}"
+      data-sort="{{item.value}}"
+      bind:tap="selectSort"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <view wx:if="{{loading && !shops.length}}" class="shop-list">
+    <view wx:for="{{[1, 2, 3]}}" wx:key="*this" class="shop-skeleton roamly-panel">
+      <t-skeleton theme="avatar" row-col="{{[1, 1, 1]}}" loading />
+    </view>
+  </view>
+
+  <app-empty
+    wx:elif="{{error && !shops.length}}"
+    description="{{error}}"
+    action-text="重新加载"
+    bind:action="retry"
+  />
+
+  <app-empty wx:elif="{{!shops.length}}" description="没有找到相关商户" />
+
+  <view wx:else class="shop-list">
+    <shop-card
+      wx:for="{{shops}}"
+      wx:key="id"
+      shop="{{item}}"
+      bind:select="openShop"
+    />
+    <view wx:if="{{loading}}" class="list-footer">
+      <t-loading size="38rpx" />
+      加载中
+    </view>
+    <view wx:elif="{{error}}" class="list-footer list-footer--error" bind:tap="retry">
+      {{error}}，点击重试
+    </view>
+    <view wx:elif="{{!hasMore}}" class="list-footer">没有更多商户了</view>
+  </view>
+</view>

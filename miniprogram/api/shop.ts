@@ -1,86 +1,92 @@
-import type { PageResult, Result, Shop, ShopType, Voucher } from "../types";
+import type {
+  CursorPageResult,
+  PageResult,
+  PostCardResponse,
+  Result,
+  ShopListQuery,
+  ShopResponse,
+  ShopType,
+  Voucher,
+} from "../types";
 import { request } from "../utils/request";
 
 export const listShopTypes = (): Promise<Result<ShopType[]>> =>
   request("/v1/shop-types", { auth: "public" });
 
-export async function listShopsByType(data: {
-  typeId: string;
-  current?: number;
-  x?: number;
-  y?: number;
-}): Promise<Result<Shop[]>> {
-  const query: {
-    typeId: string;
-    page: number;
-    size: number;
-    longitude?: number;
-    latitude?: number;
-  } = {
-    typeId: data.typeId,
-    page: data.current || 1,
-    size: 10,
+export function listShops(
+  query: ShopListQuery,
+): Promise<Result<PageResult<ShopResponse>>> {
+  const keyword = query.keyword?.trim();
+  const data: Record<string, unknown> = {
+    cityCode: query.cityCode,
+    sort: query.sort,
+    page: query.page || 1,
+    size: query.size || 10,
   };
-
-  if (
-    data.x !== undefined &&
-    data.y !== undefined &&
-    Number.isFinite(data.x) &&
-    Number.isFinite(data.y)
-  ) {
-    query.longitude = data.x;
-    query.latitude = data.y;
+  if (query.typeId) data.typeId = query.typeId;
+  if (keyword) {
+    data.keyword = keyword;
+    // 当前后端仍使用 name；目标商户契约落地后删除这个兼容参数。
+    data.name = keyword;
+  }
+  if (hasCoordinates(query.longitude, query.latitude)) {
+    data.longitude = query.longitude;
+    data.latitude = query.latitude;
   }
 
-  const result = await request<PageResult<Shop>>("/v1/shops", {
-    data: query,
-    auth: "public",
-  });
-  return { ...result, data: result.data?.items || [] };
-}
-
-export async function searchShops(data: {
-  name?: string;
-  current?: number;
-}): Promise<Result<Shop[]>> {
-  const query: { page: number; size: number; name?: string } = {
-    page: data.current || 1,
-    size: 10,
-  };
-  if (data.name) query.name = data.name;
-
-  const result = await request<PageResult<Shop>>("/v1/shops", {
-    data: query,
-    auth: "public",
-  });
-  return { ...result, data: result.data?.items || [] };
-}
-
-export async function listShopOptions(data: {
-  cityCode: string;
-  keyword?: string;
-  page?: number;
-  size?: number;
-}): Promise<Result<PageResult<Shop>>> {
-  const query: {
-    cityCode: string;
-    page: number;
-    size: number;
-    keyword?: string;
-  } = {
-    cityCode: data.cityCode,
-    page: data.page || 1,
-    size: data.size || 10,
-  };
-  if (data.keyword?.trim()) query.keyword = data.keyword.trim();
   return request("/v1/shops", {
-    data: query,
+    data,
     auth: "public",
     showError: false,
   });
 }
 
-export const getShop = (id: string): Promise<Result<Shop>> =>
-  request(`/v1/shops/${id}`, { auth: "public" });
+export function getShop(
+  id: string,
+  location: { longitude?: number; latitude?: number } = {},
+): Promise<Result<ShopResponse>> {
+  const data = hasCoordinates(location.longitude, location.latitude)
+    ? { longitude: location.longitude, latitude: location.latitude }
+    : undefined;
+  return request(`/v1/shops/${id}`, {
+    ...(data ? { data } : {}),
+    auth: "public",
+    showError: false,
+  });
+}
+
+export function listShopPosts(
+  shopId: string,
+  query: { cursor?: number; offset?: number; size?: number } = {},
+): Promise<Result<CursorPageResult<PostCardResponse>>> {
+  const data: Record<string, unknown> = { size: query.size || 3 };
+  if (query.cursor !== undefined) data.cursor = query.cursor;
+  if (query.offset !== undefined) data.offset = query.offset;
+  return request(`/v1/shops/${shopId}/posts`, {
+    data,
+    auth: "optional",
+    showError: false,
+  });
+}
+
 export const listVouchers = (shopId: string): Promise<Result<Voucher[]>> =>
-  request(`/v1/shops/${shopId}/vouchers`, { auth: "public" });
+  request(`/v1/shops/${shopId}/vouchers`, {
+    auth: "public",
+    showError: false,
+  });
+
+function hasCoordinates(
+  longitude?: number,
+  latitude?: number,
+): longitude is number {
+  return (
+    longitude !== undefined &&
+    latitude !== undefined &&
+    Number.isFinite(longitude) &&
+    Number.isFinite(latitude) &&
+    longitude >= -180 &&
+    longitude <= 180 &&
+    latitude >= -90 &&
+    latitude <= 90
+  );
+}

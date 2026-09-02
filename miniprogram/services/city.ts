@@ -19,3 +19,52 @@ export async function loadAvailableCities(): Promise<City[]> {
   }
   return result.data;
 }
+
+export async function locateForNearby(): Promise<{
+  status: "READY" | "DENIED" | "FAILED";
+  longitude?: number;
+  latitude?: number;
+}> {
+  const requestedCityCode = cityStore.getState().selectedCity?.code;
+  cityStore.setLocation("LOCATING");
+  try {
+    const coordinates = await requestLocation();
+    if (cityStore.getState().selectedCity?.code !== requestedCityCode) {
+      return { status: "FAILED" };
+    }
+    cityStore.setLocation("READY", coordinates);
+    return { status: "READY", ...coordinates };
+  } catch (error) {
+    const denied = isLocationDenied(error);
+    const status = denied ? "DENIED" : "FAILED";
+    cityStore.setLocation(status);
+    return { status };
+  }
+}
+
+function requestLocation(): Promise<{
+  longitude: number;
+  latitude: number;
+}> {
+  return new Promise((resolve, reject) => {
+    wx.getLocation({
+      type: "gcj02",
+      timeout: 5000,
+      success(result) {
+        resolve({
+          longitude: result.longitude,
+          latitude: result.latitude,
+        });
+      },
+      fail: reject,
+    });
+  });
+}
+
+function isLocationDenied(error: unknown): boolean {
+  const message =
+    typeof error === "object" && error && "errMsg" in error
+      ? String((error as { errMsg?: string }).errMsg || "")
+      : "";
+  return /auth deny|auth denied|permission denied/i.test(message);
+}

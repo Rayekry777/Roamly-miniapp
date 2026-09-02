@@ -1,1 +1,19 @@
-<view class="shop-card pressable" bind:tap="onSelect"><app-image custom-class="cover" src="{{cover}}" /><view class="content"><view class="title">{{shop.name}}</view><view class="rating"><t-icon name="star-filled" size="28rpx" color="#ff9a43"/> {{score}} <text>{{shop.comments || 0}} 条评价</text></view><view class="meta">{{shop.area || '城市漫游'}} · 人均 ¥{{shop.avgPrice || '--'}}</view><view class="meta">{{distance}} · 月售 {{shop.sold || 0}}</view></view></view>
+<view
+  class="shop-card pressable"
+  bind:tap="onSelect"
+  aria-role="button"
+  aria-label="查看{{shop.name}}商户详情"
+>
+  <app-image custom-class="cover" src="{{shop.cover}}" />
+  <view class="content">
+    <view class="title">{{shop.name}}</view>
+    <view class="rating">
+      <t-icon name="star-filled" size="28rpx" color="#ff9a43" />
+      {{scoreText}}
+      <text>{{shop.comments}} 条评价</text>
+    </view>
+    <view class="meta">{{shop.area || "城市漫游"}} · 人均 ¥{{shop.avgPrice || "--"}}</view>
+    <view class="meta">{{shop.distanceText}} · 月售 {{shop.sold}}</view>
+  </view>
+  <t-icon name="chevron-right" size="30rpx" color="#aaa8b3" />
+</view>

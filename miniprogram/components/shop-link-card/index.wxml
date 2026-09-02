@@ -1,0 +1,21 @@
+<view
+  class="shop-link pressable"
+  bind:tap="onOpen"
+  aria-role="button"
+  aria-label="查看{{shop.name}}商户详情"
+>
+  <view class="shop-link__cover">
+    <app-image src="{{shop.cover}}" />
+  </view>
+  <view class="shop-link__body">
+    <view class="shop-link__eyebrow">本条动态关联商户</view>
+    <view class="shop-link__name">{{shop.name}}</view>
+    <view class="shop-link__meta">
+      <text wx:if="{{shop.typeName}}">{{shop.typeName}}</text>
+      <text wx:if="{{shop.score !== undefined}}">{{shop.score}} 分</text>
+      <text wx:if="{{shop.distance !== undefined}}">{{shop.distance}} m</text>
+    </view>
+    <view wx:if="{{shop.address}}" class="shop-link__address">{{shop.address}}</view>
+  </view>
+  <t-icon name="chevron-right" size="34rpx" />
+</view>

@@ -1,11 +1,147 @@
-<app-navbar title="{{shop.name || '商户详情'}}"/>
+<app-navbar title="{{shop.name || '商户详情'}}" />
+
 <view class="page page-enter">
-  <view wx:if="{{loading}}" class="center-state"><t-loading size="52rpx" text="加载商户信息"/></view>
-  <block wx:elif="{{shop}}">
-    <swiper class="gallery" indicator-dots autoplay interval="3500"><swiper-item wx:for="{{images.length ? images : ['']}}" wx:key="*this"><app-image src="{{item}}"/></swiper-item></swiper>
-    <view class="detail roamly-panel"><view class="detail__head"><view><view class="eyebrow">{{shop.area || 'ROAMLY 推荐'}}</view><view class="detail__name">{{shop.name}}</view></view><view class="score">{{shop.score / 10 || '0.0'}}<text>/5</text></view></view><view class="address"><t-icon name="location" size="32rpx"/>{{shop.address || '地址信息暂缺'}}</view><view class="stats"><text>人均 ¥{{shop.avgPrice || '--'}}</text><text>月售 {{shop.sold || 0}}</text><text>{{shop.openHours || '营业时间未知'}}</text></view></view>
-    <view class="section"><view class="section-title"><text>限时优惠</text><text class="section-link">{{vouchers.length}} 张可用</text></view><view class="stack"><view wx:for="{{vouchers}}" wx:key="id" class="voucher roamly-panel"><view class="voucher__price"><text>¥</text>{{item.payValue / 100}}</view><view class="voucher__copy"><text class="strong">{{item.title}}</text><text>{{item.subTitle || '到店可用'}}</text><t-tag wx:if="{{item.type === 1}}" theme="danger" variant="light">限时秒杀</t-tag></view><t-button theme="primary" shape="round" size="small" loading="{{buyingId === item.id}}" data-id="{{item.id}}" bind:tap="buy">抢购</t-button></view><app-empty wx:if="{{!vouchers.length}}" description="暂无可用优惠券"/></view></view>
+  <view wx:if="{{loading}}" class="detail-skeleton roamly-panel">
+    <t-skeleton theme="image" row-col="{{[1, 1, 1]}}" loading />
+  </view>
+
+  <app-empty
+    wx:elif="{{error || !shop}}"
+    description="{{error || '商户不存在或已下架'}}"
+    action-text="重新加载"
+    bind:action="retryShop"
+  />
+
+  <block wx:else>
+    <swiper class="gallery" indicator-dots autoplay interval="3500">
+      <swiper-item wx:for="{{shop.images.length ? shop.images : ['']}}" wx:key="*this">
+        <app-image src="{{item}}" />
+      </swiper-item>
+    </swiper>
+
+    <view class="detail roamly-panel">
+      <view class="detail__head">
+        <view class="detail__identity">
+          <view class="eyebrow">{{shop.area || "ROAMLY 推荐"}}</view>
+          <view class="detail__name">{{shop.name}}</view>
+        </view>
+        <view class="score">{{scoreText}}<text>/5</text></view>
+      </view>
+      <view class="address">
+        <t-icon name="location" size="32rpx" />
+        <text>{{shop.address || "地址信息暂缺"}}</text>
+      </view>
+      <view class="stats">
+        <text>{{shop.distanceText}}</text>
+        <text>人均 ¥{{shop.avgPrice || "--"}}</text>
+        <text>月售 {{shop.sold}}</text>
+      </view>
+      <view class="open-hours">
+        <text>营业时间</text>
+        <text>{{shop.openHours || "暂未提供"}}</text>
+      </view>
+    </view>
+
+    <view id="voucher-section" class="section">
+      <view class="section-title">
+        <text>团购与优惠</text>
+        <text class="section-link">{{vouchers.length}} 个可用</text>
+      </view>
+      <view wx:if="{{voucherStatus === 'IDLE' || voucherStatus === 'LOADING'}}" class="module-state roamly-panel">
+        <t-loading size="38rpx" />
+        正在加载优惠
+      </view>
+      <app-empty
+        wx:elif="{{voucherStatus === 'ERROR'}}"
+        description="{{voucherError}}"
+        action-text="重新加载"
+        bind:action="retryVouchers"
+      />
+      <app-empty
+        wx:elif="{{!vouchers.length}}"
+        description="暂无可用团购或优惠"
+      />
+      <view wx:else class="stack">
+        <view wx:for="{{vouchers}}" wx:key="id" class="voucher roamly-panel">
+          <view class="voucher__price"><text>¥</text>{{item.payValue / 100}}</view>
+          <view class="voucher__copy">
+            <text class="strong">{{item.title}}</text>
+            <text>{{item.subTitle || "到店可用"}}</text>
+            <t-tag wx:if="{{item.type === 1}}" theme="danger" variant="light">限时秒杀</t-tag>
+          </view>
+          <t-button
+            theme="primary"
+            shape="round"
+            size="small"
+            loading="{{buyingId === item.id}}"
+            data-id="{{item.id}}"
+            bind:tap="buy"
+          >
+            抢购
+          </t-button>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">
+        <text>到店点评</text>
+        <text class="section-link pressable" bind:tap="openReviews">查看全部</text>
+      </view>
+      <view class="review-summary roamly-panel">
+        <view class="review-summary__score">{{scoreText}}</view>
+        <view class="review-summary__copy">
+          <view>综合评分</view>
+          <text>{{shop.comments}} 条评价 · 独立点评能力下一阶段接入</text>
+        </view>
+      </view>
+    </view>
+
+    <view id="post-section" class="section">
+      <view class="section-title">
+        <text>相关探店动态</text>
+        <text class="section-link">来自社区</text>
+      </view>
+      <view wx:if="{{postStatus === 'IDLE' || postStatus === 'LOADING'}}" class="module-state roamly-panel">
+        <t-loading size="38rpx" />
+        正在加载动态
+      </view>
+      <app-empty
+        wx:elif="{{postStatus === 'ERROR'}}"
+        description="{{postError}}"
+        action-text="重新加载"
+        bind:action="retryPosts"
+      />
+      <app-empty wx:elif="{{!posts.length}}" description="暂无相关探店动态" />
+      <view wx:else class="related-posts">
+        <view
+          wx:for="{{posts}}"
+          wx:key="id"
+          class="related-post roamly-panel pressable"
+          data-id="{{item.id}}"
+          bind:tap="openPost"
+        >
+          <view class="related-post__section">{{item.section.name}}</view>
+          <view class="related-post__title">{{item.title || item.contentPreview}}</view>
+          <view class="related-post__meta">
+            {{item.author.nickName}} · {{item.likedCount}} 赞 · {{item.commentCount}} 评论
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section address-detail roamly-panel">
+      <view class="section-title"><text>到店信息</text></view>
+      <view class="address-detail__row">
+        <text>营业时间</text>
+        <text>{{shop.openHours || "暂未提供"}}</text>
+      </view>
+      <view class="address-detail__row">
+        <text>详细地址</text>
+        <text>{{shop.address || "暂未提供"}}</text>
+      </view>
+    </view>
   </block>
-  <app-empty wx:else description="商户不存在或已下架"/>
 </view>
-<success-motion id="order-motion" message="{{orderMessage}}"/>
+
+<success-motion id="order-motion" message="{{orderMessage}}" />

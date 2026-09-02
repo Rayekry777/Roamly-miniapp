@@ -12,6 +12,7 @@ export interface ShopSummary {
   id: string;
   name: string;
   cover?: string;
+  typeId?: string;
   typeName?: string;
   address?: string;
   distance?: number;
@@ -70,6 +71,26 @@ export interface PostCardResponse
   extends Omit<PostCard, "media" | "highlightComment"> {
   media: PostMediaResponse[];
   highlightComment?: HighlightCommentResponse;
+}
+
+export interface ShopSummaryResponse {
+  id: string;
+  name: string;
+  typeId?: string;
+  typeName?: string;
+  cover?: string;
+  address?: string;
+  distance?: number;
+  score?: number;
+}
+
+export interface PostDetailResponse
+  extends Omit<PostCardResponse, "contentPreview" | "highlightComment"> {
+  content: string;
+  shop?: ShopSummaryResponse;
+  editable: boolean;
+  deletable: boolean;
+  defaultCommentSort: PostCommentSort;
 }
 
 export interface PostDetail extends PostCard {

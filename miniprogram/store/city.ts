@@ -39,7 +39,10 @@ export class CityStore {
   }
 
   select(city: City): void {
-    this.state = { ...this.state, selectedCity: city };
+    this.state = {
+      selectedCity: city,
+      locationStatus: "IDLE",
+    };
     wx.setStorageSync(SELECTED_CITY_KEY, city.code);
   }
 
@@ -48,9 +51,9 @@ export class CityStore {
     coordinates?: { longitude: number; latitude: number },
   ): void {
     this.state = {
-      ...this.state,
+      selectedCity: this.state.selectedCity,
       locationStatus,
-      ...(coordinates || {}),
+      ...(locationStatus === "READY" && coordinates ? coordinates : {}),
     };
   }
 }

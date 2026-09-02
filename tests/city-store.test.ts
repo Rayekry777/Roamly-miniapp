@@ -23,4 +23,23 @@ describe("city store", () => {
     expect(selected).toEqual({ code: "SHANGHAI", name: "上海" });
     expect(store.getState().selectedCity).toEqual(selected);
   });
+
+  it("clears precise coordinates after location failure or city switching", () => {
+    const store = new CityStore();
+    store.initialize([{ code: "HANGZHOU", name: "杭州" }]);
+    store.setLocation("READY", { longitude: 120.1, latitude: 30.2 });
+    store.setLocation("FAILED");
+
+    expect(store.getState()).toEqual({
+      selectedCity: { code: "HANGZHOU", name: "杭州" },
+      locationStatus: "FAILED",
+    });
+
+    store.setLocation("READY", { longitude: 120.1, latitude: 30.2 });
+    store.select({ code: "SHANGHAI", name: "上海" });
+    expect(store.getState()).toEqual({
+      selectedCity: { code: "SHANGHAI", name: "上海" },
+      locationStatus: "IDLE",
+    });
+  });
 });

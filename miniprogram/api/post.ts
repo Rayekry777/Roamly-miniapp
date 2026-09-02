@@ -3,7 +3,7 @@ import type {
   PageResult,
   PostCard,
   PostCreateRequest,
-  PostDetail,
+  PostDetailResponse,
   PostUpdateRequest,
   Result,
   UserSummary,
@@ -20,13 +20,16 @@ export const createPost = (
     showError: false,
   });
 
-export const getPost = (postId: string): Promise<Result<PostDetail>> =>
-  request(`/v1/posts/${postId}`, { auth: "optional" });
+export const getPost = (postId: string): Promise<Result<PostDetailResponse>> =>
+  request(`/v1/posts/${postId}`, {
+    auth: "optional",
+    showError: false,
+  });
 
 export const updatePost = (
   postId: string,
   data: PostUpdateRequest,
-): Promise<Result<PostDetail>> =>
+): Promise<Result<PostDetailResponse>> =>
   request(`/v1/posts/${postId}`, {
     method: "PUT",
     data,

@@ -1,6 +1,12 @@
-import { createPost } from "../api/post";
-import type { IdResponse, PostCreateRequest, PostDraft } from "../types";
+import { createPost, getPost } from "../api/post";
+import type {
+  IdResponse,
+  PostCreateRequest,
+  PostDetail,
+  PostDraft,
+} from "../types";
 import type { ApiError } from "../utils/request";
+import { adaptPostDetail } from "./post-card";
 
 export interface DraftValidationError {
   field: "title" | "content" | "media" | "section" | "shop";
@@ -83,6 +89,12 @@ export async function publishPost(draft: PostDraft): Promise<IdResponse> {
       throw toDraftSubmissionError(error);
     },
   );
+}
+
+export async function loadPostDetail(postId: string): Promise<PostDetail> {
+  const result = await getPost(postId);
+  if (!result.data) throw new Error("动态不存在或已删除");
+  return adaptPostDetail(result.data);
 }
 
 export function toDraftSubmissionError(error: unknown): DraftSubmissionError {

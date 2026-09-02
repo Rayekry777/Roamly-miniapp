@@ -1,0 +1,39 @@
+.comment-thread {
+  padding: 26rpx 4rpx;
+  border-bottom: 1rpx solid var(--roamly-border);
+  transition: background 180ms ease;
+}
+
+.comment-thread--highlighted,
+.comment-thread__reply--highlighted {
+  border-radius: 20rpx;
+  background: rgba(130, 117, 255, 0.1);
+}
+
+.comment-thread__replies {
+  position: relative;
+  margin: 22rpx 0 0 34rpx;
+  padding-left: 34rpx;
+}
+
+.comment-thread__line {
+  position: absolute;
+  top: -12rpx;
+  bottom: 18rpx;
+  left: 0;
+  width: 2rpx;
+  border-radius: 999rpx;
+  background: #dedde8;
+}
+
+.comment-thread__reply {
+  margin-top: 24rpx;
+  padding: 6rpx;
+}
+
+.comment-thread__more {
+  margin-top: 22rpx;
+  color: var(--roamly-accent);
+  font-size: 21rpx;
+  font-weight: 650;
+}

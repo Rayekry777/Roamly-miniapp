@@ -1,0 +1,80 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { locateForNearby } from "../miniprogram/services/city";
+import { cityStore } from "../miniprogram/store/city";
+
+describe("nearby location service", () => {
+  beforeEach(() => {
+    vi.stubGlobal("wx", {
+      setStorageSync: vi.fn(),
+      getStorageSync: vi.fn(() => ""),
+      getLocation: vi.fn(),
+    });
+    cityStore.select({ code: "330100", name: "杭州" });
+  });
+
+  it("stores valid coordinates after locating", async () => {
+    vi.mocked(wx.getLocation).mockImplementation((options) => {
+      options.success?.({
+        longitude: 120.1,
+        latitude: 30.2,
+      } as WechatMiniprogram.GetLocationSuccessCallbackResult);
+      return undefined as never;
+    });
+
+    await expect(locateForNearby()).resolves.toEqual({
+      status: "READY",
+      longitude: 120.1,
+      latitude: 30.2,
+    });
+    expect(cityStore.getState()).toMatchObject({
+      locationStatus: "READY",
+      longitude: 120.1,
+      latitude: 30.2,
+    });
+  });
+
+  it("distinguishes denied authorization and clears coordinates", async () => {
+    cityStore.setLocation("READY", { longitude: 120.1, latitude: 30.2 });
+    vi.mocked(wx.getLocation).mockImplementation((options) => {
+      options.fail?.({ errMsg: "getLocation:fail auth deny" });
+      return undefined as never;
+    });
+
+    await expect(locateForNearby()).resolves.toEqual({ status: "DENIED" });
+    expect(cityStore.getState()).toEqual({
+      selectedCity: { code: "330100", name: "杭州" },
+      locationStatus: "DENIED",
+    });
+  });
+
+  it("treats timeout and device failures as a recoverable location failure", async () => {
+    vi.mocked(wx.getLocation).mockImplementation((options) => {
+      options.fail?.({ errMsg: "getLocation:fail timeout" });
+      return undefined as never;
+    });
+
+    await expect(locateForNearby()).resolves.toEqual({ status: "FAILED" });
+    expect(cityStore.getState().locationStatus).toBe("FAILED");
+  });
+
+  it("discards a late result after the selected city changes", async () => {
+    let success: WechatMiniprogram.GetLocationOption["success"] | undefined;
+    vi.mocked(wx.getLocation).mockImplementation((options) => {
+      success = options.success;
+      return undefined as never;
+    });
+
+    const locating = locateForNearby();
+    cityStore.select({ code: "310100", name: "上海" });
+    success?.({
+      longitude: 120.1,
+      latitude: 30.2,
+    } as WechatMiniprogram.GetLocationSuccessCallbackResult);
+
+    await expect(locating).resolves.toEqual({ status: "FAILED" });
+    expect(cityStore.getState()).toEqual({
+      selectedCity: { code: "310100", name: "上海" },
+      locationStatus: "IDLE",
+    });
+  });
+});

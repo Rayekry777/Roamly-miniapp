@@ -2,6 +2,7 @@ import type { UserDTO } from "../types";
 import { session } from "../utils/session";
 import { feedStore } from "./feed";
 import { sectionStore } from "./section";
+import { commentStore } from "./comment";
 
 class AuthStore {
   token = "";
@@ -28,6 +29,7 @@ class AuthStore {
     session.clear();
     feedStore.clearFollowingAndPersonalization();
     sectionStore.clearPersonalization();
+    commentStore.clearPersonalization();
   }
 
   isLoggedIn(): boolean {

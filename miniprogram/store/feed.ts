@@ -129,6 +129,14 @@ export class FeedStore {
     return () => this.restorePostFields(previous);
   }
 
+  adjustPostCommentCount(postId: string, delta: number): void {
+    this.mapPosts((post) =>
+      post.id === postId
+        ? { ...post, commentCount: Math.max(0, post.commentCount + delta) }
+        : post,
+    );
+  }
+
   clearFollowingAndPersonalization(): void {
     this.feeds.FOLLOWING = EMPTY_FEED_STATE();
     this.feeds.RECOMMENDED = {

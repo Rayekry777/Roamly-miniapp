@@ -1,0 +1,54 @@
+.shop-link {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 22rpx;
+  border: 1rpx solid var(--roamly-border);
+  border-radius: 28rpx;
+  background: #f8f8fc;
+  color: var(--roamly-muted);
+}
+
+.shop-link__cover {
+  width: 118rpx;
+  height: 118rpx;
+  overflow: hidden;
+  flex: none;
+  border-radius: 22rpx;
+}
+
+.shop-link__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.shop-link__eyebrow {
+  color: var(--roamly-accent);
+  font-size: 19rpx;
+  font-weight: 650;
+}
+
+.shop-link__name {
+  margin-top: 5rpx;
+  overflow: hidden;
+  color: var(--roamly-text);
+  font-size: 27rpx;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shop-link__meta {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 7rpx;
+  font-size: 20rpx;
+}
+
+.shop-link__address {
+  margin-top: 5rpx;
+  overflow: hidden;
+  font-size: 20rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -283,6 +283,14 @@ export class SectionStore {
     };
   }
 
+  adjustPostCommentCount(postId: string, delta: number): void {
+    this.mapFeedPosts((post) =>
+      post.id === postId
+        ? { ...post, commentCount: Math.max(0, post.commentCount + delta) }
+        : post,
+    );
+  }
+
   rememberFollowIntent(sectionId: string): void {
     const intent: FollowIntent = { sectionId, createdAt: Date.now() };
     wx.setStorageSync(FOLLOW_INTENT_KEY, intent);

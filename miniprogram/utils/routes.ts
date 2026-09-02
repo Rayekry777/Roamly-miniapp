@@ -17,3 +17,7 @@ export function sectionDetailUrl(sectionId: string): string {
 export function userProfileUrl(userId: string): string {
   return `/package-user/pages/profile/index?id=${encodeURIComponent(userId)}`;
 }
+
+export function shopDetailUrl(shopId: string): string {
+  return `/package-shop/pages/detail/index?id=${encodeURIComponent(shopId)}`;
+}

@@ -5,7 +5,7 @@ import {
   listRecommendedPosts,
 } from "../miniprogram/api/feed";
 import { createPost, getPost, likePost } from "../miniprogram/api/post";
-import { listShopOptions } from "../miniprogram/api/shop";
+import { listShops } from "../miniprogram/api/shop";
 import {
   followSection,
   listSectionPosts,
@@ -93,7 +93,7 @@ describe("new product contract APIs", () => {
     expect(requestMock).toHaveBeenNthCalledWith(
       2,
       "/v1/posts/9223372036854775807",
-      { auth: "optional" },
+      { auth: "optional", showError: false },
     );
   });
 
@@ -117,15 +117,18 @@ describe("new product contract APIs", () => {
   });
 
   it("searches publishable shops by city and keyword", async () => {
-    await listShopOptions({
+    await listShops({
       cityCode: "330100",
       keyword: "  咖啡  ",
+      sort: "POPULAR",
     });
 
     expect(requestMock).toHaveBeenCalledWith("/v1/shops", {
       data: {
         cityCode: "330100",
         keyword: "咖啡",
+        name: "咖啡",
+        sort: "POPULAR",
         page: 1,
         size: 10,
       },
