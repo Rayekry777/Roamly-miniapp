@@ -1,0 +1,50 @@
+<app-navbar title="商户点评" />
+
+<view class="page page-enter">
+  <view class="reviews-heading">
+    <view>
+      <view class="eyebrow">ROAMLY REVIEWS</view>
+      <view class="reviews-heading__title">真实到店感受</view>
+    </view>
+    <t-button theme="primary" shape="round" size="small" bind:tap="startCreate">写点评</t-button>
+  </view>
+
+  <view class="sort-row">
+    <view wx:for="{{sortOptions}}" wx:key="value" class="sort-item {{sort === item.value ? 'sort-item--active' : ''}}" data-sort="{{item.value}}" bind:tap="selectSort">{{item.label}}</view>
+  </view>
+
+  <view wx:if="{{loading && !reviews.length}}" class="reviews-skeletons">
+    <view wx:for="{{[1, 2, 3]}}" wx:key="*this" class="review-skeleton roamly-panel"><t-skeleton theme="avatar" row-col="{{[1, 1, 1]}}" loading /></view>
+  </view>
+  <app-empty wx:elif="{{error && !reviews.length}}" description="{{error}}" action-text="重新加载" bind:action="retry" />
+  <app-empty wx:elif="{{!reviews.length}}" description="还没有点评，来分享第一条感受吧" />
+
+  <view wx:else class="reviews-list">
+    <view wx:for="{{reviews}}" wx:key="id" class="review-card roamly-panel">
+      <view class="review-card__head">
+        <app-image custom-class="review-card__avatar" src="{{item.author.icon}}" kind="avatar" mode="aspectFill" />
+        <view class="review-card__identity"><view class="review-card__name">{{item.author.nickName}}</view><view class="review-card__meta">{{item.createdTime}}</view></view>
+        <view class="review-card__score">{{item.score}}.0</view>
+      </view>
+      <view class="review-card__badges">
+        <t-tag wx:if="{{item.verifiedConsumption}}" theme="success" variant="light">已消费</t-tag>
+        <t-button wx:if="{{item.editable}}" theme="primary" variant="text" size="small" data-id="{{item.id}}" bind:tap="editReview">编辑</t-button>
+      </view>
+      <view class="review-card__content">{{item.content}}</view>
+      <view wx:if="{{item.media.length}}" class="review-media-grid"><app-image wx:for="{{item.media}}" wx:key="id" custom-class="review-media-image" src="{{item.url}}" mode="aspectFill" /></view>
+    </view>
+    <view wx:if="{{loading}}" class="list-footer"><t-loading size="38rpx" /> 加载中</view>
+    <view wx:elif="{{!hasMore}}" class="list-footer">没有更多点评了</view>
+  </view>
+</view>
+
+<view wx:if="{{formVisible}}" class="review-editor-mask">
+  <view class="review-editor" catch:tap="noop">
+    <view class="review-editor__head"><text>{{editing ? "编辑点评" : "写下你的点评"}}</text><t-icon name="close" size="38rpx" bind:tap="closeForm" /></view>
+    <view class="score-picker"><text>评分</text><view class="score-picker__stars"><text wx:for="{{[1, 2, 3, 4, 5]}}" wx:key="*this" class="score-star {{item <= score ? 'score-star--active' : ''}}" data-score="{{item}}" bind:tap="selectScore">★</text></view><text wx:if="{{score}}">{{score}} 分</text></view>
+    <t-textarea value="{{content}}" maxlength="2000" autosize="{{ { minHeight: 180 } }}" placeholder="说说你的真实体验…" disabled="{{submitting}}" bind:change="onContent" />
+    <draft-media-grid media="{{media}}" disabled="{{submitting}}" bind:add="addImages" bind:retry="retryImage" bind:remove="removeImage" />
+    <view wx:if="{{formError}}" class="form-error">{{formError}}</view>
+    <view class="review-editor__actions"><t-button wx:if="{{editing}}" theme="danger" variant="text" loading="{{submitting}}" bind:tap="deleteReview">删除点评</t-button><t-button theme="primary" shape="round" loading="{{submitting}}" bind:tap="submit">提交点评</t-button></view>
+  </view>
+</view>

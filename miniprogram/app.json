@@ -8,7 +8,7 @@
   "subpackages": [
     {
       "root": "package-shop",
-      "pages": ["pages/list/index", "pages/detail/index"]
+      "pages": ["pages/list/index", "pages/detail/index", "pages/reviews/index"]
     },
     {
       "root": "package-blog",

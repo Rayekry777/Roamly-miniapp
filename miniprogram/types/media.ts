@@ -14,4 +14,6 @@ export interface UploadedMedia {
   asset?: MediaAsset;
   status: MediaUploadStatus;
   error?: string;
+  /** 编辑已有业务资源时标记为已绑定，不能按临时媒体删除。 */
+  bound?: boolean;
 }

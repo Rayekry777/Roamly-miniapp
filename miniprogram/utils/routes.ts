@@ -21,3 +21,7 @@ export function userProfileUrl(userId: string): string {
 export function shopDetailUrl(shopId: string): string {
   return `/package-shop/pages/detail/index?id=${encodeURIComponent(shopId)}`;
 }
+
+export function shopReviewsUrl(shopId: string): string {
+  return `/package-shop/pages/reviews/index?id=${encodeURIComponent(shopId)}`;
+}

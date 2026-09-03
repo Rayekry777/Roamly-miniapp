@@ -8,6 +8,7 @@ import { cityStore } from "../../../store/city";
 import type { PostCard, Shop, Voucher } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
 import { postDetailUrl } from "../../../utils/routes";
+import { shopReviewsUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 
 type ModuleStatus = "IDLE" | "LOADING" | "READY" | "ERROR";
@@ -36,6 +37,9 @@ Page({
     }
     void this.loadShop();
   },
+  onShow() {
+    if (this.loaded && this.shopId) void this.loadShop();
+  },
   onUnload() {
     this.scope?.close();
     this.observers.forEach((observer) => observer.disconnect());
@@ -57,6 +61,9 @@ Page({
         scoreText: shop.score.toFixed(1),
         loading: false,
       });
+      this.loaded = true;
+      this.observers.forEach((observer) => observer.disconnect());
+      this.observers = [];
       wx.nextTick(() => this.observeLazyModules());
     } catch (error) {
       this.setData({
@@ -133,7 +140,7 @@ Page({
     if (postId) wx.navigateTo({ url: postDetailUrl(postId) });
   },
   openReviews() {
-    wx.showToast({ title: "点评列表将在下一阶段接入", icon: "none" });
+    wx.navigateTo({ url: shopReviewsUrl(this.shopId) });
   },
   retryShop() {
     void this.loadShop();
@@ -147,4 +154,5 @@ Page({
   shopId: "",
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
   observers: [] as WechatMiniprogram.IntersectionObserver[],
+  loaded: false,
 });

@@ -1,0 +1,15 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "app-empty": "/components/app-empty/index",
+    "app-image": "/components/app-image/index",
+    "app-navbar": "/components/app-navbar/index",
+    "draft-media-grid": "/components/draft-media-grid/index",
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-skeleton": "tdesign-miniprogram/skeleton/skeleton",
+    "t-tag": "tdesign-miniprogram/tag/tag",
+    "t-textarea": "tdesign-miniprogram/textarea/textarea"
+  }
+}

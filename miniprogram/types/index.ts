@@ -91,5 +91,6 @@ export * from "./comment";
 export * from "./draft";
 export * from "./media";
 export * from "./post";
+export * from "./review";
 export * from "./section";
 export * from "./shop";
