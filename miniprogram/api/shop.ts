@@ -25,8 +25,6 @@ export function listShops(
   if (query.typeId) data.typeId = query.typeId;
   if (keyword) {
     data.keyword = keyword;
-    // 当前后端仍使用 name；目标商户契约落地后删除这个兼容参数。
-    data.name = keyword;
   }
   if (hasCoordinates(query.longitude, query.latitude)) {
     data.longitude = query.longitude;

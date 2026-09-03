@@ -127,7 +127,6 @@ describe("new product contract APIs", () => {
       data: {
         cityCode: "330100",
         keyword: "咖啡",
-        name: "咖啡",
         sort: "POPULAR",
         page: 1,
         size: 10,
