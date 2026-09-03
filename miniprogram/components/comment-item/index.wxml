@@ -6,11 +6,11 @@
     <view class="comment-item__header">
       <view class="comment-item__identity">
         <text class="comment-item__name">{{comment.author.nickName || "Roamly 用户"}}</text>
-        <text wx:if="{{comment.author.id === postAuthorId}}" class="comment-item__author-badge">作者</text>
+        <text wx:if="{{comment.postAuthor}}" class="comment-item__author-badge">作者</text>
         <text class="comment-item__time">{{displayTime}}</text>
       </view>
       <view
-        wx:if="{{comment.author.id === currentUserId && comment.status !== 'DELETED'}}"
+        wx:if="{{comment.deletable && comment.status !== 'DELETED'}}"
         class="comment-item__delete pressable"
         bind:tap="onDelete"
         aria-role="button"

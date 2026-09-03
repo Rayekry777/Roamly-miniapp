@@ -6,11 +6,14 @@ function comment(id: string, patch: Partial<PostComment> = {}): PostComment {
   return {
     id,
     postId: "post-1",
+    rootId: id,
     author: { id: `user-${id}`, nickName: `用户${id}` },
     content: `评论${id}`,
+    postAuthor: false,
     likedCount: 0,
     replyCount: 0,
     likedByMe: false,
+    deletable: false,
     status: "NORMAL",
     createdTime: "2026-09-02T12:00:00+08:00",
     ...patch,
@@ -113,7 +116,6 @@ describe("comment store", () => {
       "root-1",
       comment("reply-2", {
         rootId: "root-1",
-        parentId: "reply-1",
         replyToUser: { id: "user-1", nickName: "上层用户" },
       }),
     );
@@ -125,7 +127,6 @@ describe("comment store", () => {
           {
             id: "reply-2",
             rootId: "root-1",
-            parentId: "reply-1",
           },
         ],
       });

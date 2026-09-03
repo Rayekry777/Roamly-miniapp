@@ -3,8 +3,6 @@ import type { CommentThread } from "../../types";
 Component({
   properties: {
     thread: { type: Object, value: {} },
-    postAuthorId: { type: String, value: "" },
-    currentUserId: { type: String, value: "" },
     likingIds: { type: Object, value: {} },
     deletingIds: { type: Object, value: {} },
     highlightedId: { type: String, value: "" },

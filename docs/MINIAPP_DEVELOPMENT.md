@@ -13,7 +13,7 @@ implementationStatus: 未实现
 本文档是 Roamly 小程序页面、组件、状态、API 调用和交互行为的实现契约。后端接口、目标数据库、鉴权、事务、迁移和阶段总状态见后端项目 `docs/BACKEND_DEVELOPMENT.md`。
 
 - 当前首页、五入口导航和统一发布器已经切换到 Post 契约；旧 Blog 详情与兼容页面仍保留。
-- 新导航、Post 首页、发布器、分区列表、分区详情、Post 详情、Threads 评论界面、附近商户和商户聚合详情已经实现；后端评论、商户扩展、点评和券包接口继续按阶段推进。
+- 新导航、Post 首页、发布器、分区列表、分区详情、Post 详情、Threads 评论界面、附近商户和商户聚合详情已经实现；评论 API 已与后端正式契约对齐，商户扩展、点评和券包接口继续按阶段推进。
 - OpenAPI 是 HTTP 契约真源；本文件说明小程序如何消费接口，不复制后端全部数据库字段。
 - 状态只使用“未确认、未实现、开发中、已实现、已废弃”。
 - 每个阶段开始前必须冻结页面状态机、接口类型、失败恢复和验收用例。
@@ -25,7 +25,7 @@ implementationStatus: 未实现
 - 当前分层：`api / services / store / types / utils / components / pages / package-*`。
 - 当前自定义 TabBar 已显示“首页 / 分区 / 发布 / 附近 / 我的”，发布为中央操作按钮。
 - 当前社区首页和发布模型为 `Post`，图片先上传为临时媒体并提交字符串 `mediaIds`；旧 Blog 页面尚未退役。
-- 当前 Post 详情、探店商户连接和评论交互界面已经完成；后端评论接口未实现，旧 Blog 详情仍提供过渡读取能力。
+- 当前 Post 详情、探店商户连接和评论交互界面已经完成；后端 7 个评论接口、热门评论批量摘要和小程序响应适配已经实现，旧 Blog 详情仍提供过渡读取能力。
 - 当前鉴权为 Sa-Token Bearer，所有业务 ID 已按字符串处理。
 - 当前 `.idea` 取消 Git 跟踪的暂存变更属于用户改动，后续实现不得撤销或覆盖。
 
@@ -213,17 +213,45 @@ interface PostDetail extends PostCard {
 
 type CommentStatus = "NORMAL" | "DELETED";
 
+interface CommentCreateDTO {
+  content: string;
+}
+
+interface CommentResponse {
+  id: string;
+  rootId: string;
+  author: UserSummary;
+  replyToUser: UserSummary | null;
+  content: string | null;
+  deleted: boolean;
+  postAuthor: boolean;
+  likedCount: number;
+  likedByMe: boolean;
+  deletable: boolean;
+  createdTime: string;
+}
+
+interface CommentThreadResponse {
+  root: CommentResponse;
+  previewReplies: CommentResponse[];
+  replyCount: number;
+  hasMoreReplies: boolean;
+  nextReplyCursor: number;
+  nextReplyOffset: number;
+}
+
 interface PostComment {
   id: string;
   postId: string;
   author: UserSummary;
-  rootId?: string;
-  parentId?: string;
+  rootId: string;
   replyToUser?: UserSummary;
   content: string;
+  postAuthor: boolean;
   likedCount: number;
   replyCount: number;
   likedByMe: boolean;
+  deletable: boolean;
   status: CommentStatus;
   createdTime: string;
 }
@@ -238,7 +266,7 @@ interface CommentThread {
 }
 ```
 
-后端没有返回的可选字段必须按缺失处理，不能用空字符串伪造对象。
+`CommentResponse` 和 `CommentThreadResponse` 是 API 层原始响应；页面与 Store 只消费适配后的 `PostComment` 和 `CommentThread`。Service 负责将 `deleted` 转为内部 `status`、将 `previewReplies` 转为 `replies`、把删除正文的 `null` 转为空字符串，并用当前动态上下文补充后端未返回的 `postId`。后端没有返回的可选对象必须按缺失处理，不能用空字符串伪造对象。
 
 ## 7. 请求、会话和环境
 
@@ -471,7 +499,7 @@ interface HomePageState {
 
 - `GET /v1/posts/{postId}/comments` 返回 `CursorPageResult<CommentThread>`。
 - `GET /v1/comments/{commentId}/replies` 返回按时间升序的 `CursorPageResult<PostComment>`。
-- 根评论和回复分别使用 `POST /v1/posts/{postId}/comments`、`POST /v1/comments/{commentId}/replies`，请求体均只有去除首尾空白后的 `content`。
+- 根评论和回复分别使用 `POST /v1/posts/{postId}/comments`、`POST /v1/comments/{commentId}/replies`，请求体类型均为 `CommentCreateDTO`，只有去除首尾空白后的 `content`。
 - 评论删除与点赞分别使用 `/v1/comments/{commentId}` 和 `/v1/comments/{commentId}/like`，所有业务 ID 保持字符串。
 - 评论读取使用可选鉴权；发布、回复、删除和点赞必须登录。
 
@@ -506,7 +534,7 @@ interface HomePageState {
 
 - `GET /v1/posts/{postId}` 已实现，动态正文、媒体、分区、点赞状态和探店商户摘要可以按正式结构消费。
 - 后端商户摘要当前提供 `typeId`、封面、地址和放大 10 倍的评分；尚不提供分类名称和距离，客户端统一换算评分并隐藏缺失字段，不伪造展示值。
-- 评论表、评论 Controller、热门排序和定位接口尚未实现。客户端保留真实错误与重试，评论写入不会回退到旧 `blog_comments` 或本地假数据。
+- 评论表、评论 Controller、热门排序、回复分页、删除和点赞接口已实现。客户端 API 层严格消费 `CommentVO/CommentThreadVO`，Service 层再转换为页面模型；评论写入不会回退到旧 `blog_comments` 或本地假数据。
 
 ## 14. 附近与商户契约
 

@@ -1,9 +1,9 @@
 import type {
-  CommentCreateRequest,
+  CommentCreateDTO,
+  CommentResponse,
   CommentSort,
-  CommentThread,
+  CommentThreadResponse,
   CursorPageResult,
-  PostComment,
   Result,
 } from "../types";
 import { request } from "../utils/request";
@@ -21,7 +21,7 @@ export interface RootCommentQuery extends CommentPageQuery {
 export function listPostComments(
   postId: string,
   query: RootCommentQuery,
-): Promise<Result<CursorPageResult<CommentThread>>> {
+): Promise<Result<CursorPageResult<CommentThreadResponse>>> {
   return request(`/v1/posts/${postId}/comments`, {
     data: compactCommentQuery(query),
     auth: "optional",
@@ -31,8 +31,8 @@ export function listPostComments(
 
 export function createPostComment(
   postId: string,
-  data: CommentCreateRequest,
-): Promise<Result<PostComment>> {
+  data: CommentCreateDTO,
+): Promise<Result<CommentResponse>> {
   return request(`/v1/posts/${postId}/comments`, {
     method: "POST",
     data,
@@ -44,7 +44,7 @@ export function createPostComment(
 export function listCommentReplies(
   commentId: string,
   query: CommentPageQuery = {},
-): Promise<Result<CursorPageResult<PostComment>>> {
+): Promise<Result<CursorPageResult<CommentResponse>>> {
   return request(`/v1/comments/${commentId}/replies`, {
     data: compactCommentQuery(query),
     auth: "optional",
@@ -54,8 +54,8 @@ export function listCommentReplies(
 
 export function createCommentReply(
   commentId: string,
-  data: CommentCreateRequest,
-): Promise<Result<PostComment>> {
+  data: CommentCreateDTO,
+): Promise<Result<CommentResponse>> {
   return request(`/v1/comments/${commentId}/replies`, {
     method: "POST",
     data,

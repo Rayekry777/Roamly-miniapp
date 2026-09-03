@@ -5,8 +5,6 @@
   <comment-item
     comment="{{thread.root}}"
     root="{{true}}"
-    post-author-id="{{postAuthorId}}"
-    current-user-id="{{currentUserId}}"
     liking="{{likingIds[thread.root.id]}}"
     deleting="{{deletingIds[thread.root.id]}}"
     bind:reply="onReply"
@@ -24,8 +22,6 @@
     >
       <comment-item
         comment="{{item}}"
-        post-author-id="{{postAuthorId}}"
-        current-user-id="{{currentUserId}}"
         liking="{{likingIds[item.id]}}"
         deleting="{{deletingIds[item.id]}}"
         bind:reply="onReply"

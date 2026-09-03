@@ -130,8 +130,6 @@
           wx:for="{{commentThreads}}"
           wx:key="id"
           thread="{{item}}"
-          post-author-id="{{post.author.id}}"
-          current-user-id="{{currentUserId}}"
           liking-ids="{{likingCommentIds}}"
           deleting-ids="{{deletingCommentIds}}"
           highlighted-id="{{highlightedCommentId}}"

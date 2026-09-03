@@ -5,8 +5,6 @@ Component({
   properties: {
     comment: { type: Object, value: {} },
     root: { type: Boolean, value: false },
-    postAuthorId: { type: String, value: "" },
-    currentUserId: { type: String, value: "" },
     liking: { type: Boolean, value: false },
     deleting: { type: Boolean, value: false },
   },
@@ -26,7 +24,7 @@ Component({
       if (comment.status === "DELETED") return;
       this.triggerEvent("reply", {
         commentId: comment.id,
-        rootId: comment.rootId || comment.id,
+        rootId: comment.rootId,
         user: comment.author,
       });
     },

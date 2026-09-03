@@ -333,7 +333,7 @@ Page({
     try {
       if (this.data.replyTarget) {
         const target = this.data.replyTarget;
-        const reply = await submitReply(target.commentId, content);
+        const reply = await submitReply(this.postId, target.commentId, content);
         commentStore.appendReply(this.postId, target.rootId, reply);
       } else {
         const comment = await submitRootComment(this.postId, content);
@@ -378,7 +378,7 @@ Page({
     this.syncComments();
     try {
       const page = await this.scope?.run(
-        loadReplies(rootId, {
+        loadReplies(this.postId, rootId, {
           cursor: thread.replies.length
             ? (thread.nextReplyCursor ?? undefined)
             : undefined,

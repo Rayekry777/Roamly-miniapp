@@ -9,7 +9,13 @@ import {
   type CommentPageQuery,
   type RootCommentQuery,
 } from "../api/comment";
-import type { CommentThread, CursorPageResult, PostComment } from "../types";
+import type {
+  CommentResponse,
+  CommentThread,
+  CommentThreadResponse,
+  CursorPageResult,
+  PostComment,
+} from "../types";
 
 export async function loadRootComments(
   postId: string,
@@ -21,11 +27,13 @@ export async function loadRootComments(
   }
   return {
     ...result.data,
-    items: result.data.items.map(normalizeThread),
+    nextCursor: normalizeCursor(result.data.nextCursor, result.data.hasMore),
+    items: result.data.items.map((thread) => adaptThread(postId, thread)),
   };
 }
 
 export async function loadReplies(
+  postId: string,
   rootCommentId: string,
   query: CommentPageQuery,
 ): Promise<CursorPageResult<PostComment>> {
@@ -35,7 +43,8 @@ export async function loadReplies(
   }
   return {
     ...result.data,
-    items: result.data.items.map(normalizeComment),
+    nextCursor: normalizeCursor(result.data.nextCursor, result.data.hasMore),
+    items: result.data.items.map((comment) => adaptComment(comment, postId)),
   };
 }
 
@@ -46,10 +55,11 @@ export async function submitRootComment(
   const normalized = validateCommentContent(content);
   const result = await createPostComment(postId, { content: normalized });
   if (!result.data) throw new Error("评论结果缺少内容");
-  return normalizeComment(result.data);
+  return adaptComment(result.data, postId);
 }
 
 export async function submitReply(
+  postId: string,
   targetCommentId: string,
   content: string,
 ): Promise<PostComment> {
@@ -58,7 +68,7 @@ export async function submitReply(
     content: normalized,
   });
   if (!result.data) throw new Error("回复结果缺少内容");
-  return normalizeComment(result.data);
+  return adaptComment(result.data, postId);
 }
 
 export async function removeComment(commentId: string): Promise<void> {
@@ -80,24 +90,47 @@ export function validateCommentContent(content: string): string {
   return normalized;
 }
 
-function normalizeThread(thread: CommentThread): CommentThread {
+function adaptThread(
+  postId: string,
+  thread: CommentThreadResponse,
+): CommentThread {
+  const root = adaptComment(thread.root, postId);
+  const replyCount = Number(thread.replyCount || 0);
   return {
-    ...thread,
-    root: normalizeComment(thread.root),
-    replies: (thread.replies || []).map(normalizeComment),
+    root: { ...root, replyCount },
+    replies: (thread.previewReplies || []).map((comment) =>
+      adaptComment(comment, postId),
+    ),
+    replyCount,
+    hasMoreReplies: Boolean(thread.hasMoreReplies),
+    nextReplyCursor: normalizeCursor(
+      thread.nextReplyCursor,
+      thread.hasMoreReplies,
+    ),
+    nextReplyOffset: Number(thread.nextReplyOffset || 0),
   };
 }
 
-function normalizeComment(comment: PostComment): PostComment {
+function adaptComment(comment: CommentResponse, postId: string): PostComment {
   return {
-    ...comment,
     id: String(comment.id),
-    postId: String(comment.postId),
-    rootId: comment.rootId ? String(comment.rootId) : undefined,
-    parentId: comment.parentId ? String(comment.parentId) : undefined,
+    postId,
+    rootId: String(comment.rootId || comment.id),
     author: { ...comment.author, id: String(comment.author.id) },
     replyToUser: comment.replyToUser
       ? { ...comment.replyToUser, id: String(comment.replyToUser.id) }
       : undefined,
+    content: comment.content ?? "",
+    postAuthor: Boolean(comment.postAuthor),
+    likedCount: Number(comment.likedCount || 0),
+    replyCount: 0,
+    likedByMe: Boolean(comment.likedByMe),
+    deletable: Boolean(comment.deletable),
+    status: comment.deleted ? "DELETED" : "NORMAL",
+    createdTime: comment.createdTime,
   };
+}
+
+function normalizeCursor(cursor: number | null, hasMore: boolean): number | null {
+  return hasMore ? Number(cursor || 0) : null;
 }
