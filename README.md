@@ -14,9 +14,9 @@ npm run verify
 
 ## 真机调试
 
-开发者工具访问 `http://127.0.0.1:8081`，开发版真机访问当前电脑 Wi-Fi 地址 `http://192.168.2.102:8081`。手机和电脑需要位于同一局域网，并在微信开发者工具中关闭合法域名校验。电脑网络变化后，应同步更新 `miniprogram/config/env.ts` 中的 `deviceDevelopEnvironment`。
+开发者工具访问 `http://127.0.0.1:8081`，开发版真机访问当前电脑 Wi-Fi 地址 `http://192.168.2.109:8081`。手机和电脑需要位于同一局域网，并在微信开发者工具中关闭合法域名校验。电脑网络变化后，应同步更新 `miniprogram/config/env.ts` 中的 `deviceDevelopEnvironment`。
 
-Spring Boot 必须监听非回环网卡，Windows 防火墙仅需允许本地子网访问 Java 的 TCP 8081。可先在手机浏览器打开 `http://192.168.2.102:8081/v1/shop-types`，确认返回 `code: "OK"` 后再进行真机调试。
+Spring Boot 必须监听非回环网卡，Windows 防火墙仅需允许本地子网访问 Java 的 TCP 8081。可先在手机浏览器打开 `http://192.168.2.109:8081/v1/shop-types`，确认返回 `code: "OK"` 后再进行真机调试。
 
 ## 目录
 

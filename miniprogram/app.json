@@ -11,12 +11,8 @@
       "pages": ["pages/list/index", "pages/detail/index", "pages/reviews/index"]
     },
     {
-      "root": "package-blog",
-      "pages": ["pages/detail/index", "pages/publish/index", "pages/mine/index"]
-    },
-    {
       "root": "package-post",
-      "pages": ["pages/detail/index", "pages/publish/index"]
+      "pages": ["pages/detail/index", "pages/publish/index", "pages/mine/index"]
     },
     {
       "root": "package-section",

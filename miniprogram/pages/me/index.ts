@@ -49,9 +49,9 @@ Page({
     if (requireLogin())
       wx.navigateTo({ url: "/package-post/pages/publish/index" });
   },
-  myBlogs() {
+  myPosts() {
     if (requireLogin())
-      wx.navigateTo({ url: "/package-blog/pages/mine/index" });
+      wx.navigateTo({ url: "/package-post/pages/mine/index" });
   },
   async logout() {
     try {

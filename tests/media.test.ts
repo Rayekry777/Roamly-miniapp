@@ -12,6 +12,6 @@ describe('imageUrl', () => {
   it('拆分服务端逗号图片列表', () => { expect(splitImages('a.jpg, b.jpg,')).toEqual(['a.jpg', 'b.jpg']) })
   it('真机开发版使用局域网服务地址', () => {
     vi.stubGlobal('wx', { getAccountInfoSync: () => ({ miniProgram: { envVersion: 'develop' } }), getDeviceInfo: () => ({ platform: 'android' }) })
-    expect(imageUrl('/blogs/a.webp')).toBe('http://192.168.2.102:8081/blogs/a.webp')
+    expect(imageUrl('/blogs/a.webp')).toBe('http://192.168.2.109:8081/blogs/a.webp')
   })
 })

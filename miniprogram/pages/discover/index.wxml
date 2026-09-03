@@ -1,8 +1,0 @@
-<app-navbar title="探店" back="{{false}}"/>
-<view class="page page-enter">
-  <view class="segment roamly-panel"><view class="segment__item segment__item--active">热门</view><view class="segment__item" bind:tap="openFollowing">关注</view></view>
-  <view class="stack discover-list"><blog-card wx:for="{{blogs}}" wx:key="id" blog="{{item}}" bind:select="openBlog"/></view>
-  <app-empty wx:if="{{!loading && !blogs.length}}" description="还没有热门笔记" action-text="发布第一篇" bind:action="publish"/>
-  <view wx:if="{{loading}}" class="list-footer"><t-loading theme="circular" size="40rpx"/> 加载中</view>
-  <view wx:if="{{finished && blogs.length}}" class="list-footer">已经看到全部啦</view>
-</view>

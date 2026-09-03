@@ -3,8 +3,8 @@
   "enablePullDownRefresh": true,
   "usingComponents": {
     "app-navbar": "/components/app-navbar/index",
-    "blog-card": "/components/blog-card/index",
     "app-empty": "/components/app-empty/index",
+    "post-card": "/components/post-card/index",
     "t-loading": "tdesign-miniprogram/loading/loading"
   }
 }

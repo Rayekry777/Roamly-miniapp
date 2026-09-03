@@ -1,4 +1,0 @@
-.segment { display: grid; grid-template-columns: 1fr 1fr; padding: 8rpx; }
-.segment__item { padding: 18rpx; color: var(--roamly-muted); text-align: center; }
-.segment__item--active { border-radius: 26rpx; background: var(--roamly-text); color: #fff; font-weight: 700; }
-.discover-list { margin-top: 28rpx; }

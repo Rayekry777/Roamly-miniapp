@@ -1,7 +1,7 @@
 import type {
   IdResponse,
   PageResult,
-  PostCard,
+  PostCardResponse,
   PostCreateRequest,
   PostDetailResponse,
   PostUpdateRequest,
@@ -42,14 +42,14 @@ export const deletePost = (postId: string): Promise<Result<null>> =>
 export const listMyPosts = (
   page = 1,
   size = 10,
-): Promise<Result<PageResult<PostCard>>> =>
+): Promise<Result<PageResult<PostCardResponse>>> =>
   request("/v1/users/me/posts", { data: { page, size } });
 
 export const listUserPosts = (
   userId: string,
   page = 1,
   size = 10,
-): Promise<Result<PageResult<PostCard>>> =>
+): Promise<Result<PageResult<PostCardResponse>>> =>
   request(`/v1/users/${userId}/posts`, {
     data: { page, size },
     auth: "public",

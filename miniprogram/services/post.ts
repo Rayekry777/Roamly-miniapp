@@ -1,12 +1,43 @@
-import { createPost, getPost } from "../api/post";
+import { createPost, getPost, listMyPosts, listUserPosts } from "../api/post";
 import type {
   IdResponse,
+  PageResult,
+  PostCard,
   PostCreateRequest,
   PostDetail,
   PostDraft,
 } from "../types";
 import type { ApiError } from "../utils/request";
-import { adaptPostDetail } from "./post-card";
+import { adaptPostCard, adaptPostDetail } from "./post-card";
+
+export async function loadMyPostPage(
+  page = 1,
+  size = 10,
+): Promise<PageResult<PostCard>> {
+  const result = await listMyPosts(page, size);
+  if (!result.data || !Array.isArray(result.data.items)) {
+    throw new Error("我的动态暂时加载失败");
+  }
+  return {
+    ...result.data,
+    items: result.data.items.map(adaptPostCard),
+  };
+}
+
+export async function loadUserPostPage(
+  userId: string,
+  page = 1,
+  size = 10,
+): Promise<PageResult<PostCard>> {
+  const result = await listUserPosts(String(userId), page, size);
+  if (!result.data || !Array.isArray(result.data.items)) {
+    throw new Error("用户动态暂时加载失败");
+  }
+  return {
+    ...result.data,
+    items: result.data.items.map(adaptPostCard),
+  };
+}
 
 export interface DraftValidationError {
   field: "title" | "content" | "media" | "section" | "shop";

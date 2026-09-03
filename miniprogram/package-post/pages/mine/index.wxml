@@ -1,0 +1,7 @@
+<app-navbar title="我的动态" back />
+<view class="page page-enter">
+  <view wx:if="{{loading && !posts.length}}" class="module-state"><t-loading size="42rpx" /> 正在加载动态</view>
+  <app-empty wx:elif="{{error && !posts.length}}" description="{{error}}" action-text="重新加载" bind:action="retry" />
+  <app-empty wx:elif="{{!posts.length}}" description="还没有发布动态" />
+  <view wx:else class="stack"><post-card wx:for="{{posts}}" wx:key="id" post="{{item}}" bind:openpost="openPost" /><view wx:if="{{loading}}" class="list-footer"><t-loading size="36rpx" /> 加载中</view><view wx:elif="{{!hasMore}}" class="list-footer">没有更多动态了</view></view>
+</view>

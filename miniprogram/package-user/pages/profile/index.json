@@ -3,7 +3,7 @@
   "usingComponents": {
     "app-navbar": "/components/app-navbar/index",
     "app-image": "/components/app-image/index",
-    "blog-card": "/components/blog-card/index",
+    "post-card": "/components/post-card/index",
     "app-empty": "/components/app-empty/index",
     "t-button": "tdesign-miniprogram/button/button",
     "t-loading": "tdesign-miniprogram/loading/loading"

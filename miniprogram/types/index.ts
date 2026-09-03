@@ -20,12 +20,6 @@ export interface CursorPageResult<T> {
   nextOffset: number;
   hasMore: boolean;
 }
-export interface ScrollResult<T> {
-  list: T[];
-  minTime: number;
-  offset: number;
-  hasMore: boolean;
-}
 export interface AuthToken {
   tokenType: "Bearer";
   accessToken: string;
@@ -49,41 +43,6 @@ export interface UserInfo {
   birthday?: string;
   credits?: number;
   level?: number;
-}
-export interface Blog {
-  id: string;
-  shopId?: string;
-  userId: string;
-  icon?: string;
-  name?: string;
-  likedByMe?: boolean;
-  isLike?: boolean;
-  title: string;
-  images: string;
-  content: string;
-  liked?: number;
-  comments?: number;
-  createTime?: string;
-}
-export interface Voucher {
-  id: string;
-  shopId: string;
-  title: string;
-  subTitle?: string;
-  rules?: string;
-  payValue: number;
-  actualValue: number;
-  type?: number;
-  status?: number;
-  stock?: number;
-  beginTime?: string;
-  endTime?: string;
-}
-export interface UploadedImage {
-  localPath: string;
-  remotePath: string;
-  status: "uploading" | "done" | "failed";
-  error?: string;
 }
 
 export * from "./city";

@@ -13,7 +13,9 @@ describe("unified post publisher contract", () => {
 
     expect(postPackage?.pages).toContain("pages/publish/index");
     expect(tabBar).toContain("/package-post/pages/publish/index");
-    expect(tabBar).not.toContain("/package-blog/pages/publish/index");
+    expect(app.subpackages.some((item) => item.root === "package-blog")).toBe(
+      false,
+    );
   });
 
   it("renders the shop visit switch, conditional selectors and draft media", () => {

@@ -52,9 +52,9 @@
         <text>发布动态</text>
         <t-icon name="chevron-right" />
       </view>
-      <view class="menu__item pressable" bind:tap="myBlogs">
+      <view class="menu__item pressable" bind:tap="myPosts">
         <t-icon name="file" size="42rpx" />
-        <text>我的笔记</text>
+        <text>我的动态</text>
         <t-icon name="chevron-right" />
       </view>
     </view>
