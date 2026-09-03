@@ -1,0 +1,10 @@
+.filters { display: flex; gap: 28rpx; margin-bottom: 24rpx; overflow-x: auto; white-space: nowrap; }
+.filter { color: var(--roamly-muted); font-size: 24rpx; }
+.filter--active { color: var(--roamly-primary); font-weight: 700; }
+.voucher-card { padding: 28rpx; }
+.voucher-card__head { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
+.voucher-card__title { font-size: 30rpx; font-weight: 700; }
+.status { color: var(--roamly-primary); font-size: 22rpx; }
+.shop, .meta, .rules { margin-top: 12rpx; color: var(--roamly-muted); font-size: 23rpx; }
+.code { margin-top: 18rpx; padding: 18rpx; border-radius: 14rpx; background: #fff4f1; color: var(--roamly-primary); font-size: 28rpx; letter-spacing: 2rpx; }
+.module-state { display: flex; min-height: 240rpx; align-items: center; justify-content: center; gap: 14rpx; color: var(--roamly-muted); }

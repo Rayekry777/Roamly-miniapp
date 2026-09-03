@@ -63,21 +63,20 @@
       />
       <view wx:else class="stack">
         <view wx:for="{{vouchers}}" wx:key="id" class="voucher roamly-panel">
-          <view class="voucher__price"><text>¥</text>{{item.payValue / 100}}</view>
+          <view class="voucher__price"><text>¥</text>{{item.payAmountText}}</view>
           <view class="voucher__copy">
             <text class="strong">{{item.title}}</text>
-            <text>{{item.subTitle || "到店可用"}}</text>
-            <t-tag wx:if="{{item.type === 1}}" theme="danger" variant="light">限时秒杀</t-tag>
+            <text>{{item.subtitle}}</text>
+            <t-tag wx:if="{{item.saleType === 'SECKILL'}}" theme="danger" variant="light">限时秒杀</t-tag>
           </view>
           <t-button
             theme="primary"
             shape="round"
             size="small"
-            loading="{{buyingId === item.id}}"
             data-id="{{item.id}}"
-            bind:tap="buy"
+            bind:tap="openVoucher"
           >
-            抢购
+            查看详情
           </t-button>
         </view>
       </view>
@@ -143,5 +142,3 @@
     </view>
   </block>
 </view>
-
-<success-motion id="order-motion" message="{{orderMessage}}" />

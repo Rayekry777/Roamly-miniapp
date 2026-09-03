@@ -1,0 +1,19 @@
+<app-navbar title="团购详情" back />
+
+<view class="page page-enter">
+  <view wx:if="{{loading}}" class="module-state roamly-panel"><t-loading size="42rpx" /> 正在加载团购商品</view>
+  <app-empty wx:elif="{{error || !product}}" description="{{error || '团购商品不存在或已下架'}}" action-text="重新加载" bind:action="retry" />
+  <block wx:else>
+    <app-image src="{{product.cover}}" custom-class="product-cover" mode="aspectFill" />
+    <view class="product-card roamly-panel">
+      <view class="eyebrow">{{product.saleType === 'SECKILL' ? '限时秒杀' : '团购商品'}}</view>
+      <view class="product-title">{{product.title}}</view>
+      <view class="product-subtitle">{{product.subtitle}}</view>
+      <view class="price-row"><text class="price">¥{{product.payAmountText}}</text><text wx:if="{{product.originalAmountText}}" class="origin">¥{{product.originalAmountText}}</text></view>
+      <view class="facts"><text>库存 {{product.stock === undefined ? '以服务端为准' : product.stock}}</text><text>已售 {{product.soldCount}}</text><text>限购 {{product.perUserLimit || '不限'}}</text></view>
+    </view>
+    <view class="section roamly-panel rules"><view class="section-title">有效期</view><view>{{product.validityText}}</view><view class="section-title">使用规则</view><view>{{product.usageRules}}</view></view>
+    <t-button block theme="primary" shape="round" loading="{{submitting}}" disabled="{{product.status !== 'ON_SALE'}}" bind:tap="createOrder">创建订单（数量 1）</t-button>
+    <view wx:if="{{product.status !== 'ON_SALE'}}" class="hint">当前商品暂不可购买</view>
+  </block>
+</view>

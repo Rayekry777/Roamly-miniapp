@@ -12,7 +12,6 @@ import { splitImages } from "../utils/media";
 import { adaptPostCard } from "./post-card";
 
 export const listShopTypes = shopApi.listShopTypes;
-export const listVouchers = shopApi.listVouchers;
 
 export async function loadShopPage(
   query: ShopListQuery,

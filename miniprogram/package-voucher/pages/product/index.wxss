@@ -1,0 +1,12 @@
+.product-cover { width: 100%; height: 420rpx; overflow: hidden; border-radius: 32rpx; }
+.product-card { margin-top: 22rpx; padding: 30rpx; }
+.product-title { margin-top: 12rpx; font-size: 38rpx; font-weight: 750; }
+.product-subtitle { margin-top: 10rpx; color: var(--roamly-muted); font-size: 24rpx; }
+.price-row { display: flex; align-items: baseline; gap: 16rpx; margin-top: 24rpx; }
+.price { color: var(--roamly-primary); font-size: 52rpx; font-weight: 800; }
+.origin { color: var(--roamly-muted); text-decoration: line-through; }
+.facts { display: flex; flex-wrap: wrap; gap: 18rpx; margin-top: 20rpx; color: var(--roamly-muted); font-size: 22rpx; }
+.rules { display: flex; flex-direction: column; gap: 14rpx; margin: 22rpx 0; padding: 28rpx; color: var(--roamly-muted); font-size: 24rpx; line-height: 1.6; }
+.section-title { color: var(--roamly-text); font-size: 28rpx; font-weight: 700; }
+.hint { margin-top: 16rpx; color: var(--roamly-muted); text-align: center; font-size: 22rpx; }
+.module-state { display: flex; min-height: 220rpx; align-items: center; justify-content: center; gap: 14rpx; color: var(--roamly-muted); }

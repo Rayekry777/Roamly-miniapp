@@ -1,12 +1,7 @@
-import {
-  listVouchers,
-  loadShopDetail,
-  loadShopPostPage,
-} from "../../../services/shop";
-import { seckillVoucher } from "../../../services/voucher";
+import { loadShopDetail, loadShopPostPage } from "../../../services/shop";
+import { listVoucherProducts } from "../../../services/voucher-product";
 import { cityStore } from "../../../store/city";
-import type { PostCard, Shop, Voucher } from "../../../types";
-import { requireLogin } from "../../../utils/navigation";
+import type { PostCard, Shop, VoucherProduct } from "../../../types";
 import { postDetailUrl } from "../../../utils/routes";
 import { shopReviewsUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
@@ -19,14 +14,12 @@ Page({
     scoreText: "0.0",
     loading: true,
     error: "",
-    vouchers: [] as Voucher[],
+    vouchers: [] as VoucherProduct[],
     voucherStatus: "IDLE" as ModuleStatus,
     voucherError: "",
     posts: [] as PostCard[],
     postStatus: "IDLE" as ModuleStatus,
     postError: "",
-    buyingId: "",
-    orderMessage: "下单成功",
   },
   onLoad(options) {
     this.shopId = String(options.id || "");
@@ -91,10 +84,10 @@ Page({
     if (this.data.voucherStatus === "LOADING") return;
     this.setData({ voucherStatus: "LOADING", voucherError: "" });
     try {
-      const result = await this.scope?.run(listVouchers(this.shopId));
-      if (!result) return;
+      const products = await this.scope?.run(listVoucherProducts(this.shopId));
+      if (!products) return;
       this.setData({
-        vouchers: result.data || [],
+        vouchers: products,
         voucherStatus: "READY",
       });
     } catch (error) {
@@ -120,20 +113,12 @@ Page({
       });
     }
   },
-  async buy(event: WechatMiniprogram.TouchEvent) {
-    if (!requireLogin() || this.data.buyingId) return;
+  openVoucher(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id || "");
     if (!id) return;
-    this.setData({ buyingId: id });
-    try {
-      const result = await seckillVoucher(id);
-      if (result.data) {
-        this.setData({ orderMessage: `下单成功 · ${result.data.id}` });
-        this.selectComponent("#order-motion")?.show(1600);
-      }
-    } finally {
-      this.setData({ buyingId: "" });
-    }
+    wx.navigateTo({
+      url: `/package-voucher/pages/product/index?id=${encodeURIComponent(id)}`,
+    });
   },
   openPost(event: WechatMiniprogram.TouchEvent) {
     const postId = String(event.currentTarget.dataset.id || "");

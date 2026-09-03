@@ -25,6 +25,14 @@
     {
       "root": "package-user",
       "pages": ["pages/login/index", "pages/profile/index"]
+    },
+    {
+      "root": "package-voucher",
+      "pages": ["pages/product/index", "pages/wallet/index"]
+    },
+    {
+      "root": "package-order",
+      "pages": ["pages/list/index", "pages/detail/index"]
     }
   ],
   "window": {

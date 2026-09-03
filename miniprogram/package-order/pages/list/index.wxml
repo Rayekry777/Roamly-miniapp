@@ -1,0 +1,17 @@
+<app-navbar title="我的订单" back />
+<view class="page page-enter">
+  <view class="filters"><view wx:for="{{filters}}" wx:key="value" class="filter {{status === item.value ? 'filter--active' : ''}}" data-status="{{item.value}}" bind:tap="selectStatus">{{item.label}}</view></view>
+  <view wx:if="{{loading && !orders.length}}" class="module-state"><t-loading size="42rpx" /> 正在加载订单</view>
+  <app-empty wx:elif="{{error && !orders.length}}" description="{{error}}" action-text="重新加载" bind:action="retry" />
+  <app-empty wx:elif="{{!orders.length}}" description="暂无订单" />
+  <view wx:else class="stack">
+    <view wx:for="{{orders}}" wx:key="id" class="order-card roamly-panel" data-id="{{item.id}}" bind:tap="openOrder">
+      <view class="order-head"><text class="order-title">{{item.productTitle}}</text><text class="status">{{item.statusText}}</text></view>
+      <view class="meta">订单号 {{item.orderNo}} · {{item.createdTime}}</view>
+      <view class="amount">¥{{item.payAmountText}}</view>
+      <t-button wx:if="{{item.status === 'PENDING_PAYMENT'}}" size="small" variant="outline" loading="{{cancellingId === item.id}}" data-id="{{item.id}}" catch:tap="cancel">取消订单</t-button>
+    </view>
+    <view wx:if="{{loading}}" class="list-footer"><t-loading size="36rpx" /> 加载中</view>
+    <view wx:elif="{{!hasMore}}" class="list-footer">没有更多订单了</view>
+  </view>
+</view>

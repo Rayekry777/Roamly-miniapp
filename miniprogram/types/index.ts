@@ -94,3 +94,4 @@ export * from "./post";
 export * from "./review";
 export * from "./section";
 export * from "./shop";
+export * from "./voucher";

@@ -1,0 +1,9 @@
+{
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "app-navbar": "/components/app-navbar/index",
+    "app-empty": "/components/app-empty/index",
+    "t-loading": "tdesign-miniprogram/loading/loading"
+  }
+}

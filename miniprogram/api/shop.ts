@@ -6,7 +6,6 @@ import type {
   ShopListQuery,
   ShopResponse,
   ShopType,
-  Voucher,
 } from "../types";
 import { request } from "../utils/request";
 
@@ -68,12 +67,6 @@ export function listShopPosts(
     showError: false,
   });
 }
-
-export const listVouchers = (shopId: string): Promise<Result<Voucher[]>> =>
-  request(`/v1/shops/${shopId}/vouchers`, {
-    auth: "public",
-    showError: false,
-  });
 
 function hasCoordinates(
   longitude?: number,

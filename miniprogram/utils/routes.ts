@@ -25,3 +25,15 @@ export function shopDetailUrl(shopId: string): string {
 export function shopReviewsUrl(shopId: string): string {
   return `/package-shop/pages/reviews/index?id=${encodeURIComponent(shopId)}`;
 }
+
+export function voucherProductUrl(productId: string): string {
+  return `/package-voucher/pages/product/index?id=${encodeURIComponent(productId)}`;
+}
+
+export function orderDetailUrl(orderId: string): string {
+  return `/package-order/pages/detail/index?id=${encodeURIComponent(orderId)}`;
+}
+
+export function voucherDetailUrl(voucherId: string): string {
+  return `/package-voucher/pages/wallet/index?id=${encodeURIComponent(voucherId)}`;
+}

@@ -1,0 +1,18 @@
+<app-navbar title="我的券包" back />
+<view class="page page-enter">
+  <view wx:if="{{!voucherId}}" class="filters"><view wx:for="{{filters}}" wx:key="value" class="filter {{status === item.value ? 'filter--active' : ''}}" data-status="{{item.value}}" bind:tap="selectStatus">{{item.label}}</view></view>
+  <view wx:if="{{loading && !vouchers.length}}" class="module-state"><t-loading size="42rpx" /> 正在加载券包</view>
+  <app-empty wx:elif="{{error && !vouchers.length}}" description="{{error}}" action-text="重新加载" bind:action="retry" />
+  <app-empty wx:elif="{{!vouchers.length}}" description="暂无符合条件的券" />
+  <view wx:else class="stack">
+    <view wx:for="{{vouchers}}" wx:key="id" class="voucher-card roamly-panel">
+      <view class="voucher-card__head"><text class="voucher-card__title">{{item.productTitle}}</text><text class="status">{{item.statusText}}</text></view>
+      <view class="shop">{{item.shop.name}}</view>
+      <view class="code" wx:if="{{item.status === 'UNUSED'}}">券码：{{item.voucherCode}}</view>
+      <view class="meta">有效期：{{item.validFrom || '购买后生效'}} 至 {{item.expireTime || '以商户规则为准'}}</view>
+      <view class="rules">{{item.usageRules}}</view>
+    </view>
+    <view wx:if="{{loading}}" class="list-footer"><t-loading size="36rpx" /> 加载中</view>
+    <view wx:elif="{{!hasMore && !voucherId}}" class="list-footer">没有更多券了</view>
+  </view>
+</view>
