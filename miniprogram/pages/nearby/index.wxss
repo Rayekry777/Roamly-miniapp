@@ -6,15 +6,8 @@
 }
 
 .nearby-hero__title {
-  margin-top: 8rpx;
   font-size: 38rpx;
   font-weight: 760;
-}
-
-.nearby-hero__hint {
-  margin-top: 10rpx;
-  color: var(--roamly-muted);
-  font-size: 22rpx;
 }
 
 .nearby-hero__location {

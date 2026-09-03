@@ -26,8 +26,7 @@
 }
 
 .post-detail__author-row,
-.post-detail__footer,
-.comments__header {
+.post-detail__footer {
   justify-content: space-between;
 }
 
@@ -141,19 +140,9 @@ shop-link-card {
 
 .comments__header {
   gap: 18rpx;
+  justify-content: flex-end;
   padding-bottom: 22rpx;
   border-bottom: 1rpx solid var(--roamly-border);
-}
-
-.comments__title {
-  font-size: 31rpx;
-  font-weight: 750;
-}
-
-.comments__subtitle {
-  margin-top: 4rpx;
-  color: var(--roamly-muted);
-  font-size: 19rpx;
 }
 
 .comments__tabs {

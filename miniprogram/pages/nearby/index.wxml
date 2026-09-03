@@ -3,9 +3,7 @@
 <view class="page page-enter">
   <view class="nearby-hero roamly-panel">
     <view>
-      <view class="eyebrow">NEARBY ROAM</view>
       <view class="nearby-hero__title">{{cityName || "当前城市"}}好去处</view>
-      <view class="nearby-hero__hint">{{locationHint}}</view>
     </view>
     <view
       class="nearby-hero__location pressable"

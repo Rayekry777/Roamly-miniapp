@@ -2,10 +2,6 @@
 
 <view class="page page-enter">
   <view class="reviews-heading">
-    <view>
-      <view class="eyebrow">ROAMLY REVIEWS</view>
-      <view class="reviews-heading__title">真实到店感受</view>
-    </view>
     <t-button theme="primary" shape="round" size="small" bind:tap="startCreate">写点评</t-button>
   </view>
 

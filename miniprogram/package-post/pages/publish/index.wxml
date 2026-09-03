@@ -12,11 +12,6 @@
 </app-navbar>
 
 <view class="publish-page page-enter">
-  <view class="publish-intro">
-    <view class="eyebrow">SHARE YOUR ROAM</view>
-    <view class="publish-intro__title">此刻，想分享什么？</view>
-  </view>
-
   <view id="field-title" class="form-card roamly-panel">
     <t-input
       value="{{draft.title}}"
@@ -161,6 +156,7 @@
   </block>
 
   <t-button
+    class="publish-submit"
     theme="primary"
     shape="round"
     block

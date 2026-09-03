@@ -38,6 +38,7 @@ describe("nearby and shop page contract", () => {
     expect(view).toContain('id="voucher-section"');
     expect(view).toContain('id="post-section"');
     expect(view).toContain("到店点评");
+    expect(view).toContain("查看真实到店感受");
     expect(logic).toContain("createIntersectionObserver");
     expect(logic).toContain('observeOnce("#voucher-section"');
     expect(logic).toContain('observeOnce("#post-section"');

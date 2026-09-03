@@ -1,5 +1,4 @@
-.reviews-heading { display: flex; align-items: center; justify-content: space-between; }
-.reviews-heading__title { margin-top: 8rpx; font-size: 36rpx; font-weight: 750; }
+.reviews-heading { display: flex; justify-content: flex-end; }
 .sort-row { display: flex; gap: 34rpx; margin: 30rpx 0 24rpx; }
 .sort-item { color: var(--roamly-muted); font-size: 24rpx; }
 .sort-item--active { color: var(--roamly-text); font-weight: 700; }

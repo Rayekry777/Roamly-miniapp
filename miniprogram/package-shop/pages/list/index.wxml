@@ -1,13 +1,6 @@
 <app-navbar title="发现好店" />
 
 <view class="page page-enter">
-  <view class="list-heading">
-    <view>
-      <view class="eyebrow">{{cityName || "当前城市"}}</view>
-      <view class="list-heading__title">筛选适合你的去处</view>
-    </view>
-  </view>
-
   <view class="search-panel roamly-panel">
     <t-search
       value="{{keyword}}"

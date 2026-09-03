@@ -91,7 +91,7 @@
         <view class="review-summary__score">{{scoreText}}</view>
         <view class="review-summary__copy">
           <view>综合评分</view>
-          <text>{{shop.comments}} 条评价 · 独立点评能力下一阶段接入</text>
+          <text>{{shop.comments}} 条评价 · 查看真实到店感受</text>
         </view>
       </view>
     </view>

@@ -1,16 +1,6 @@
 <app-navbar title="分区" back="{{false}}" />
 
 <view class="page page-enter">
-  <view class="sections-hero roamly-panel">
-    <view class="sections-hero__icon">
-      <t-icon name="app" size="52rpx" />
-    </view>
-    <view class="sections-hero__content">
-      <view class="sections-hero__title">找到你的漫游分区</view>
-      <view class="sections-hero__description">关注感兴趣的分区，优先发现同频内容。</view>
-    </view>
-  </view>
-
   <view class="section">
     <view class="section-title">
       <text>全部分区</text>

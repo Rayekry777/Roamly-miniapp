@@ -22,7 +22,6 @@ Page({
     refreshing: false,
     error: "",
     locationStatus: "IDLE",
-    locationHint: "定位后可按距离查找",
   },
   onLoad() {
     this.scope = createRequestScope();
@@ -167,27 +166,14 @@ Page({
       current.longitude !== undefined &&
       current.latitude !== undefined
     ) {
-      this.setData({
-        locationStatus: "READY",
-        locationHint: "已定位，可按距离查找",
-      });
+      this.setData({ locationStatus: "READY" });
       return true;
     }
 
-    this.setData({
-      locationStatus: "LOCATING",
-      locationHint: "正在获取位置…",
-    });
+    this.setData({ locationStatus: "LOCATING" });
     this.locationPromise = locateForNearby().then((result) => {
       const ready = result.status === "READY";
-      this.setData({
-        locationStatus: result.status,
-        locationHint: ready
-          ? "已定位，可按距离查找"
-          : result.status === "DENIED"
-            ? "未授权定位，已使用综合排序"
-            : "定位失败，已使用综合排序",
-      });
+      this.setData({ locationStatus: result.status });
       if (!ready && showFailure) {
         wx.showToast({
           title:

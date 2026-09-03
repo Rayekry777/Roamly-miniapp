@@ -4,20 +4,14 @@
   box-sizing: border-box;
 }
 
-.publish-intro {
-  padding: 10rpx 4rpx 28rpx;
-}
-
-.publish-intro__title {
-  margin-top: 8rpx;
-  font-size: 42rpx;
-  font-weight: 750;
-}
-
 .form-card {
   position: relative;
   overflow: hidden;
   padding: 16rpx 22rpx 42rpx;
+}
+
+.publish-submit {
+  margin-top: 20rpx;
 }
 
 .form-divider {

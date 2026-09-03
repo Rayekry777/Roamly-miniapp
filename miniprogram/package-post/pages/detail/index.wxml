@@ -78,10 +78,6 @@
 
     <view id="comments" class="comments">
       <view class="comments__header">
-        <view>
-          <view class="comments__title">讨论</view>
-          <view class="comments__subtitle">像 Threads 一样继续追加对话</view>
-        </view>
         <view class="comments__tabs" aria-role="tablist">
           <view
             class="comments__tab {{commentSort === 'HOT' ? 'comments__tab--active' : ''}}"
