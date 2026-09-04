@@ -2,6 +2,7 @@ import type {
   PageResult,
   Result,
   VoucherOrderDetailResponse,
+  VoucherOrderConfirmationResponse,
   VoucherOrderCreateRequest,
   VoucherOrderResponse,
   VoucherOrderStatusFilter,
@@ -11,11 +12,25 @@ import { request } from "../utils/request";
 export function createVoucherOrder(
   productId: string,
   data: VoucherOrderCreateRequest,
+  idempotencyKey: string,
 ): Promise<Result<VoucherOrderResponse>> {
   return request(`/v1/voucher-products/${productId}/orders`, {
     method: "POST",
     data,
     dedupe: false,
+    showError: false,
+    headers: { "Idempotency-Key": idempotencyKey },
+  });
+}
+
+export function confirmVoucherOrder(
+  productId: string,
+  data: VoucherOrderCreateRequest,
+): Promise<Result<VoucherOrderConfirmationResponse>> {
+  return request(`/v1/voucher-products/${productId}/order-confirmations`, {
+    method: "POST",
+    data,
+    auth: "required",
     showError: false,
   });
 }

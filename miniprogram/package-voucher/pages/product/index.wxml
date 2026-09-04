@@ -33,7 +33,7 @@
       <view wx:if="{{product.stackable}}" class="rule-note">支持与其他优惠叠加使用</view>
       <view wx:if="{{product.refundAnytime}}" class="rule-note">未使用可随时退款{{product.refundExpired ? '，过期也可退款' : ''}}</view>
     </view>
-    <t-button block theme="primary" shape="round" loading="{{submitting}}" disabled="{{product.status !== 'ON_SALE'}}" bind:tap="createOrder">创建订单（数量 1）</t-button>
+    <t-button block theme="primary" shape="round" loading="{{submitting}}" disabled="{{product.status !== 'ON_SALE'}}" bind:tap="openConfirm">去确认订单</t-button>
     <view wx:if="{{product.status !== 'ON_SALE'}}" class="hint">当前商品暂不可购买</view>
   </block>
 </view>

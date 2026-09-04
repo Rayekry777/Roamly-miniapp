@@ -24,6 +24,7 @@ interface RequestOptions<TBody> {
   auth?: AuthMode;
   dedupe?: boolean;
   showError?: boolean;
+  headers?: Record<string, string>;
 }
 const pending = new Map<string, Promise<Result<unknown>>>();
 
@@ -47,7 +48,10 @@ export function request<
       method,
       data: options.data,
       timeout: 12000,
-      header: token ? { Authorization: `Bearer ${token}` } : {},
+      header: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {}),
+      },
       success(response) {
         if (response.statusCode === 401) {
           authStore.clear();

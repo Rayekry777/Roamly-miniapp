@@ -3,6 +3,8 @@ import type {
   PageResult,
   VoucherOrder,
   VoucherOrderDetail,
+  VoucherOrderConfirmation,
+  VoucherOrderConfirmationResponse,
   VoucherOrderResponse,
   VoucherOrderStatusFilter,
 } from "../types";
@@ -10,12 +12,45 @@ import { formatAmount } from "./voucher-product";
 import { normalizeVoucherProduct } from "./voucher-product";
 import { adaptShopSummary } from "./post-card";
 
-export async function createOrder(productId: string): Promise<VoucherOrder> {
+export async function createOrder(productId: string, quantity = 1): Promise<VoucherOrder> {
+  const idempotencyKey = `miniapp-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
   const result = await orderApi.createVoucherOrder(String(productId), {
-    quantity: 1,
-  });
+    quantity,
+  }, idempotencyKey);
   if (!result.data) throw new Error("订单创建结果缺少内容");
   return normalizeOrder(result.data);
+}
+
+export async function confirmOrder(
+  productId: string,
+  quantity: number,
+): Promise<VoucherOrderConfirmation> {
+  const result = await orderApi.confirmVoucherOrder(String(productId), { quantity });
+  if (!result.data) throw new Error("订单确认响应格式异常，请稍后重试");
+  return normalizeConfirmation(result.data);
+}
+
+function normalizeConfirmation(value: VoucherOrderConfirmationResponse): VoucherOrderConfirmation {
+  const totalAmount = Number(value.totalAmount) || 0;
+  const discountAmount = Number(value.discountAmount) || 0;
+  const payAmount = Number(value.payAmount) || 0;
+  return {
+    ...value,
+    productId: String(value.productId),
+    shopId: String(value.shopId),
+    unitAmount: Number(value.unitAmount) || 0,
+    quantity: Number(value.quantity) || 1,
+    minQuantity: Number(value.minQuantity) || 1,
+    maxQuantity: Number(value.maxQuantity) || 1,
+    totalAmount,
+    discountAmount,
+    payAmount,
+    availableStock: Number(value.availableStock) || 0,
+    unitAmountText: formatAmount(value.unitAmount),
+    totalAmountText: formatAmount(totalAmount),
+    discountAmountText: formatAmount(discountAmount),
+    payAmountText: formatAmount(payAmount),
+  };
 }
 
 export async function loadMyOrders(

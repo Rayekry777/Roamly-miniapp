@@ -43,7 +43,7 @@ describe("voucher, order and wallet contracts", () => {
   });
 
   it("keeps order writes non-deduplicated and filters optional status", async () => {
-    await createVoucherOrder("7", { quantity: 1 });
+    await createVoucherOrder("7", { quantity: 1 }, "stage22-miniapp-1");
     await listMyOrders({ page: 2, size: 20, status: "PAID" });
     await cancelMyOrder("8");
     expect(requestMock).toHaveBeenNthCalledWith(
@@ -54,6 +54,7 @@ describe("voucher, order and wallet contracts", () => {
         data: { quantity: 1 },
         dedupe: false,
         showError: false,
+        headers: { "Idempotency-Key": "stage22-miniapp-1" },
       },
     );
     expect(requestMock).toHaveBeenNthCalledWith(2, "/v1/users/me/orders", {

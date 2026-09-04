@@ -28,7 +28,7 @@
     },
     {
       "root": "package-order",
-      "pages": ["pages/list/index", "pages/detail/index"]
+      "pages": ["pages/list/index", "pages/detail/index", "pages/confirm/index"]
     }
   ],
   "window": {

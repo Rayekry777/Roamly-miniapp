@@ -151,6 +151,7 @@ export interface VoucherOrderResponse {
   paidTime?: string;
   cancelledTime?: string;
   expireTime?: string;
+  paymentExpireTime?: string;
 }
 
 export interface VoucherOrder {
@@ -172,6 +173,7 @@ export interface VoucherOrder {
   paidTime?: string;
   cancelledTime?: string;
   expireTime?: string;
+  paymentExpireTime?: string;
 }
 
 export interface VoucherOrderDetailResponse {
@@ -216,7 +218,43 @@ export interface UserVoucher {
 }
 
 export interface VoucherOrderCreateRequest {
-  quantity: 1;
+  quantity: number;
+}
+
+export interface VoucherOrderConfirmationResponse {
+  productId: string | number;
+  shopId: string | number;
+  productTitle: string;
+  unitAmount: number;
+  quantity: number;
+  minQuantity: number;
+  maxQuantity: number;
+  totalAmount: number;
+  discountAmount: number;
+  payAmount: number;
+  availableStock: number;
+  serverTime: string;
+  paymentExpireTime: string;
+}
+
+export interface VoucherOrderConfirmation {
+  productId: string;
+  shopId: string;
+  productTitle: string;
+  unitAmount: number;
+  quantity: number;
+  minQuantity: number;
+  maxQuantity: number;
+  totalAmount: number;
+  discountAmount: number;
+  payAmount: number;
+  availableStock: number;
+  serverTime: string;
+  paymentExpireTime: string;
+  unitAmountText: string;
+  totalAmountText: string;
+  discountAmountText: string;
+  payAmountText: string;
 }
 
 export type VoucherOrderStatusFilter = VoucherOrderStatus | "ALL";

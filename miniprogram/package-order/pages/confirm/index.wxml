@@ -1,0 +1,34 @@
+<app-navbar title="确认订单" back />
+
+<view class="page page-enter">
+  <view wx:if="{{loading}}" class="module-state roamly-panel"><t-loading size="42rpx" /> 正在读取商品事实</view>
+  <app-empty wx:elif="{{error && !product}}" description="{{error}}" action-text="重新加载" bind:action="retry" />
+  <block wx:else>
+    <view class="product-card roamly-panel">
+      <view class="product-title">{{product.title}}</view>
+      <view class="product-subtitle">{{shop.name}} · {{shop.address || '到店使用'}}</view>
+      <view class="product-meta">{{product.productTypeLabel}} · {{product.validityText}}</view>
+    </view>
+    <view class="quantity-card roamly-panel">
+      <view class="row-title">购买数量</view>
+      <view class="stepper">
+        <button class="stepper-button" disabled="{{quantity <= 1 || refreshing}}" bind:tap="decrease">−</button>
+        <text class="stepper-value">{{quantity}}</text>
+        <button class="stepper-button" disabled="{{quantity >= (confirmation.maxQuantity || 1) || refreshing}}" bind:tap="increase">+</button>
+      </view>
+      <view class="stock-hint">最多可购 {{confirmation.maxQuantity || 1}} 份 · 当前库存 {{confirmation.availableStock || 0}}</view>
+    </view>
+    <view wx:if="{{confirmation}}" class="amount-card roamly-panel">
+      <view class="row"><text>单价</text><text>¥{{confirmation.unitAmountText}}</text></view>
+      <view class="row"><text>商品总额</text><text>¥{{confirmation.totalAmountText}}</text></view>
+      <view class="row"><text>优惠</text><text>-¥{{confirmation.discountAmountText}}</text></view>
+      <view class="row total"><text>实付</text><text>¥{{confirmation.payAmountText}}</text></view>
+      <view class="server-note">价格和库存以服务端确认结果为准</view>
+    </view>
+    <app-empty wx:if="{{error}}" description="{{error}}" action-text="重新确认" bind:action="retry" />
+    <view class="bottom-bar">
+      <view class="bottom-total"><text>实付</text><text class="bottom-price">¥{{confirmation.payAmountText || '0.00'}}</text></view>
+      <t-button theme="primary" shape="round" loading="{{submitting || refreshing}}" disabled="{{!confirmation || refreshing}}" bind:tap="submit">提交订单</t-button>
+    </view>
+  </block>
+</view>

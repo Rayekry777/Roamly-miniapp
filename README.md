@@ -33,7 +33,7 @@ Spring Boot 必须监听非回环网卡，Windows 防火墙仅需允许本地子
 
 详细消费者页面、交互、接口消费、视觉和分阶段实施契约见 [消费者小程序契约](docs/MINIAPP_DEVELOPMENT.md)。
 
-阶段 21 已完成消费者四类券展示与销售状态适配；阶段 22 至 27 的确认订单、15 分钟倒计时、Mock 支付、多份发券、退款和动态二维码已完成设计冻结，按路线图继续推进。实施顺序见 [四端交付路线图](../Roamly/docs/roadmap/FOUR_END_DELIVERY_ROADMAP.md)。
+阶段 22 已完成消费者确认订单、服务端计价、数量步进和幂等下单；阶段 23 至 27 的 15 分钟倒计时、Mock 支付、多份发券、退款和动态二维码已完成设计冻结，按路线图继续推进。实施顺序见 [四端交付路线图](../Roamly/docs/roadmap/FOUR_END_DELIVERY_ROADMAP.md)。
 
 ## 会话迁移
 

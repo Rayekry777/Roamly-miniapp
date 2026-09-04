@@ -1,8 +1,7 @@
-import { createOrder } from "../../../services/order";
 import { loadVoucherProduct } from "../../../services/voucher-product";
 import type { ShopSummary, VoucherProduct } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
-import { orderDetailUrl, shopDetailUrl } from "../../../utils/routes";
+import { shopDetailUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 
 Page({
@@ -45,7 +44,7 @@ Page({
       });
     }
   },
-  async createOrder() {
+  openConfirm() {
     if (this.data.submitting || !this.data.product) return;
     if (
       !requireLogin(
@@ -53,27 +52,9 @@ Page({
       )
     )
       return;
-    const confirmed = await new Promise<boolean>((resolve) => {
-      wx.showModal({
-        title: "确认下单",
-        content: `将创建 1 份「${this.data.product?.title || "团购商品"}」订单`,
-        success: (result) => resolve(result.confirm),
-        fail: () => resolve(false),
-      });
+    wx.navigateTo({
+      url: `/package-order/pages/confirm/index?id=${encodeURIComponent(this.productId)}`,
     });
-    if (!confirmed) return;
-    this.setData({ submitting: true, error: "" });
-    try {
-      const order = await createOrder(this.productId);
-      wx.navigateTo({ url: orderDetailUrl(order.id) });
-    } catch (error) {
-      this.setData({
-        error:
-          error instanceof Error ? error.message : "订单创建失败，请稍后重试",
-      });
-    } finally {
-      this.setData({ submitting: false });
-    }
   },
   retry() {
     void this.loadProduct();
