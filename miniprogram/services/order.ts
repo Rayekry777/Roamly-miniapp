@@ -14,11 +14,18 @@ import { formatAmount } from "./voucher-product";
 import { normalizeVoucherProduct } from "./voucher-product";
 import { adaptShopSummary } from "./post-card";
 
-export async function createOrder(productId: string, quantity = 1): Promise<VoucherOrder> {
+export async function createOrder(
+  productId: string,
+  quantity = 1,
+): Promise<VoucherOrder> {
   const idempotencyKey = `miniapp-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
-  const result = await orderApi.createVoucherOrder(String(productId), {
-    quantity,
-  }, idempotencyKey);
+  const result = await orderApi.createVoucherOrder(
+    String(productId),
+    {
+      quantity,
+    },
+    idempotencyKey,
+  );
   if (!result.data) throw new Error("订单创建结果缺少内容");
   return normalizeOrder(result.data);
 }
@@ -27,12 +34,16 @@ export async function confirmOrder(
   productId: string,
   quantity: number,
 ): Promise<VoucherOrderConfirmation> {
-  const result = await orderApi.confirmVoucherOrder(String(productId), { quantity });
+  const result = await orderApi.confirmVoucherOrder(String(productId), {
+    quantity,
+  });
   if (!result.data) throw new Error("订单确认响应格式异常，请稍后重试");
   return normalizeConfirmation(result.data);
 }
 
-function normalizeConfirmation(value: VoucherOrderConfirmationResponse): VoucherOrderConfirmation {
+function normalizeConfirmation(
+  value: VoucherOrderConfirmationResponse,
+): VoucherOrderConfirmation {
   const totalAmount = Number(value.totalAmount) || 0;
   const discountAmount = Number(value.discountAmount) || 0;
   const payAmount = Number(value.payAmount) || 0;
@@ -81,18 +92,31 @@ export async function loadMyOrder(
     product: normalizeVoucherProduct(result.data.product),
     shop: adaptShopSummary(result.data.shop),
     serverTime: result.data.serverTime || new Date().toISOString(),
-    paymentExpireTime: result.data.paymentExpireTime || result.data.order.paymentExpireTime,
+    paymentExpireTime:
+      result.data.paymentExpireTime || result.data.order.paymentExpireTime,
     paymentStatus: result.data.paymentStatus,
     vouchers: (result.data.vouchers || []).map((voucher) => ({
       ...voucher,
-      id: String(voucher.id), orderId: String(voucher.orderId), productId: String(voucher.productId),
-      statusText: voucher.status === "UNUSED" ? "待使用" : voucher.status === "USED" ? "已使用" : voucher.status === "EXPIRED" ? "已过期" : "已退款",
+      id: String(voucher.id),
+      orderId: String(voucher.orderId),
+      productId: String(voucher.productId),
+      statusText:
+        voucher.status === "UNUSED"
+          ? "待使用"
+          : voucher.status === "USED"
+            ? "已使用"
+            : voucher.status === "EXPIRED"
+              ? "已过期"
+              : "已退款",
       usageRules: voucher.usageRules || "",
     })) as UserVoucher[],
   };
 }
 
-export async function payOrder(orderId: string, scenario: "MOCK_SUCCESS" | "MOCK_FAILURE" = "MOCK_SUCCESS") {
+export async function payOrder(
+  orderId: string,
+  scenario: "MOCK_SUCCESS" | "MOCK_FAILURE" = "MOCK_SUCCESS",
+) {
   const key = `payment-${orderId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const result = await orderApi.payMyOrder(orderId, { scenario }, key);
   if (!result.data) throw new Error("支付响应格式异常，请稍后重试");

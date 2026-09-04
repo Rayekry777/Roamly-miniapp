@@ -62,20 +62,29 @@ Page({
         return;
       }
       const total = Math.floor(remain / 1000);
-      this.setData({ countdownText: `剩余 ${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}` });
+      this.setData({
+        countdownText: `剩余 ${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`,
+      });
     };
     tick();
     this.countdownTimer = setInterval(tick, 1000);
   },
   async pay() {
-    if (!this.data.order || this.data.order.status !== "PENDING_PAYMENT" || this.data.paying) return;
+    if (
+      !this.data.order ||
+      this.data.order.status !== "PENDING_PAYMENT" ||
+      this.data.paying
+    )
+      return;
     this.setData({ paying: true, error: "" });
     try {
       await payOrder(this.orderId);
       await this.loadOrder();
       wx.showToast({ title: "支付成功", icon: "success" });
     } catch (error) {
-      this.setData({ error: error instanceof Error ? error.message : "支付失败" });
+      this.setData({
+        error: error instanceof Error ? error.message : "支付失败",
+      });
     } finally {
       this.setData({ paying: false });
     }

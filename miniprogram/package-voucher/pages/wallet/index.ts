@@ -110,20 +110,42 @@ Page({
     const id = String(event.currentTarget.dataset.id || "");
     const voucher = this.data.vouchers.find((item) => item.id === id);
     if (!voucher || voucher.status !== "UNUSED") return;
-    const modal = await new Promise<boolean>((resolve) => wx.showModal({ title: "申请退款", content: "确认申请这张券的退款吗？", success: (r) => resolve(r.confirm), fail: () => resolve(false) }));
+    const modal = await new Promise<boolean>((resolve) =>
+      wx.showModal({
+        title: "申请退款",
+        content: "确认申请这张券的退款吗？",
+        success: (r) => resolve(r.confirm),
+        fail: () => resolve(false),
+      }),
+    );
     if (!modal) return;
     try {
-      const result = await requestVoucherRefund(id, "消费者申请退款", `refund-${id}-${Date.now()}`);
+      const result = await requestVoucherRefund(
+        id,
+        "消费者申请退款",
+        `refund-${id}-${Date.now()}`,
+      );
       if (!result.data) throw new Error("退款响应格式异常");
       wx.showToast({ title: "退款成功", icon: "success" });
-      if (this.voucherId) void this.loadDetail(); else void this.loadList(true);
-    } catch (error) { wx.showToast({ title: error instanceof Error ? error.message : "退款失败", icon: "none" }); }
+      if (this.voucherId) void this.loadDetail();
+      else void this.loadList(true);
+    } catch (error) {
+      wx.showToast({
+        title: error instanceof Error ? error.message : "退款失败",
+        icon: "none",
+      });
+    }
   },
   async showQr(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id || "");
     if (!id) return;
     this.qrVoucherId = id;
-    this.setData({ qrVisible: true, qrToken: "", qrSeconds: 0, qrLoading: true });
+    this.setData({
+      qrVisible: true,
+      qrToken: "",
+      qrSeconds: 0,
+      qrLoading: true,
+    });
     await this.issueQr(id);
   },
   async issueQr(id: string) {
@@ -131,13 +153,24 @@ Page({
     this.setData({ qrLoading: true });
     try {
       const result = await issueVoucherQrToken(id);
-      if (!result.data?.token || !result.data.expiresAt) throw new Error("二维码响应格式异常");
-      const seconds = Math.max(1, Math.ceil((Date.parse(result.data.expiresAt) - Date.now()) / 1000));
-      this.setData({ qrToken: result.data.token, qrSeconds: seconds, qrLoading: false });
+      if (!result.data?.token || !result.data.expiresAt)
+        throw new Error("二维码响应格式异常");
+      const seconds = Math.max(
+        1,
+        Math.ceil((Date.parse(result.data.expiresAt) - Date.now()) / 1000),
+      );
+      this.setData({
+        qrToken: result.data.token,
+        qrSeconds: seconds,
+        qrLoading: false,
+      });
       this.startQrTimer();
     } catch (error) {
       this.setData({ qrLoading: false, qrToken: "", qrSeconds: 0 });
-      wx.showToast({ title: error instanceof Error ? error.message : "二维码生成失败", icon: "none" });
+      wx.showToast({
+        title: error instanceof Error ? error.message : "二维码生成失败",
+        icon: "none",
+      });
     }
   },
   startQrTimer() {
@@ -155,7 +188,12 @@ Page({
   },
   closeQr() {
     this.stopQrTimer();
-    this.setData({ qrVisible: false, qrToken: "", qrSeconds: 0, qrLoading: false });
+    this.setData({
+      qrVisible: false,
+      qrToken: "",
+      qrSeconds: 0,
+      qrLoading: false,
+    });
     this.qrVoucherId = "";
   },
   noop() {},
