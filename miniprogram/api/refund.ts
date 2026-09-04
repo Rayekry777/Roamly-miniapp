@@ -7,3 +7,6 @@ export function requestVoucherRefund(voucherId: string, reason: string, idempote
     headers: { "Idempotency-Key": idempotencyKey },
   });
 }
+export function issueVoucherQrToken(voucherId: string): Promise<Result<{ token: string; expiresAt: string }>> {
+  return request(`/v1/users/me/vouchers/${voucherId}/qr-tokens`, { method: "POST", auth: "required", dedupe: false, showError: false });
+}

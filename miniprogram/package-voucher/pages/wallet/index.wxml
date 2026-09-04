@@ -12,6 +12,7 @@
       <view class="meta">有效期：{{item.validFrom || '购买后生效'}} 至 {{item.expireTime || '以商户规则为准'}}</view>
       <view class="rules">{{item.usageRules}}</view>
       <t-button wx:if="{{item.status === 'UNUSED'}}" size="small" variant="outline" data-id="{{item.id}}" catch:tap="refund">申请退款</t-button>
+      <t-button wx:if="{{item.status === 'UNUSED'}}" size="small" data-id="{{item.id}}" catch:tap="showQr">出示二维码</t-button>
     </view>
     <view wx:if="{{loading}}" class="list-footer"><t-loading size="36rpx" /> 加载中</view>
     <view wx:elif="{{!hasMore && !voucherId}}" class="list-footer">没有更多券了</view>

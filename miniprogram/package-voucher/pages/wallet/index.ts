@@ -2,7 +2,7 @@ import { loadMyVoucher, loadMyVouchers } from "../../../services/user-voucher";
 import type { UserVoucher, UserVoucherStatusFilter } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
 import { createRequestScope } from "../../../utils/scope";
-import { requestVoucherRefund } from "../../../api/refund";
+import { requestVoucherRefund, issueVoucherQrToken } from "../../../api/refund";
 
 const PAGE_SIZE = 10;
 
@@ -105,6 +105,11 @@ Page({
       wx.showToast({ title: "退款成功", icon: "success" });
       if (this.voucherId) void this.loadDetail(); else void this.loadList(true);
     } catch (error) { wx.showToast({ title: error instanceof Error ? error.message : "退款失败", icon: "none" }); }
+  },
+  async showQr(event: WechatMiniprogram.TouchEvent) {
+    const id = String(event.currentTarget.dataset.id || "");
+    try { const result = await issueVoucherQrToken(id); if (!result.data) throw new Error("二维码响应格式异常"); wx.showModal({ title: "动态券码", content: result.data.token, showCancel: false }); }
+    catch (error) { wx.showToast({ title: error instanceof Error ? error.message : "二维码生成失败", icon: "none" }); }
   },
   voucherId: "",
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
