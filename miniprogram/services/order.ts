@@ -32,7 +32,9 @@ export async function loadMyOrders(
   return { ...result.data, items: result.data.items.map(normalizeOrder) };
 }
 
-export async function loadMyOrder(orderId: string): Promise<VoucherOrderDetail> {
+export async function loadMyOrder(
+  orderId: string,
+): Promise<VoucherOrderDetail> {
   const result = await orderApi.getMyOrder(String(orderId));
   if (!result.data?.order || !result.data.product || !result.data.shop) {
     throw new Error("订单详情响应格式异常，请稍后重试");

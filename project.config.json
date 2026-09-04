@@ -1,5 +1,5 @@
 {
-  "appid": "wx411f9b2ee21a2bd0",
+  "appid": "touristappid",
   "projectname": "roamly-miniapp",
   "compileType": "miniprogram",
   "miniprogramRoot": "miniprogram/",
@@ -18,9 +18,7 @@
         "miniprogramNpmDistDir": "./miniprogram/"
       }
     ],
-    "useCompilerPlugins": [
-      "typescript"
-    ],
+    "useCompilerPlugins": ["typescript"],
     "compileWorklet": false,
     "uglifyFileName": false,
     "uploadWithSourceMap": true,

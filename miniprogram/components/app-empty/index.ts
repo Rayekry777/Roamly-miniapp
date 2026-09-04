@@ -1,7 +1,11 @@
 Component({
   properties: {
-    description: { type: String, value: '这里暂时还没有内容' },
-    actionText: { type: String, value: '' }
+    description: { type: String, value: "这里暂时还没有内容" },
+    actionText: { type: String, value: "" },
   },
-  methods: { onAction() { this.triggerEvent('action') } }
-})
+  methods: {
+    onAction() {
+      this.triggerEvent("action");
+    },
+  },
+});

@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FeedStore, mergePosts } from "../miniprogram/store/feed";
 import type { PostCard } from "../miniprogram/types";
 
-function post(
-  id: string,
-  options: Partial<PostCard> = {},
-): PostCard {
+function post(id: string, options: Partial<PostCard> = {}): PostCard {
   return {
     id,
     author: { id: `user-${id}`, nickName: `用户${id}` },

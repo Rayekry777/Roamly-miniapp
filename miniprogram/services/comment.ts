@@ -131,6 +131,9 @@ function adaptComment(comment: CommentResponse, postId: string): PostComment {
   };
 }
 
-function normalizeCursor(cursor: number | null, hasMore: boolean): number | null {
+function normalizeCursor(
+  cursor: number | null,
+  hasMore: boolean,
+): number | null {
   return hasMore ? Number(cursor || 0) : null;
 }

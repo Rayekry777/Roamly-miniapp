@@ -13,7 +13,9 @@ Component({
   },
   observers: {
     post(post: PostCard) {
-      this.setData({ displayTime: formatRelativeTime(post?.createdTime || "") });
+      this.setData({
+        displayTime: formatRelativeTime(post?.createdTime || ""),
+      });
     },
   },
   methods: {

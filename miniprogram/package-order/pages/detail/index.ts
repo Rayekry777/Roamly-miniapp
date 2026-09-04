@@ -1,9 +1,5 @@
 import { cancelOrder, loadMyOrder } from "../../../services/order";
-import type {
-  ShopSummary,
-  VoucherOrder,
-  VoucherProduct,
-} from "../../../types";
+import type { ShopSummary, VoucherOrder, VoucherProduct } from "../../../types";
 import { shopDetailUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 

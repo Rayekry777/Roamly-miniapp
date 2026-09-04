@@ -1,3 +1,3 @@
 interface IAppOption {
-  globalData: { motionEnabled: boolean }
+  globalData: { motionEnabled: boolean };
 }

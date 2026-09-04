@@ -1,1 +1,7 @@
-{ "desc": "Roamly 页面索引", "rules": [{ "action": "allow", "page": "pages/home/index" }, { "action": "disallow", "page": "*" }] }
+{
+  "desc": "Roamly 页面索引",
+  "rules": [
+    { "action": "allow", "page": "pages/home/index" },
+    { "action": "disallow", "page": "*" }
+  ]
+}

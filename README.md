@@ -12,6 +12,8 @@ npm run verify
 
 `npm run build:npm` 会生成微信运行所需的 `miniprogram/miniprogram_npm`；依赖变化后重新执行。环境地址在 `miniprogram/config/env.ts` 中按开发版、体验版、正式版分层配置；体验版和正式版 `apiBaseUrl` 必须保留末尾 `/api`，上传前还要将占位域名替换为已备案 HTTPS 合法域名。
 
+仓库中的 `project.config.json` 使用微信游客 AppID。真实 AppID 写入已忽略的 `project.private.config.json`，可从 `project.private.config.example.json` 复制本地配置，禁止提交真实值。
+
 ## 真机调试
 
 开发者工具访问 `http://127.0.0.1:8081`，开发版真机访问当前电脑 Wi-Fi 地址 `http://192.168.2.109:8081`。手机和电脑需要位于同一局域网，并在微信开发者工具中关闭合法域名校验。电脑网络变化后，应同步更新 `miniprogram/config/env.ts` 中的 `deviceDevelopEnvironment`。
