@@ -1,13 +1,13 @@
 # Roamly 消费者小程序契约
 
 ```yaml
-version: 6
-updatedAt: 2026-09-04
+version: 7
+updatedAt: 2026-09-05
 scope: 消费者页面、交互、接口消费与客户端状态
 reviewStatus: accepted
 designStatus: 已冻结
 demoImplementationStatus: 已实现
-transactionExpansionStatus: 未实现
+transactionExpansionStatus: 已实现（Demo Mock）
 deviceAcceptanceStatus: 未确认
 ```
 
@@ -67,10 +67,10 @@ deviceAcceptanceStatus: 未确认
 |   15 | 契约拆分和视觉基线复核          | 已实现 |
 |   21 | 四类券展示                      | 已实现 |
 |   22 | 确认订单与数量计价              | 已实现 |
-|   23 | 倒计时、Mock 支付和多份券       | 未实现 |
-|   24 | 单券退款                        | 未实现 |
-|   27 | 动态二维码与前台刷新            | 未实现 |
-|   30 | 自动化与真机验收                | 未实现 |
+|   23 | 倒计时、Mock 支付和多份券       | 已实现 |
+|   24 | 单券退款                        | 已实现 |
+|   27 | 动态二维码与前台刷新            | 已实现 |
+|   30 | 自动化与真机验收                | 已实现（自动化；真机未确认） |
 
 ## 验收
 
