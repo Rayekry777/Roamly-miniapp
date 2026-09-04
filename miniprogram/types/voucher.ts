@@ -242,6 +242,17 @@ export interface VoucherPaymentResponse {
   paymentExpireTime?: string;
 }
 
+export interface VoucherRefundResponse {
+  id: string | number;
+  voucherId: string | number;
+  orderId: string | number;
+  amount: number;
+  status: string;
+  reason?: string;
+  requestedTime?: string;
+  processedTime?: string;
+}
+
 export interface VoucherOrderConfirmationResponse {
   productId: string | number;
   shopId: string | number;

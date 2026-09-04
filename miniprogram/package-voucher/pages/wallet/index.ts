@@ -2,6 +2,7 @@ import { loadMyVoucher, loadMyVouchers } from "../../../services/user-voucher";
 import type { UserVoucher, UserVoucherStatusFilter } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
 import { createRequestScope } from "../../../utils/scope";
+import { requestVoucherRefund } from "../../../api/refund";
 
 const PAGE_SIZE = 10;
 
@@ -91,6 +92,19 @@ Page({
   retry() {
     if (this.voucherId) void this.loadDetail();
     else void this.loadList(true);
+  },
+  async refund(event: WechatMiniprogram.TouchEvent) {
+    const id = String(event.currentTarget.dataset.id || "");
+    const voucher = this.data.vouchers.find((item) => item.id === id);
+    if (!voucher || voucher.status !== "UNUSED") return;
+    const modal = await new Promise<boolean>((resolve) => wx.showModal({ title: "申请退款", content: "确认申请这张券的退款吗？", success: (r) => resolve(r.confirm), fail: () => resolve(false) }));
+    if (!modal) return;
+    try {
+      const result = await requestVoucherRefund(id, "消费者申请退款", `refund-${id}-${Date.now()}`);
+      if (!result.data) throw new Error("退款响应格式异常");
+      wx.showToast({ title: "退款成功", icon: "success" });
+      if (this.voucherId) void this.loadDetail(); else void this.loadList(true);
+    } catch (error) { wx.showToast({ title: error instanceof Error ? error.message : "退款失败", icon: "none" }); }
   },
   voucherId: "",
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
