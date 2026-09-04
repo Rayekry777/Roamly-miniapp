@@ -4,6 +4,7 @@
   "usingComponents": {
     "app-navbar": "/components/app-navbar/index",
     "app-empty": "/components/app-empty/index",
-    "t-loading": "tdesign-miniprogram/loading/loading"
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-qrcode": "tdesign-miniprogram/qrcode/qrcode"
   }
 }

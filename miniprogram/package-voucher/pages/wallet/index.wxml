@@ -18,3 +18,12 @@
     <view wx:elif="{{!hasMore && !voucherId}}" class="list-footer">没有更多券了</view>
   </view>
 </view>
+<view wx:if="{{qrVisible}}" class="qr-mask" catch:tap="closeQr">
+  <view class="qr-dialog" catch:tap="noop">
+    <view class="qr-dialog__head"><text>动态券二维码</text><text class="qr-close" bind:tap="closeQr">关闭</text></view>
+    <view wx:if="{{qrLoading}}" class="qr-loading"><t-loading size="48rpx" /> 正在生成</view>
+    <t-qrcode wx:elif="{{qrToken}}" value="{{qrToken}}" size="240" level="M" include-margin />
+    <view wx:if="{{qrToken}}" class="qr-countdown">{{qrSeconds}} 秒后自动刷新</view>
+    <view class="qr-tip">请将二维码交给商户扫码核销</view>
+  </view>
+</view>

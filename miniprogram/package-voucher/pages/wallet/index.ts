@@ -21,6 +21,10 @@ Page({
     hasMore: true,
     loading: true,
     error: "",
+    qrVisible: false,
+    qrToken: "",
+    qrSeconds: 0,
+    qrLoading: false,
   },
   onLoad(options) {
     this.scope = createRequestScope();
@@ -33,7 +37,16 @@ Page({
     }
   },
   onUnload() {
+    this.stopQrTimer();
     this.scope?.close();
+  },
+  onHide() {
+    this.stopQrTimer();
+  },
+  onShow() {
+    if (this.data.qrVisible && this.qrVoucherId && this.data.qrSeconds <= 0) {
+      void this.issueQr(this.qrVoucherId);
+    }
   },
   onPullDownRefresh() {
     void this.loadList(true).finally(() => wx.stopPullDownRefresh());
@@ -108,9 +121,46 @@ Page({
   },
   async showQr(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id || "");
-    try { const result = await issueVoucherQrToken(id); if (!result.data) throw new Error("二维码响应格式异常"); wx.showModal({ title: "动态券码", content: result.data.token, showCancel: false }); }
-    catch (error) { wx.showToast({ title: error instanceof Error ? error.message : "二维码生成失败", icon: "none" }); }
+    if (!id) return;
+    this.qrVoucherId = id;
+    this.setData({ qrVisible: true, qrToken: "", qrSeconds: 0, qrLoading: true });
+    await this.issueQr(id);
   },
+  async issueQr(id: string) {
+    this.stopQrTimer();
+    this.setData({ qrLoading: true });
+    try {
+      const result = await issueVoucherQrToken(id);
+      if (!result.data?.token || !result.data.expiresAt) throw new Error("二维码响应格式异常");
+      const seconds = Math.max(1, Math.ceil((Date.parse(result.data.expiresAt) - Date.now()) / 1000));
+      this.setData({ qrToken: result.data.token, qrSeconds: seconds, qrLoading: false });
+      this.startQrTimer();
+    } catch (error) {
+      this.setData({ qrLoading: false, qrToken: "", qrSeconds: 0 });
+      wx.showToast({ title: error instanceof Error ? error.message : "二维码生成失败", icon: "none" });
+    }
+  },
+  startQrTimer() {
+    this.stopQrTimer();
+    this.qrTimer = setInterval(() => {
+      if (!this.data.qrVisible) return this.stopQrTimer();
+      const seconds = this.data.qrSeconds - 1;
+      if (seconds > 0) this.setData({ qrSeconds: seconds });
+      else if (this.qrVoucherId) void this.issueQr(this.qrVoucherId);
+    }, 1000);
+  },
+  stopQrTimer() {
+    if (this.qrTimer) clearInterval(this.qrTimer);
+    this.qrTimer = undefined;
+  },
+  closeQr() {
+    this.stopQrTimer();
+    this.setData({ qrVisible: false, qrToken: "", qrSeconds: 0, qrLoading: false });
+    this.qrVoucherId = "";
+  },
+  noop() {},
   voucherId: "",
+  qrVoucherId: "",
+  qrTimer: undefined as ReturnType<typeof setInterval> | undefined,
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
 });
