@@ -29,7 +29,7 @@ export async function loadFeedPage(
       : await listFollowingPosts(options);
 
   if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("信息流接口尚未完成升级，请稍后重试");
+    throw new Error("信息流响应格式异常，请稍后重试");
   }
   return {
     ...result.data,

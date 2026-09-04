@@ -1,23 +1,33 @@
 import * as voucherApi from "../api/voucher-product";
-import type { VoucherProduct, VoucherProductResponse } from "../types";
+import type {
+  VoucherProduct,
+  VoucherProductDetail,
+  VoucherProductResponse,
+} from "../types";
 import { imageUrl } from "../utils/media";
+import { adaptShopSummary } from "./post-card";
 
 export const listVoucherProducts = async (
   shopId: string,
 ): Promise<VoucherProduct[]> => {
   const result = await voucherApi.listVoucherProducts(String(shopId));
   if (!Array.isArray(result.data)) {
-    throw new Error("团购商品接口尚未完成升级，请稍后重试");
+    throw new Error("团购商品响应格式异常，请稍后重试");
   }
   return result.data.map(normalizeVoucherProduct);
 };
 
 export const loadVoucherProduct = async (
   productId: string,
-): Promise<VoucherProduct> => {
+): Promise<VoucherProductDetail> => {
   const result = await voucherApi.getVoucherProduct(String(productId));
-  if (!result.data) throw new Error("团购商品不存在或已下架");
-  return normalizeVoucherProduct(result.data);
+  if (!result.data?.product || !result.data.shop) {
+    throw new Error("团购商品详情响应格式异常，请稍后重试");
+  }
+  return {
+    product: normalizeVoucherProduct(result.data.product),
+    shop: adaptShopSummary(result.data.shop),
+  };
 };
 
 export function normalizeVoucherProduct(

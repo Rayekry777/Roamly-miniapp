@@ -15,7 +15,7 @@ export async function loadMyVouchers(
 ): Promise<PageResult<UserVoucher>> {
   const result = await voucherApi.listMyVouchers(query);
   if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("券包接口尚未完成升级，请稍后重试");
+    throw new Error("券包响应格式异常，请稍后重试");
   }
   return { ...result.data, items: result.data.items.map(normalizeUserVoucher) };
 }

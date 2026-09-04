@@ -10,7 +10,7 @@ export type VoucherProductStatus =
 export type VoucherOrderStatus =
   | "PENDING_PAYMENT"
   | "PAID"
-  | "CANCELLED"
+  | "CANCELED"
   | "REFUNDING"
   | "REFUNDED";
 export type UserVoucherStatus = "UNUSED" | "USED" | "EXPIRED" | "REFUNDED";
@@ -57,6 +57,16 @@ export interface VoucherProduct {
   usageRules: string;
 }
 
+export interface VoucherProductDetailResponse {
+  product: VoucherProductResponse;
+  shop: ShopSummary;
+}
+
+export interface VoucherProductDetail {
+  product: VoucherProduct;
+  shop: ShopSummary;
+}
+
 export interface VoucherOrderResponse {
   id: string | number;
   orderNo?: string;
@@ -94,6 +104,18 @@ export interface VoucherOrder {
   paidTime?: string;
   cancelledTime?: string;
   expireTime?: string;
+}
+
+export interface VoucherOrderDetailResponse {
+  order: VoucherOrderResponse;
+  product: VoucherProductResponse;
+  shop: ShopSummary;
+}
+
+export interface VoucherOrderDetail {
+  order: VoucherOrder;
+  product: VoucherProduct;
+  shop: ShopSummary;
 }
 
 export interface UserVoucherResponse {

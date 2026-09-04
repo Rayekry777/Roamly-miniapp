@@ -44,7 +44,7 @@ export async function loadSectionPostPage(
 ): Promise<CursorPageResult<PostCard>> {
   const result = await listSectionPosts(sectionId, options);
   if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("分区动态接口尚未完成升级，请稍后重试");
+    throw new Error("分区动态响应格式异常，请稍后重试");
   }
   return {
     ...result.data,

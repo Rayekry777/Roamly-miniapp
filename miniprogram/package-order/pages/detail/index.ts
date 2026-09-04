@@ -1,10 +1,17 @@
 import { cancelOrder, loadMyOrder } from "../../../services/order";
-import type { VoucherOrder } from "../../../types";
+import type {
+  ShopSummary,
+  VoucherOrder,
+  VoucherProduct,
+} from "../../../types";
+import { shopDetailUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 
 Page({
   data: {
     order: null as VoucherOrder | null,
+    product: null as VoucherProduct | null,
+    shop: null as ShopSummary | null,
     loading: true,
     error: "",
     cancelling: false,
@@ -24,8 +31,15 @@ Page({
   async loadOrder() {
     this.setData({ loading: true, error: "" });
     try {
-      const order = await this.scope?.run(loadMyOrder(this.orderId));
-      if (order) this.setData({ order, loading: false });
+      const detail = await this.scope?.run(loadMyOrder(this.orderId));
+      if (detail) {
+        this.setData({
+          order: detail.order,
+          product: detail.product,
+          shop: detail.shop,
+          loading: false,
+        });
+      }
     } catch (error) {
       this.setData({
         loading: false,
@@ -54,6 +68,11 @@ Page({
   },
   retry() {
     void this.loadOrder();
+  },
+  openShop() {
+    if (this.data.shop?.id) {
+      wx.navigateTo({ url: shopDetailUrl(this.data.shop.id) });
+    }
   },
   orderId: "",
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,

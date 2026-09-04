@@ -52,7 +52,7 @@ describe("nearby and shop page contract", () => {
     const service = readFileSync("miniprogram/services/shop.ts", "utf8");
 
     expect(view).toContain('description="{{postError}}"');
-    expect(service).toContain("商户相关动态接口尚未完成升级");
+    expect(service).toContain("商户动态响应格式异常");
     expect(service).not.toContain("mock");
   });
 });

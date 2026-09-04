@@ -1,6 +1,10 @@
 .order-card { padding: 30rpx; }
 .order-status { color: var(--roamly-primary); font-size: 26rpx; font-weight: 700; }
 .title { margin: 18rpx 0 26rpx; font-size: 34rpx; font-weight: 750; }
+.product-summary { margin: -14rpx 0 18rpx; color: var(--roamly-muted); font-size: 23rpx; }
+.shop-row { display: flex; align-items: center; justify-content: space-between; margin-top: 20rpx; padding: 24rpx 28rpx; }
+.shop-name { font-size: 28rpx; font-weight: 700; }
+.shop-address { margin-top: 8rpx; color: var(--roamly-muted); font-size: 22rpx; }
 .line { display: flex; justify-content: space-between; padding: 16rpx 0; color: var(--roamly-muted); font-size: 23rpx; border-bottom: 1rpx solid var(--roamly-border); }
 .line text { color: var(--roamly-text); }
 .total { margin-top: 12rpx; color: var(--roamly-text); font-size: 27rpx; font-weight: 700; }

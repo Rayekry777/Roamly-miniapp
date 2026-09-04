@@ -1,6 +1,7 @@
 import type {
   CursorPageResult,
   Result,
+  VoucherProductDetailResponse,
   VoucherProductResponse,
 } from "../types";
 import { request } from "../utils/request";
@@ -16,7 +17,7 @@ export function listVoucherProducts(
 
 export function getVoucherProduct(
   productId: string,
-): Promise<Result<VoucherProductResponse>> {
+): Promise<Result<VoucherProductDetailResponse>> {
   return request(`/v1/voucher-products/${productId}`, {
     auth: "public",
     showError: false,

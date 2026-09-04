@@ -1,6 +1,7 @@
 import type {
   PageResult,
   Result,
+  VoucherOrderDetailResponse,
   VoucherOrderCreateRequest,
   VoucherOrderResponse,
   VoucherOrderStatusFilter,
@@ -40,7 +41,7 @@ export function listMyOrders(
 
 export function getMyOrder(
   orderId: string,
-): Promise<Result<VoucherOrderResponse>> {
+): Promise<Result<VoucherOrderDetailResponse>> {
   return request(`/v1/users/me/orders/${orderId}`, {
     auth: "required",
     showError: false,

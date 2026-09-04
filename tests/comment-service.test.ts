@@ -199,7 +199,7 @@ describe("comment service", () => {
     api.listPostComments.mockResolvedValue({ data: null });
 
     await expect(loadRootComments("9", { sort: "HOT" })).rejects.toThrow(
-      "评论接口尚未完成升级",
+      "评论列表响应格式异常",
     );
   });
 });

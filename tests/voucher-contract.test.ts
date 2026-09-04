@@ -8,8 +8,15 @@ import {
   createVoucherOrder,
   listMyOrders,
 } from "../miniprogram/api/order";
-import { normalizeVoucherProduct } from "../miniprogram/services/voucher-product";
-import { normalizeOrder } from "../miniprogram/services/order";
+import {
+  loadVoucherProduct,
+  normalizeVoucherProduct,
+} from "../miniprogram/services/voucher-product";
+import {
+  loadMyOrder,
+  normalizeOrder,
+  orderStatusText,
+} from "../miniprogram/services/order";
 
 const requestMock = vi.hoisted(() => vi.fn());
 vi.mock("../miniprogram/utils/request", () => ({ request: requestMock }));
@@ -60,6 +67,77 @@ describe("voucher, order and wallet contracts", () => {
       dedupe: false,
       showError: false,
     });
+  });
+
+  it("sends the backend-authoritative CANCELED order filter", async () => {
+    await listMyOrders({ status: "CANCELED" });
+    expect(requestMock).toHaveBeenCalledWith("/v1/users/me/orders", {
+      data: { page: 1, size: 10, status: "CANCELED" },
+      auth: "required",
+      showError: false,
+    });
+    expect(orderStatusText("CANCELED")).toBe("已取消");
+  });
+
+  it("adapts wrapped product detail and preserves large string ids", async () => {
+    requestMock.mockResolvedValueOnce({
+      code: "OK",
+      message: "ok",
+      data: {
+        product: {
+          id: "9007199254740993",
+          shopId: "9007199254740995",
+          title: "双人套餐",
+          payAmount: 9900,
+        },
+        shop: {
+          id: "9007199254740995",
+          name: "漫游咖啡实验室",
+          score: 46,
+        },
+      },
+    });
+
+    const detail = await loadVoucherProduct("9007199254740993");
+
+    expect(detail.product.id).toBe("9007199254740993");
+    expect(detail.shop.id).toBe("9007199254740995");
+    expect(detail.shop.score).toBe(4.6);
+  });
+
+  it("adapts wrapped order detail with product and shop summaries", async () => {
+    requestMock.mockResolvedValueOnce({
+      code: "OK",
+      message: "ok",
+      data: {
+        order: {
+          id: "9007199254740997",
+          shopId: "9007199254740995",
+          productId: "9007199254740993",
+          productTitle: "双人套餐",
+          quantity: 1,
+          unitAmount: 9900,
+          totalAmount: 9900,
+          payAmount: 9900,
+          status: "CANCELED",
+          createdTime: "2026-09-04T10:00:00",
+        },
+        product: {
+          id: "9007199254740993",
+          shopId: "9007199254740995",
+          title: "双人套餐",
+          payAmount: 9900,
+        },
+        shop: { id: "9007199254740995", name: "漫游咖啡实验室" },
+      },
+    });
+
+    const detail = await loadMyOrder("9007199254740997");
+
+    expect(detail.order.id).toBe("9007199254740997");
+    expect(detail.order.statusText).toBe("已取消");
+    expect(detail.product.id).toBe("9007199254740993");
+    expect(detail.shop.id).toBe("9007199254740995");
   });
 
   it("normalizes string ids and cents without inventing payment success", () => {

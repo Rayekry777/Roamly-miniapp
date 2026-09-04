@@ -3,6 +3,8 @@ import type {
   PostCardResponse,
   PostDetail,
   PostDetailResponse,
+  ShopSummary,
+  ShopSummaryResponse,
 } from "../types";
 
 export function adaptPostCard(response: PostCardResponse): PostCard {
@@ -47,22 +49,20 @@ export function adaptPostDetail(response: PostDetailResponse): PostDetail {
   return {
     ...card,
     content: response.content,
-    shop: response.shop
-      ? {
-          ...response.shop,
-          id: String(response.shop.id),
-          typeId: response.shop.typeId
-            ? String(response.shop.typeId)
-            : undefined,
-          score:
-            response.shop.score === undefined
-              ? undefined
-              : response.shop.score / 10,
-        }
-      : undefined,
+    shop: response.shop ? adaptShopSummary(response.shop) : undefined,
     editable: response.editable,
     deletable: response.deletable,
     defaultCommentSort:
       response.defaultCommentSort === "LATEST" ? "LATEST" : "HOT",
+  };
+}
+
+export function adaptShopSummary(response: ShopSummaryResponse): ShopSummary {
+  return {
+    ...response,
+    id: String(response.id),
+    typeId: response.typeId ? String(response.typeId) : undefined,
+    score:
+      response.score === undefined ? undefined : Number(response.score) / 10,
   };
 }

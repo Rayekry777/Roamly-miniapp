@@ -14,7 +14,7 @@ export async function loadReviewPage(
 ): Promise<PageResult<ShopReview>> {
   const result = await reviewApi.listShopReviews(shopId, query);
   if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("点评接口尚未完成升级，请稍后重试");
+    throw new Error("点评列表响应格式异常，请稍后重试");
   }
   return {
     ...result.data,

@@ -42,7 +42,7 @@ export async function loadShopPostPage(
 ): Promise<CursorPageResult<PostCard>> {
   const result = await shopApi.listShopPosts(shopId, { size: 3 });
   if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("商户相关动态接口尚未完成升级，请稍后重试");
+    throw new Error("商户动态响应格式异常，请稍后重试");
   }
   return {
     ...result.data,

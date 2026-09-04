@@ -14,7 +14,7 @@ Page({
       { value: "ALL", label: "全部" },
       { value: "PENDING_PAYMENT", label: "待支付" },
       { value: "PAID", label: "已支付" },
-      { value: "CANCELLED", label: "已取消" },
+      { value: "CANCELED", label: "已取消" },
       { value: "REFUNDED", label: "退款" },
     ] as Array<{ value: VoucherOrderStatusFilter; label: string }>,
     page: 1,

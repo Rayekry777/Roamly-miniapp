@@ -48,7 +48,7 @@ describe("section page contract", () => {
       "utf8",
     );
 
-    expect(service).toContain("分区动态接口尚未完成升级");
+    expect(service).toContain("分区动态响应格式异常");
     expect(view).toContain('description="{{feedError}}"');
     expect(view).not.toContain("后续阶段接入");
   });

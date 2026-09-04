@@ -6,6 +6,9 @@
 .price { color: var(--roamly-primary); font-size: 52rpx; font-weight: 800; }
 .origin { color: var(--roamly-muted); text-decoration: line-through; }
 .facts { display: flex; flex-wrap: wrap; gap: 18rpx; margin-top: 20rpx; color: var(--roamly-muted); font-size: 22rpx; }
+.shop-row { display: flex; align-items: center; justify-content: space-between; margin-top: 22rpx; padding: 24rpx 28rpx; }
+.shop-name { font-size: 28rpx; font-weight: 700; }
+.shop-address { margin-top: 8rpx; color: var(--roamly-muted); font-size: 22rpx; }
 .rules { display: flex; flex-direction: column; gap: 14rpx; margin: 22rpx 0; padding: 28rpx; color: var(--roamly-muted); font-size: 24rpx; line-height: 1.6; }
 .section-title { color: var(--roamly-text); font-size: 28rpx; font-weight: 700; }
 .hint { margin-top: 16rpx; color: var(--roamly-muted); text-align: center; font-size: 22rpx; }

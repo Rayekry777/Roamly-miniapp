@@ -23,7 +23,7 @@ export async function loadRootComments(
 ): Promise<CursorPageResult<CommentThread>> {
   const result = await listPostComments(postId, query);
   if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("评论接口尚未完成升级，请稍后重试");
+    throw new Error("评论列表响应格式异常，请稍后重试");
   }
   return {
     ...result.data,
@@ -39,7 +39,7 @@ export async function loadReplies(
 ): Promise<CursorPageResult<PostComment>> {
   const result = await listCommentReplies(rootCommentId, query);
   if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("回复接口尚未完成升级，请稍后重试");
+    throw new Error("回复列表响应格式异常，请稍后重试");
   }
   return {
     ...result.data,

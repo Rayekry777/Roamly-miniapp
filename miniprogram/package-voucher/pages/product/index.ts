@@ -1,13 +1,14 @@
 import { createOrder } from "../../../services/order";
 import { loadVoucherProduct } from "../../../services/voucher-product";
-import type { VoucherProduct } from "../../../types";
+import type { ShopSummary, VoucherProduct } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
-import { orderDetailUrl } from "../../../utils/routes";
+import { orderDetailUrl, shopDetailUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 
 Page({
   data: {
     product: null as VoucherProduct | null,
+    shop: null as ShopSummary | null,
     loading: true,
     error: "",
     submitting: false,
@@ -27,11 +28,18 @@ Page({
   async loadProduct() {
     this.setData({ loading: true, error: "" });
     try {
-      const product = await this.scope?.run(loadVoucherProduct(this.productId));
-      if (product) this.setData({ product, loading: false });
+      const detail = await this.scope?.run(loadVoucherProduct(this.productId));
+      if (detail) {
+        this.setData({
+          product: detail.product,
+          shop: detail.shop,
+          loading: false,
+        });
+      }
     } catch (error) {
       this.setData({
         product: null,
+        shop: null,
         loading: false,
         error: error instanceof Error ? error.message : "团购商品暂时加载失败",
       });
@@ -69,6 +77,11 @@ Page({
   },
   retry() {
     void this.loadProduct();
+  },
+  openShop() {
+    if (this.data.shop?.id) {
+      wx.navigateTo({ url: shopDetailUrl(this.data.shop.id) });
+    }
   },
   productId: "",
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,

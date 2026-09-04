@@ -2,10 +2,13 @@ import * as orderApi from "../api/order";
 import type {
   PageResult,
   VoucherOrder,
+  VoucherOrderDetail,
   VoucherOrderResponse,
   VoucherOrderStatusFilter,
 } from "../types";
 import { formatAmount } from "./voucher-product";
+import { normalizeVoucherProduct } from "./voucher-product";
+import { adaptShopSummary } from "./post-card";
 
 export async function createOrder(productId: string): Promise<VoucherOrder> {
   const result = await orderApi.createVoucherOrder(String(productId), {
@@ -24,15 +27,21 @@ export async function loadMyOrders(
 ): Promise<PageResult<VoucherOrder>> {
   const result = await orderApi.listMyOrders(query);
   if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("订单接口尚未完成升级，请稍后重试");
+    throw new Error("订单列表响应格式异常，请稍后重试");
   }
   return { ...result.data, items: result.data.items.map(normalizeOrder) };
 }
 
-export async function loadMyOrder(orderId: string): Promise<VoucherOrder> {
+export async function loadMyOrder(orderId: string): Promise<VoucherOrderDetail> {
   const result = await orderApi.getMyOrder(String(orderId));
-  if (!result.data) throw new Error("订单不存在或无权查看");
-  return normalizeOrder(result.data);
+  if (!result.data?.order || !result.data.product || !result.data.shop) {
+    throw new Error("订单详情响应格式异常，请稍后重试");
+  }
+  return {
+    order: normalizeOrder(result.data.order),
+    product: normalizeVoucherProduct(result.data.product),
+    shop: adaptShopSummary(result.data.shop),
+  };
 }
 
 export async function cancelOrder(orderId: string): Promise<void> {
@@ -60,7 +69,7 @@ export function orderStatusText(status: VoucherOrder["status"]): string {
   return {
     PENDING_PAYMENT: "待支付",
     PAID: "已支付",
-    CANCELLED: "已取消",
+    CANCELED: "已取消",
     REFUNDING: "退款中",
     REFUNDED: "已退款",
   }[status];

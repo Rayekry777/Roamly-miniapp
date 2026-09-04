@@ -12,6 +12,10 @@
       <view class="price-row"><text class="price">¥{{product.payAmountText}}</text><text wx:if="{{product.originalAmountText}}" class="origin">¥{{product.originalAmountText}}</text></view>
       <view class="facts"><text>库存 {{product.stock === undefined ? '以服务端为准' : product.stock}}</text><text>已售 {{product.soldCount}}</text><text>限购 {{product.perUserLimit || '不限'}}</text></view>
     </view>
+    <view wx:if="{{shop}}" class="shop-row roamly-panel" bind:tap="openShop">
+      <view><view class="shop-name">{{shop.name}}</view><view class="shop-address">{{shop.address || '查看商户详情'}}</view></view>
+      <t-icon name="chevron-right" size="36rpx" />
+    </view>
     <view class="section roamly-panel rules"><view class="section-title">有效期</view><view>{{product.validityText}}</view><view class="section-title">使用规则</view><view>{{product.usageRules}}</view></view>
     <t-button block theme="primary" shape="round" loading="{{submitting}}" disabled="{{product.status !== 'ON_SALE'}}" bind:tap="createOrder">创建订单（数量 1）</t-button>
     <view wx:if="{{product.status !== 'ON_SALE'}}" class="hint">当前商品暂不可购买</view>
