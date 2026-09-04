@@ -5,7 +5,8 @@
   <block wx:else>
     <view class="order-card roamly-panel"><view class="order-status">{{order.statusText}}</view><view class="title">{{product.title || order.productTitle}}</view><view wx:if="{{product.productTypeLabel}}" class="product-type">{{product.productTypeLabel}} · {{product.saleStatusLabel}}</view><view wx:if="{{product.subtitle}}" class="product-summary">{{product.subtitle}}</view><view class="line">订单号 <text>{{order.orderNo}}</text></view><view class="line">数量 <text>{{order.quantity}}</text></view><view class="line">创建时间 <text>{{order.createdTime}}</text></view><view class="line total">实付 <text>¥{{order.payAmountText}}</text></view></view>
     <view wx:if="{{shop}}" class="shop-row roamly-panel" bind:tap="openShop"><view><view class="shop-name">{{shop.name}}</view><view class="shop-address">{{shop.address || '查看商户详情'}}</view></view><t-icon name="chevron-right" size="36rpx" /></view>
-    <view wx:if="{{order.status === 'PENDING_PAYMENT'}}" class="notice">暂未接入微信支付，请勿将此订单视为已支付。</view>
-    <t-button wx:if="{{order.status === 'PENDING_PAYMENT'}}" block theme="danger" variant="outline" loading="{{cancelling}}" bind:tap="cancel">取消订单</t-button>
+    <view wx:if="{{order.status === 'PENDING_PAYMENT'}}" class="notice">模拟支付 · {{countdownText || '支付有效期 15 分钟'}}</view>
+    <view wx:if="{{order.status === 'PENDING_PAYMENT'}}" class="action-row"><t-button block theme="danger" loading="{{paying}}" bind:tap="pay">模拟支付</t-button><t-button block variant="outline" loading="{{cancelling}}" bind:tap="cancel">取消订单</t-button></view>
+    <view wx:if="{{vouchers.length}}" class="voucher-list roamly-panel"><view class="line">券包明细</view><view wx:for="{{vouchers}}" wx:key="id" class="line"><text>第 {{index + 1}} 张券</text><text>{{item.statusText}}</text></view></view>
   </block>
 </view>

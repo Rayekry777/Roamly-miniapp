@@ -6,6 +6,8 @@ import type {
   VoucherOrderCreateRequest,
   VoucherOrderResponse,
   VoucherOrderStatusFilter,
+  VoucherPaymentRequest,
+  VoucherPaymentResponse,
 } from "../types";
 import { request } from "../utils/request";
 
@@ -69,5 +71,20 @@ export function cancelMyOrder(orderId: string): Promise<Result<null>> {
     auth: "required",
     dedupe: false,
     showError: false,
+  });
+}
+
+export function payMyOrder(
+  orderId: string,
+  data: VoucherPaymentRequest,
+  idempotencyKey: string,
+): Promise<Result<VoucherPaymentResponse>> {
+  return request(`/v1/users/me/orders/${orderId}/payments`, {
+    method: "POST",
+    data,
+    auth: "required",
+    dedupe: false,
+    showError: false,
+    headers: { "Idempotency-Key": idempotencyKey },
   });
 }

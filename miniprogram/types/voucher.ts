@@ -180,12 +180,20 @@ export interface VoucherOrderDetailResponse {
   order: VoucherOrderResponse;
   product: VoucherProductResponse;
   shop: ShopSummary;
+  serverTime?: string;
+  paymentExpireTime?: string;
+  paymentStatus?: "PENDING" | "SUCCEEDED" | "FAILED" | "CLOSED";
+  vouchers?: UserVoucherResponse[];
 }
 
 export interface VoucherOrderDetail {
   order: VoucherOrder;
   product: VoucherProduct;
   shop: ShopSummary;
+  serverTime: string;
+  paymentExpireTime?: string;
+  paymentStatus?: "PENDING" | "SUCCEEDED" | "FAILED" | "CLOSED";
+  vouchers: UserVoucher[];
 }
 
 export interface UserVoucherResponse {
@@ -219,6 +227,19 @@ export interface UserVoucher {
 
 export interface VoucherOrderCreateRequest {
   quantity: number;
+}
+
+export interface VoucherPaymentRequest {
+  scenario: "MOCK_SUCCESS" | "MOCK_FAILURE";
+}
+
+export interface VoucherPaymentResponse {
+  transactionId: string | number;
+  orderId: string | number;
+  status: "PENDING" | "SUCCEEDED" | "FAILED" | "CLOSED";
+  amount: number;
+  paidTime?: string;
+  paymentExpireTime?: string;
 }
 
 export interface VoucherOrderConfirmationResponse {

@@ -7,6 +7,8 @@ import type {
   VoucherOrderConfirmationResponse,
   VoucherOrderResponse,
   VoucherOrderStatusFilter,
+  VoucherPaymentResponse,
+  UserVoucher,
 } from "../types";
 import { formatAmount } from "./voucher-product";
 import { normalizeVoucherProduct } from "./voucher-product";
@@ -78,7 +80,23 @@ export async function loadMyOrder(
     order: normalizeOrder(result.data.order),
     product: normalizeVoucherProduct(result.data.product),
     shop: adaptShopSummary(result.data.shop),
+    serverTime: result.data.serverTime || new Date().toISOString(),
+    paymentExpireTime: result.data.paymentExpireTime || result.data.order.paymentExpireTime,
+    paymentStatus: result.data.paymentStatus,
+    vouchers: (result.data.vouchers || []).map((voucher) => ({
+      ...voucher,
+      id: String(voucher.id), orderId: String(voucher.orderId), productId: String(voucher.productId),
+      statusText: voucher.status === "UNUSED" ? "待使用" : voucher.status === "USED" ? "已使用" : voucher.status === "EXPIRED" ? "已过期" : "已退款",
+      usageRules: voucher.usageRules || "",
+    })) as UserVoucher[],
   };
+}
+
+export async function payOrder(orderId: string, scenario: "MOCK_SUCCESS" | "MOCK_FAILURE" = "MOCK_SUCCESS") {
+  const key = `payment-${orderId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const result = await orderApi.payMyOrder(orderId, { scenario }, key);
+  if (!result.data) throw new Error("支付响应格式异常，请稍后重试");
+  return result.data as VoucherPaymentResponse;
 }
 
 export async function cancelOrder(orderId: string): Promise<void> {
