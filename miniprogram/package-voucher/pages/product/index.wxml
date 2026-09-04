@@ -6,7 +6,7 @@
   <block wx:else>
     <app-image src="{{product.cover}}" custom-class="product-cover" mode="aspectFill" />
     <view class="product-card roamly-panel">
-      <view class="eyebrow">{{product.saleType === 'SECKILL' ? '限时秒杀' : '团购商品'}}</view>
+      <view class="eyebrow">{{product.productTypeLabel}} · {{product.saleStatusLabel}}</view>
       <view class="product-title">{{product.title}}</view>
       <view class="product-subtitle">{{product.subtitle}}</view>
       <view class="price-row"><text class="price">¥{{product.payAmountText}}</text><text wx:if="{{product.originalAmountText}}" class="origin">¥{{product.originalAmountText}}</text></view>
@@ -16,7 +16,23 @@
       <view><view class="shop-name">{{shop.name}}</view><view class="shop-address">{{shop.address || '查看商户详情'}}</view></view>
       <t-icon name="chevron-right" size="36rpx" />
     </view>
-    <view class="section roamly-panel rules"><view class="section-title">有效期</view><view>{{product.validityText}}</view><view class="section-title">使用规则</view><view>{{product.usageRules}}</view></view>
+    <view class="section roamly-panel rules">
+      <view class="section-title">有效期</view>
+      <view>{{product.validityText}}</view>
+      <view wx:if="{{product.validDays}}" class="rule-note">购买后 {{product.validDays}} 天有效</view>
+      <view wx:if="{{product.validBeginTime || product.validEndTime}}" class="rule-note">{{product.validBeginTime || '即刻'}} 至 {{product.validEndTime || '长期'}}</view>
+      <view class="section-title">使用规则</view>
+      <view wx:if="{{product.packageItems && product.packageItems.length}}" class="package-items">
+        <view wx:for="{{product.packageItems}}" wx:key="id" class="package-item"><text>{{item.name}}</text><text>{{item.quantity}} {{item.unit}}</text></view>
+      </view>
+      <view wx:if="{{product.usageRuleRows && product.usageRuleRows.length}}" class="rule-list">
+        <view wx:for="{{product.usageRuleRows}}" wx:key="dayOfWeek">{{item.dayOfWeek}}：{{item.closed ? '不可用' : item.periods[0].open + ' - ' + item.periods[0].close}}</view>
+      </view>
+      <view wx:else>{{product.usageRules}}</view>
+      <view wx:if="{{product.reservationRequired}}" class="rule-note">需要预约：{{product.reservationNotice || '请提前联系商户预约'}}</view>
+      <view wx:if="{{product.stackable}}" class="rule-note">支持与其他优惠叠加使用</view>
+      <view wx:if="{{product.refundAnytime}}" class="rule-note">未使用可随时退款{{product.refundExpired ? '，过期也可退款' : ''}}</view>
+    </view>
     <t-button block theme="primary" shape="round" loading="{{submitting}}" disabled="{{product.status !== 'ON_SALE'}}" bind:tap="createOrder">创建订单（数量 1）</t-button>
     <view wx:if="{{product.status !== 'ON_SALE'}}" class="hint">当前商品暂不可购买</view>
   </block>

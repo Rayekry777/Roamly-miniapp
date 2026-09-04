@@ -67,7 +67,7 @@
           <view class="voucher__copy">
             <text class="strong">{{item.title}}</text>
             <text>{{item.subtitle}}</text>
-            <t-tag wx:if="{{item.saleType === 'SECKILL'}}" theme="danger" variant="light">限时秒杀</t-tag>
+            <view class="voucher-tags"><t-tag theme="primary" variant="light">{{item.productTypeLabel}}</t-tag><t-tag theme="success" variant="light">{{item.saleStatusLabel}}</t-tag></view>
           </view>
           <t-button
             theme="primary"

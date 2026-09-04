@@ -2,11 +2,14 @@ import type { MediaAsset } from "./media";
 import type { ShopSummary } from "./post";
 
 export type VoucherSaleType = "NORMAL" | "SECKILL";
-export type VoucherProductStatus =
-  | "DRAFT"
+export type VoucherProductType = "PACKAGE" | "CASH" | "DISCOUNT" | "MULTI_USE";
+export type VoucherSaleStatus =
+  | "SCHEDULED"
   | "ON_SALE"
   | "OFF_SALE"
-  | "SOLD_OUT";
+  | "SOLD_OUT"
+  | "ENDED";
+export type VoucherProductStatus = VoucherSaleStatus | "DRAFT";
 export type VoucherOrderStatus =
   | "PENDING_PAYMENT"
   | "PAID"
@@ -32,7 +35,47 @@ export interface VoucherProductResponse {
   saleStartTime?: string;
   saleEndTime?: string;
   validityText?: string;
-  usageRules?: string;
+  usageRules?:
+    | string
+    | Array<{
+        dayOfWeek?: string;
+        closed?: boolean;
+        periods?: Array<{ open?: string; close?: string }>;
+      }>;
+  packageItems?: Array<{
+    id?: string | number;
+    name: string;
+    quantity: number;
+    unit: string;
+    unitPriceAmount?: number;
+  }>;
+  productType?: VoucherProductType;
+  productTypeLabel?: string;
+  subTitle?: string;
+  coverMedia?: { id?: string | number; contentPath?: string; url?: string };
+  coverMediaId?: string | number;
+  priceAmount?: number;
+  marketAmount?: number;
+  faceValueAmount?: number;
+  minimumSpendAmount?: number;
+  discountRateBps?: number;
+  maximumDiscountAmount?: number;
+  totalUseCount?: number;
+  totalStock?: number;
+  availableStock?: number;
+  purchaseLimit?: number;
+  saleStatus?: VoucherSaleStatus;
+  saleStatusLabel?: string;
+  validityTypeLabel?: string;
+  validBeginTime?: string;
+  validEndTime?: string;
+  validDays?: number;
+  excludedDates?: string[];
+  reservationRequired?: boolean;
+  reservationNotice?: string;
+  stackable?: boolean;
+  refundAnytime?: boolean;
+  refundExpired?: boolean;
 }
 
 export interface VoucherProduct {
@@ -55,6 +98,31 @@ export interface VoucherProduct {
   saleEndTime?: string;
   validityText: string;
   usageRules: string;
+  usageRuleRows?: Array<{
+    dayOfWeek: string;
+    closed: boolean;
+    periods: Array<{ open: string; close: string }>;
+  }>;
+  packageItems?: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    unit: string;
+    unitPriceAmount?: number;
+  }>;
+  validityTypeLabel?: string;
+  validBeginTime?: string;
+  validEndTime?: string;
+  validDays?: number;
+  excludedDates?: string[];
+  productType: VoucherProductType;
+  productTypeLabel: string;
+  saleStatusLabel: string;
+  reservationRequired?: boolean;
+  reservationNotice?: string;
+  stackable?: boolean;
+  refundAnytime?: boolean;
+  refundExpired?: boolean;
 }
 
 export interface VoucherProductDetailResponse {
