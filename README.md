@@ -29,7 +29,9 @@ Spring Boot 必须监听非回环网卡，Windows 防火墙仅需允许本地子
 - `styles`：主题 Token 与公共布局
 - `package-*`：商户、笔记和用户分包
 
-详细产品、页面、接口、权限、域名和分阶段实施契约见 [小程序开发与产品契约](docs/MINIAPP_DEVELOPMENT.md)。
+详细消费者页面、交互、接口消费、视觉和分阶段实施契约见 [消费者小程序契约](docs/MINIAPP_DEVELOPMENT.md)。
+
+阶段 21 至 27 涉及消费者的四类券、确认订单、15 分钟倒计时、Mock 支付、多份发券、退款和动态二维码已经完成设计冻结，但尚未实现。实施顺序见 [四端交付路线图](../Roamly/docs/roadmap/FOUR_END_DELIVERY_ROADMAP.md)。
 
 ## 会话迁移
 
