@@ -1,9 +1,14 @@
 import { ensureSelectedCity, locateForNearby } from "../../services/city";
-import { listShopTypes, loadShopPage } from "../../services/shop";
+import { listShopTypes } from "../../services/shop";
+import { loadVoucherProductPage } from "../../services/voucher-product";
 import { cityStore } from "../../store/city";
-import type { Shop, ShopSort, ShopType } from "../../types";
+import type {
+  ShopType,
+  VoucherProductListItem,
+  VoucherProductSort,
+} from "../../types";
 import { syncTabBar } from "../../utils/navigation";
-import { shopDetailUrl } from "../../utils/routes";
+import { voucherProductUrl } from "../../utils/routes";
 import { createRequestScope } from "../../utils/scope";
 
 const PAGE_SIZE = 10;
@@ -13,9 +18,9 @@ Page({
     cityName: "",
     keyword: "",
     typeId: "",
-    sort: "POPULAR" as ShopSort,
+    sort: "RECOMMENDED" as VoucherProductSort,
     types: [] as ShopType[],
-    shops: [] as Shop[],
+    products: [] as VoucherProductListItem[],
     page: 1,
     hasMore: true,
     loading: true,
@@ -37,7 +42,7 @@ Page({
     ) {
       this.cityCode = selectedCity.code;
       this.setData({ cityName: selectedCity.name });
-      void this.loadShops(true);
+      void this.loadProducts(true);
     }
   },
   onUnload() {
@@ -48,7 +53,7 @@ Page({
     void this.refresh();
   },
   onReachBottom() {
-    if (this.data.hasMore && !this.data.loading) void this.loadShops(false);
+    if (this.data.hasMore && !this.data.loading) void this.loadProducts(false);
   },
   async initialize() {
     const [cityResult, typeResult] = await Promise.allSettled([
@@ -76,19 +81,19 @@ Page({
       loading: false,
       error: "",
     });
-    await this.loadShops(true);
+    await this.loadProducts(true);
     void this.resolveLocation(false);
   },
   async refresh() {
     this.setData({ refreshing: true });
     try {
-      await this.loadShops(true);
+      await this.loadProducts(true);
     } finally {
       this.setData({ refreshing: false });
       wx.stopPullDownRefresh();
     }
   },
-  async loadShops(reset: boolean) {
+  async loadProducts(reset: boolean) {
     if (!this.cityCode || (!reset && this.data.loading)) return;
     const sequence = reset ? ++this.requestSequence : this.requestSequence;
     const page = reset ? 1 : this.data.page;
@@ -97,7 +102,7 @@ Page({
 
     try {
       const result = await this.scope?.run(
-        loadShopPage({
+        loadVoucherProductPage({
           cityCode: this.cityCode,
           typeId: this.data.typeId || undefined,
           keyword: this.data.keyword,
@@ -111,9 +116,9 @@ Page({
       if (!result || sequence !== this.requestSequence) return;
       const items = reset
         ? result.items
-        : mergeShops(this.data.shops, result.items);
+        : mergeProducts(this.data.products, result.items);
       this.setData({
-        shops: items,
+        products: items,
         page: page + 1,
         hasMore: items.length < result.total && result.items.length > 0,
         error: "",
@@ -121,7 +126,7 @@ Page({
     } catch (error) {
       if (sequence !== this.requestSequence) return;
       this.setData({
-        ...(reset ? { shops: [], page: 1, hasMore: true } : {}),
+        ...(reset ? { products: [], page: 1, hasMore: true } : {}),
         error: this.errorMessage(error),
       });
     } finally {
@@ -133,30 +138,31 @@ Page({
     const keyword = typeof detail === "string" ? detail : detail.value;
     this.setData({ keyword });
     if (this.searchTimer) clearTimeout(this.searchTimer);
-    this.searchTimer = setTimeout(() => void this.loadShops(true), 350);
+    this.searchTimer = setTimeout(() => void this.loadProducts(true), 350);
   },
   search() {
     if (this.searchTimer) clearTimeout(this.searchTimer);
-    void this.loadShops(true);
+    void this.loadProducts(true);
   },
   selectType(event: WechatMiniprogram.TouchEvent) {
     const typeId = String(event.currentTarget.dataset.id || "");
     if (typeId === this.data.typeId) return;
     this.setData({ typeId });
-    void this.loadShops(true);
+    void this.loadProducts(true);
   },
   async selectSort(event: WechatMiniprogram.TouchEvent) {
-    const sort = String(event.currentTarget.dataset.sort) as ShopSort;
+    const sort = String(event.currentTarget.dataset.sort) as VoucherProductSort;
     if (sort === this.data.sort) return;
     if (sort === "DISTANCE") {
       const located = await this.resolveLocation(true);
       if (!located) {
-        this.setData({ sort: "POPULAR" });
+        this.setData({ sort: "RECOMMENDED" });
+        await this.loadProducts(true);
         return;
       }
     }
     this.setData({ sort });
-    await this.loadShops(true);
+    await this.loadProducts(true);
   },
   async resolveLocation(showFailure: boolean): Promise<boolean> {
     if (this.locationPromise) return this.locationPromise;
@@ -196,19 +202,17 @@ Page({
   },
   retry() {
     if (!this.initialized) void this.initialize();
-    else void this.loadShops(true);
+    else void this.loadProducts(true);
   },
-  openShop(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
-    wx.navigateTo({ url: shopDetailUrl(event.detail.id) });
-  },
-  openShopList() {
-    const query = this.data.typeId
-      ? `?typeId=${encodeURIComponent(this.data.typeId)}`
-      : "";
-    wx.navigateTo({ url: `/package-shop/pages/list/index${query}` });
+  openProduct(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
+    wx.navigateTo({
+      url: voucherProductUrl(event.detail.id),
+      fail: () =>
+        wx.showToast({ title: "商品详情打开失败，请重试", icon: "none" }),
+    });
   },
   errorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : "商户暂时加载失败";
+    return error instanceof Error ? error.message : "团购商品暂时加载失败";
   },
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
   cityCode: "",
@@ -218,8 +222,11 @@ Page({
   locationPromise: undefined as Promise<boolean> | undefined,
 });
 
-function mergeShops(current: Shop[], incoming: Shop[]): Shop[] {
-  const shops = new Map(current.map((shop) => [shop.id, shop]));
-  incoming.forEach((shop) => shops.set(shop.id, shop));
-  return [...shops.values()];
+function mergeProducts(
+  current: VoucherProductListItem[],
+  incoming: VoucherProductListItem[],
+): VoucherProductListItem[] {
+  const products = new Map(current.map((item) => [item.product.id, item]));
+  incoming.forEach((item) => products.set(item.product.id, item));
+  return [...products.values()];
 }

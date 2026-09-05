@@ -5,10 +5,9 @@
     "app-image": "/components/app-image/index",
     "app-empty": "/components/app-empty/index",
     "success-motion": "/components/success-motion/index",
+    "voucher-product-card": "/components/voucher-product-card/index",
     "t-icon": "tdesign-miniprogram/icon/icon",
-    "t-button": "tdesign-miniprogram/button/button",
     "t-loading": "tdesign-miniprogram/loading/loading",
-    "t-skeleton": "tdesign-miniprogram/skeleton/skeleton",
-    "t-tag": "tdesign-miniprogram/tag/tag"
+    "t-skeleton": "tdesign-miniprogram/skeleton/skeleton"
   }
 }

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getVoucherProduct,
+  listPublicVoucherProducts,
   listVoucherProducts,
 } from "../miniprogram/api/voucher-product";
 import {
@@ -10,6 +11,7 @@ import {
 } from "../miniprogram/api/order";
 import {
   loadVoucherProduct,
+  loadVoucherProductPage,
   normalizeVoucherProduct,
 } from "../miniprogram/services/voucher-product";
 import {
@@ -40,6 +42,58 @@ describe("voucher, order and wallet contracts", () => {
       "/v1/voucher-products/9007199254740993",
       { auth: "public", showError: false },
     );
+  });
+
+  it("loads public nearby products with sort, search and coordinates", async () => {
+    await listPublicVoucherProducts({
+      cityCode: "310100",
+      typeId: "12",
+      keyword: "咖啡",
+      sort: "PRICE_ASC",
+      page: 2,
+      size: 20,
+      longitude: 121.47,
+      latitude: 31.23,
+    });
+    expect(requestMock).toHaveBeenCalledWith("/v1/voucher-products", {
+      data: {
+        cityCode: "310100",
+        typeId: "12",
+        keyword: "咖啡",
+        sort: "PRICE_ASC",
+        page: 2,
+        size: 20,
+        longitude: 121.47,
+        latitude: 31.23,
+      },
+      auth: "public",
+      showError: false,
+    });
+  });
+
+  it("falls back to shop cover and formats distance for nearby cards", async () => {
+    requestMock.mockResolvedValueOnce({
+      code: "OK",
+      message: "ok",
+      data: {
+        page: 1,
+        size: 10,
+        total: 1,
+        items: [
+          {
+            product: { id: "1", shopId: "2", title: "套餐", payAmount: 9900 },
+            shop: { id: "2", name: "门店", cover: "/shops/2.jpg" },
+            distance: 860,
+          },
+        ],
+      },
+    });
+    const page = await loadVoucherProductPage({
+      cityCode: "310100",
+      sort: "RECOMMENDED",
+    });
+    expect(page.items[0]?.product.cover).toContain("/shops/2.jpg");
+    expect(page.items[0]?.distanceText).toBe("860m");
   });
 
   it("keeps order writes non-deduplicated and filters optional status", async () => {

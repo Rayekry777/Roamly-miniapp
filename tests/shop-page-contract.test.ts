@@ -6,14 +6,14 @@ describe("nearby and shop page contract", () => {
     const view = readFileSync("miniprogram/pages/nearby/index.wxml", "utf8");
     const logic = readFileSync("miniprogram/pages/nearby/index.ts", "utf8");
 
-    expect(view).toContain("shop-skeletons");
+    expect(view).toContain("product-skeletons");
     expect(view).toContain('description="{{error}}"');
-    expect(view).toContain("当前筛选下没有找到商户");
+    expect(view).toContain("当前筛选下没有找到可购买的团购");
     expect(view).toContain('data-sort="DISTANCE"');
     expect(view).toContain('bind:tap="selectType"');
     expect(logic).toContain("requestSequence");
     expect(logic).toContain("searchTimer");
-    expect(logic).toContain("mergeShops");
+    expect(logic).toContain("mergeProducts");
   });
 
   it("downgrades location failures instead of sending partial coordinates", () => {
@@ -21,7 +21,7 @@ describe("nearby and shop page contract", () => {
     const service = readFileSync("miniprogram/services/shop.ts", "utf8");
 
     expect(nearby).toContain('result.status === "DENIED"');
-    expect(nearby).toContain('this.setData({ sort: "POPULAR" })');
+    expect(nearby).toContain('this.setData({ sort: "RECOMMENDED" })');
     expect(service).toContain('query.sort === "DISTANCE" && !hasLocation');
   });
 

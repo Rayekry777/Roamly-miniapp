@@ -10,6 +10,11 @@ export type VoucherSaleStatus =
   | "SOLD_OUT"
   | "ENDED";
 export type VoucherProductStatus = VoucherSaleStatus | "DRAFT";
+export type VoucherProductSort =
+  | "RECOMMENDED"
+  | "SALES"
+  | "DISTANCE"
+  | "PRICE_ASC";
 export type VoucherOrderStatus =
   | "PENDING_PAYMENT"
   | "PAID"
@@ -76,6 +81,11 @@ export interface VoucherProductResponse {
   stackable?: boolean;
   refundAnytime?: boolean;
   refundExpired?: boolean;
+  usageRuleRows?: Array<{
+    dayOfWeek?: string;
+    closed?: boolean;
+    periods?: Array<{ open?: string; close?: string }>;
+  }>;
 }
 
 export interface VoucherProduct {
@@ -123,6 +133,33 @@ export interface VoucherProduct {
   stackable?: boolean;
   refundAnytime?: boolean;
   refundExpired?: boolean;
+  benefitText: string;
+  savingText?: string;
+  discountText?: string;
+}
+
+export interface VoucherProductListItemResponse {
+  product: VoucherProductResponse;
+  shop: ShopSummary;
+  distance?: number;
+}
+
+export interface VoucherProductListItem {
+  product: VoucherProduct;
+  shop: ShopSummary;
+  distance?: number;
+  distanceText: string;
+}
+
+export interface VoucherProductListQuery {
+  cityCode: string;
+  typeId?: string;
+  keyword?: string;
+  sort: VoucherProductSort;
+  page?: number;
+  size?: number;
+  longitude?: number;
+  latitude?: number;
 }
 
 export interface VoucherProductDetailResponse {

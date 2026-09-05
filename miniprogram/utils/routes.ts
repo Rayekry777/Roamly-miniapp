@@ -30,6 +30,10 @@ export function voucherProductUrl(productId: string): string {
   return `/package-voucher/pages/product/index?id=${encodeURIComponent(productId)}`;
 }
 
+export function orderConfirmUrl(productId: string): string {
+  return `/package-order/pages/confirm/index?id=${encodeURIComponent(productId)}`;
+}
+
 export function orderDetailUrl(orderId: string): string {
   return `/package-order/pages/detail/index?id=${encodeURIComponent(orderId)}`;
 }

@@ -5,6 +5,8 @@ import {
 } from "../../utils/media";
 
 Component({
+  // 允许页面通过 custom-class 控制图片容器尺寸，避免商品卡中的图片被压成零宽。
+  options: { styleIsolation: "apply-shared" },
   properties: {
     src: { type: String, value: "" },
     kind: { type: String, value: "photo" },

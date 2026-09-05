@@ -62,23 +62,13 @@
         description="暂无可用团购或优惠"
       />
       <view wx:else class="stack">
-        <view wx:for="{{vouchers}}" wx:key="id" class="voucher roamly-panel">
-          <view class="voucher__price"><text>¥</text>{{item.payAmountText}}</view>
-          <view class="voucher__copy">
-            <text class="strong">{{item.title}}</text>
-            <text>{{item.subtitle}}</text>
-            <view class="voucher-tags"><t-tag theme="primary" variant="light">{{item.productTypeLabel}}</t-tag><t-tag theme="success" variant="light">{{item.saleStatusLabel}}</t-tag></view>
-          </view>
-          <t-button
-            theme="primary"
-            shape="round"
-            size="small"
-            data-id="{{item.id}}"
-            bind:tap="openVoucher"
-          >
-            查看详情
-          </t-button>
-        </view>
+        <voucher-product-card
+          wx:for="{{vouchers}}"
+          wx:key="product.id"
+          item="{{item}}"
+          compact-shop="{{true}}"
+          bind:select="openVoucher"
+        />
       </view>
     </view>
 

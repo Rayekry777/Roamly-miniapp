@@ -1,8 +1,8 @@
 import { loadShopDetail, loadShopPostPage } from "../../../services/shop";
 import { listVoucherProducts } from "../../../services/voucher-product";
 import { cityStore } from "../../../store/city";
-import type { PostCard, Shop, VoucherProduct } from "../../../types";
-import { postDetailUrl } from "../../../utils/routes";
+import type { PostCard, Shop, VoucherProductListItem } from "../../../types";
+import { postDetailUrl, voucherProductUrl } from "../../../utils/routes";
 import { shopReviewsUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 
@@ -14,7 +14,7 @@ Page({
     scoreText: "0.0",
     loading: true,
     error: "",
-    vouchers: [] as VoucherProduct[],
+    vouchers: [] as VoucherProductListItem[],
     voucherStatus: "IDLE" as ModuleStatus,
     voucherError: "",
     posts: [] as PostCard[],
@@ -87,7 +87,17 @@ Page({
       const products = await this.scope?.run(listVoucherProducts(this.shopId));
       if (!products) return;
       this.setData({
-        vouchers: products,
+        vouchers: products.map((product) => ({
+          product,
+          shop: {
+            id: this.data.shop?.id || this.shopId,
+            name: this.data.shop?.name || "",
+            cover: this.data.shop?.cover,
+            address: this.data.shop?.address,
+          },
+          distance: this.data.shop?.distance,
+          distanceText: this.data.shop?.distanceText || "",
+        })),
         voucherStatus: "READY",
       });
     } catch (error) {
@@ -113,11 +123,13 @@ Page({
       });
     }
   },
-  openVoucher(event: WechatMiniprogram.TouchEvent) {
-    const id = String(event.currentTarget.dataset.id || "");
+  openVoucher(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
+    const id = String(event.detail.id || "");
     if (!id) return;
     wx.navigateTo({
-      url: `/package-voucher/pages/product/index?id=${encodeURIComponent(id)}`,
+      url: voucherProductUrl(id),
+      fail: () =>
+        wx.showToast({ title: "商品详情打开失败，请重试", icon: "none" }),
     });
   },
   openPost(event: WechatMiniprogram.TouchEvent) {

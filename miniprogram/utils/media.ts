@@ -33,6 +33,7 @@ export function imageUrl(
   kind: keyof typeof fallbacks = "photo",
 ): string {
   if (!value) return fallbacks[kind];
+  const assetBaseUrl = getEnvironment().assetBaseUrl.replace(/\/$/, "");
   if (value.startsWith("/types/")) {
     const key = value.split("/").pop()?.split(".")[0]?.toLowerCase() || "";
     const icon = categoryIcons[key];
@@ -40,13 +41,14 @@ export function imageUrl(
   }
   if (
     value.startsWith("http://") &&
+    !value.startsWith(`${assetBaseUrl}/`) &&
     !/^http:\/\/(127\.0\.0\.1|localhost|192\.168\.2\.102)(:\d+)?\//.test(value)
   )
     return value.replace(/^http:\/\//, "https://");
   if (/^https?:\/\//.test(value)) return value;
   if (value.startsWith("/imgs/"))
     return fallbacks[kind === "avatar" ? "avatar" : "photo"];
-  return `${getEnvironment().assetBaseUrl}${value.startsWith("/") ? value : `/${value}`}`;
+  return `${assetBaseUrl}${value.startsWith("/") ? value : `/${value}`}`;
 }
 
 export function imageError(kind: keyof typeof fallbacks = "photo"): string {

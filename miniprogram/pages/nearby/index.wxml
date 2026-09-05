@@ -3,7 +3,8 @@
 <view class="page page-enter">
   <view class="nearby-hero roamly-panel">
     <view>
-      <view class="nearby-hero__title">{{cityName || "当前城市"}}好去处</view>
+      <view class="nearby-hero__title">{{cityName || "当前城市"}}附近团购</view>
+      <view class="nearby-hero__subtitle">发现现在就值得去的好店好价</view>
     </view>
     <view
       class="nearby-hero__location pressable"
@@ -19,7 +20,7 @@
     <t-search
       value="{{keyword}}"
       shape="round"
-      placeholder="搜索当前城市的商户"
+      placeholder="搜索商品或商户"
       bind:change="onKeyword"
       bind:submit="search"
     />
@@ -48,11 +49,18 @@
 
   <view class="nearby-filter-row">
     <view
-      class="nearby-sort {{sort === 'POPULAR' ? 'nearby-sort--active' : ''}}"
-      data-sort="POPULAR"
+      class="nearby-sort {{sort === 'RECOMMENDED' ? 'nearby-sort--active' : ''}}"
+      data-sort="RECOMMENDED"
       bind:tap="selectSort"
     >
-      热门
+      综合
+    </view>
+    <view
+      class="nearby-sort {{sort === 'SALES' ? 'nearby-sort--active' : ''}}"
+      data-sort="SALES"
+      bind:tap="selectSort"
+    >
+      销量
     </view>
     <view
       class="nearby-sort {{sort === 'DISTANCE' ? 'nearby-sort--active' : ''}}"
@@ -62,39 +70,38 @@
       距离
     </view>
     <view
-      class="nearby-sort {{sort === 'SCORE' ? 'nearby-sort--active' : ''}}"
-      data-sort="SCORE"
+      class="nearby-sort {{sort === 'PRICE_ASC' ? 'nearby-sort--active' : ''}}"
+      data-sort="PRICE_ASC"
       bind:tap="selectSort"
     >
-      评分
+      价格最低
     </view>
-    <view class="nearby-more pressable" bind:tap="openShopList">更多筛选</view>
   </view>
 
-  <view wx:if="{{loading && !shops.length}}" class="shop-skeletons">
+  <view wx:if="{{loading && !products.length}}" class="product-skeletons">
     <view wx:for="{{[1, 2, 3]}}" wx:key="*this" class="shop-skeleton roamly-panel">
       <t-skeleton theme="avatar" row-col="{{[1, 1, 1]}}" loading />
     </view>
   </view>
 
   <app-empty
-    wx:elif="{{error && !shops.length}}"
+    wx:elif="{{error && !products.length}}"
     description="{{error}}"
     action-text="重新加载"
     bind:action="retry"
   />
 
   <app-empty
-    wx:elif="{{!shops.length}}"
-    description="当前筛选下没有找到商户"
+    wx:elif="{{!products.length}}"
+    description="当前筛选下没有找到可购买的团购"
   />
 
-  <view wx:else class="shop-list">
-    <shop-card
-      wx:for="{{shops}}"
-      wx:key="id"
-      shop="{{item}}"
-      bind:select="openShop"
+  <view wx:else class="product-list">
+    <voucher-product-card
+      wx:for="{{products}}"
+      wx:key="product.id"
+      item="{{item}}"
+      bind:select="openProduct"
     />
     <view wx:if="{{loading}}" class="list-footer">
       <t-loading size="38rpx" />
