@@ -10,7 +10,8 @@
       <view class="shop">{{item.shop.name}}</view>
       <view class="code" wx:if="{{item.status === 'UNUSED'}}">券码：{{item.voucherCode}}</view>
       <view class="meta">有效期：{{item.validFrom || '购买后生效'}} 至 {{item.expireTime || '以商户规则为准'}}</view>
-      <view class="rules">{{item.usageRules}}</view>
+    <view class="rules">{{item.usageRules}}</view>
+    <view class="rules">额外消费由顾客与商户自行线下微信支付</view>
       <t-button wx:if="{{item.status === 'UNUSED'}}" size="small" variant="outline" data-id="{{item.id}}" catch:tap="refund">申请退款</t-button>
       <t-button wx:if="{{item.status === 'UNUSED'}}" size="small" data-id="{{item.id}}" catch:tap="showQr">出示二维码</t-button>
     </view>

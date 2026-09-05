@@ -40,13 +40,14 @@
         <view wx:else class="rule-value">{{product.usageRules}}</view>
       </view>
       <view class="rule-group">
-        <view class="rule-label">使用规则</view>
+      <view class="rule-label">使用规则</view>
         <view class="rule-bullets">
           <text>• {{product.reservationRequired ? (product.reservationNotice || '使用前请联系门店预约') : '无需预约，到店出示券码即可'}}</text>
           <text>• {{product.stackable ? '可与门店其他优惠叠加' : '不可与门店其他优惠叠加'}}</text>
           <text>• {{product.refundAnytime ? '未使用可随时退款' : '退款规则以订单说明为准'}}{{product.refundExpired ? '，过期可退' : ''}}</text>
         </view>
       </view>
+      <view class="rule-row"><view class="rule-label">线下消费</view><view class="rule-value">额外消费由顾客与商户自行线下微信支付</view></view>
     </view>
     <view wx:if="{{shop}}" class="detail-section roamly-panel shop-card" bind:tap="openShop">
       <view class="section-heading">适用门店</view>

@@ -30,4 +30,17 @@ describe("团购改版页面契约", () => {
     expect(detailLogic).toContain("orderConfirmUrl");
     expect(detailLogic).toContain("确认订单页打开失败，请重试");
   });
+
+  it("券详情和券包明确额外消费线下结算", () => {
+    const detail = readFileSync(
+      "miniprogram/package-voucher/pages/product/index.wxml",
+      "utf8",
+    );
+    const wallet = readFileSync(
+      "miniprogram/package-voucher/pages/wallet/index.wxml",
+      "utf8",
+    );
+    expect(detail).toContain("额外消费由顾客与商户自行线下微信支付");
+    expect(wallet).toContain("额外消费由顾客与商户自行线下微信支付");
+  });
 });
