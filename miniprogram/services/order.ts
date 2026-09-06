@@ -13,6 +13,7 @@ import type {
 import { formatAmount } from "./voucher-product";
 import { normalizeVoucherProduct } from "./voucher-product";
 import { adaptShopSummary } from "./post-card";
+import { imageUrl } from "../utils/media";
 
 export async function createOrder(
   productId: string,
@@ -45,7 +46,6 @@ function normalizeConfirmation(
   value: VoucherOrderConfirmationResponse,
 ): VoucherOrderConfirmation {
   const totalAmount = Number(value.totalAmount) || 0;
-  const discountAmount = Number(value.discountAmount) || 0;
   const payAmount = Number(value.payAmount) || 0;
   return {
     ...value,
@@ -56,12 +56,10 @@ function normalizeConfirmation(
     minQuantity: Number(value.minQuantity) || 1,
     maxQuantity: Number(value.maxQuantity) || 1,
     totalAmount,
-    discountAmount,
     payAmount,
     availableStock: Number(value.availableStock) || 0,
     unitAmountText: formatAmount(value.unitAmount),
     totalAmountText: formatAmount(totalAmount),
-    discountAmountText: formatAmount(discountAmount),
     payAmountText: formatAmount(payAmount),
   };
 }
@@ -77,7 +75,12 @@ export async function loadMyOrders(
   if (!result.data || !Array.isArray(result.data.items)) {
     throw new Error("订单列表响应格式异常，请稍后重试");
   }
-  return { ...result.data, items: result.data.items.map(normalizeOrder) };
+  return {
+    items: result.data.items.map(normalizeOrder),
+    page: toPositiveNumber(result.data.page, 1),
+    size: toPositiveNumber(result.data.size, 10),
+    total: toNonNegativeNumber(result.data.total),
+  };
 }
 
 export async function loadMyOrder(
@@ -103,11 +106,15 @@ export async function loadMyOrder(
       statusText:
         voucher.status === "UNUSED"
           ? "待使用"
-          : voucher.status === "USED"
-            ? "已使用"
-            : voucher.status === "EXPIRED"
-              ? "已过期"
-              : "已退款",
+          : voucher.status === "PARTIALLY_USED"
+            ? "部分使用"
+            : voucher.status === "USED"
+              ? "已使用"
+              : voucher.status === "EXPIRED"
+                ? "已过期"
+                : voucher.status === "REFUNDING"
+                  ? "退款中"
+                  : "已退款",
       usageRules: voucher.usageRules || "",
     })) as UserVoucher[],
   };
@@ -115,12 +122,24 @@ export async function loadMyOrder(
 
 export async function payOrder(
   orderId: string,
-  scenario: "MOCK_SUCCESS" | "MOCK_FAILURE" = "MOCK_SUCCESS",
+  scenario?: "MOCK_SUCCESS" | "MOCK_FAILURE",
 ) {
   const key = `payment-${orderId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const result = await orderApi.payMyOrder(orderId, { scenario }, key);
+  const result = await orderApi.payMyOrder(
+    orderId,
+    scenario ? { scenario } : {},
+    key,
+  );
   if (!result.data) throw new Error("支付响应格式异常，请稍后重试");
   return result.data as VoucherPaymentResponse;
+}
+
+export async function prepareOrderPayment(
+  orderId: string,
+): Promise<VoucherPaymentResponse> {
+  const result = await orderApi.prepareMyOrderPayment(orderId);
+  if (!result.data) throw new Error("支付能力响应格式异常，请稍后重试");
+  return result.data;
 }
 
 export async function cancelOrder(orderId: string): Promise<void> {
@@ -140,16 +159,29 @@ export function normalizeOrder(value: VoucherOrderResponse): VoucherOrder {
     unitAmountText: formatAmount(value.unitAmount),
     totalAmountText: formatAmount(value.totalAmount),
     payAmountText: formatAmount(value.payAmount),
+    productCover: value.productCover ? imageUrl(value.productCover) : undefined,
     statusText: orderStatusText(value.status),
   };
 }
 
 export function orderStatusText(status: VoucherOrder["status"]): string {
-  return {
-    PENDING_PAYMENT: "待支付",
-    PAID: "已支付",
-    CANCELED: "已取消",
-    REFUNDING: "退款中",
-    REFUNDED: "已退款",
-  }[status];
+  return (
+    {
+      PENDING_PAYMENT: "待支付",
+      PAID: "已支付",
+      CANCELED: "已取消",
+      REFUNDING: "退款中",
+      REFUNDED: "已退款",
+    }[status] || "订单处理中"
+  );
+}
+
+function toPositiveNumber(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function toNonNegativeNumber(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
 }

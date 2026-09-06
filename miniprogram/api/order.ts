@@ -88,3 +88,14 @@ export function payMyOrder(
     headers: { "Idempotency-Key": idempotencyKey },
   });
 }
+
+export function prepareMyOrderPayment(
+  orderId: string,
+): Promise<Result<VoucherPaymentResponse>> {
+  return request(`/v1/users/me/orders/${orderId}/payments/prepare`, {
+    method: "POST",
+    auth: "required",
+    dedupe: false,
+    showError: false,
+  });
+}

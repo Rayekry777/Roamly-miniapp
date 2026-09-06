@@ -6,9 +6,15 @@ import type {
   VoucherProduct,
 } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
-import { orderConfirmUrl, orderDetailUrl } from "../../../utils/routes";
+import {
+  orderConfirmUrl,
+  orderDetailUrl,
+  orderResultUrl,
+  shopDetailUrl,
+} from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 import { session } from "../../../utils/session";
+import { openVoucherPayment } from "../../../services/payment-flow";
 
 Page({
   data: {
@@ -21,6 +27,11 @@ Page({
     submitting: false,
     createdOrderId: "",
     error: "",
+    confirmationErrorTitle: "",
+    promotionLabel: "活动优惠",
+    expandedSection: "" as "promotion" | "coupon" | "payment" | "",
+    fallbackTotalAmountText: "0.00",
+    fallbackPayAmountText: "0.00",
   },
   onLoad(options) {
     this.productId = String(options.id || options.productId || "");
@@ -51,7 +62,12 @@ Page({
     try {
       const detail = await this.scope?.run(loadVoucherProduct(this.productId));
       if (!detail) return;
-      this.setData({ product: detail.product, shop: detail.shop });
+      this.setData({
+        product: detail.product,
+        shop: detail.shop,
+        fallbackTotalAmountText: detail.product.payAmountText,
+        fallbackPayAmountText: detail.product.payAmountText,
+      });
       await this.refreshConfirmation(this.data.quantity || 1);
     } catch (error) {
       this.setData({
@@ -72,14 +88,24 @@ Page({
         confirmOrder(this.productId, quantity),
       );
       if (confirmation)
-        this.setData({ confirmation, quantity: confirmation.quantity });
+        this.setData({
+          confirmation,
+          quantity: confirmation.quantity,
+          fallbackTotalAmountText: confirmation.totalAmountText,
+          fallbackPayAmountText: confirmation.payAmountText,
+          confirmationErrorTitle: "",
+        });
     } catch (error) {
+      const message = error instanceof Error ? error.message : "订单确认失败";
+      const confirmationErrorTitle = message.includes("限购")
+        ? "超过每人限购数量"
+        : message.includes("库存") || message.includes("下架")
+          ? "库存不足或商品已下架"
+          : "暂时无法确认订单";
       this.setData({
         confirmation: null,
-        error:
-          error instanceof Error
-            ? error.message
-            : "商品价格或库存已变化，请重新确认",
+        error: message,
+        confirmationErrorTitle,
       });
     } finally {
       this.setData({ refreshing: false });
@@ -95,6 +121,25 @@ Page({
     const next = Math.min(max, this.data.quantity + 1);
     if (next !== this.data.quantity) void this.refreshConfirmation(next);
   },
+  toggleSection(event: WechatMiniprogram.TouchEvent) {
+    const section = String(event.currentTarget.dataset.section || "");
+    if (!["promotion", "coupon", "payment"].includes(section)) return;
+    this.setData({
+      expandedSection:
+        this.data.expandedSection === section
+          ? ""
+          : (section as "promotion" | "coupon" | "payment"),
+    });
+  },
+  openShop() {
+    const shopId = this.data.shop?.id;
+    if (!shopId) return;
+    wx.navigateTo({
+      url: shopDetailUrl(String(shopId)),
+      fail: () =>
+        wx.showToast({ title: "门店详情打开失败，请重试", icon: "none" }),
+    });
+  },
   async submit() {
     if (this.data.createdOrderId) {
       this.openOrder(this.data.createdOrderId);
@@ -106,7 +151,22 @@ Page({
     try {
       const order = await createOrder(this.productId, this.data.quantity);
       this.setData({ createdOrderId: order.id });
-      this.openOrder(order.id);
+      let paymentOutcome: "FAILED" | "CANCELLED" | "UNAVAILABLE" | "SUCCESS" =
+        "SUCCESS";
+      try {
+        const payment = await openVoucherPayment(order.id);
+        paymentOutcome = payment.outcome;
+      } catch (paymentError) {
+        paymentOutcome = "UNAVAILABLE";
+        wx.showToast({
+          title:
+            paymentError instanceof Error
+              ? paymentError.message
+              : "支付未完成，订单已保存",
+          icon: "none",
+        });
+      }
+      wx.redirectTo({ url: orderResultUrl(order.id, paymentOutcome) });
     } catch (error) {
       this.setData({
         error:

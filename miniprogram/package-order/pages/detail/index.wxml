@@ -1,12 +1,38 @@
-<app-navbar title="订单详情" back />
-<view class="page page-enter">
+<app-navbar title="" back />
+<view class="page detail-page page-enter">
   <view wx:if="{{loading}}" class="module-state"><t-loading size="42rpx" /> 正在加载订单</view>
   <app-empty wx:elif="{{error || !order}}" description="{{error || '订单不存在'}}" action-text="重新加载" bind:action="retry" />
   <block wx:else>
-    <view class="order-card roamly-panel"><view class="order-status">{{order.statusText}}</view><view class="title">{{product.title || order.productTitle}}</view><view wx:if="{{product.productTypeLabel}}" class="product-type">{{product.productTypeLabel}} · {{product.saleStatusLabel}}</view><view wx:if="{{product.subtitle}}" class="product-summary">{{product.subtitle}}</view><view class="line">订单号 <text>{{order.orderNo}}</text></view><view class="line">数量 <text>{{order.quantity}}</text></view><view class="line">创建时间 <text>{{order.createdTime}}</text></view><view class="line total">实付 <text>¥{{order.payAmountText}}</text></view></view>
-    <view wx:if="{{shop}}" class="shop-row roamly-panel" bind:tap="openShop"><view><view class="shop-name">{{shop.name}}</view><view class="shop-address">{{shop.address || '查看商户详情'}}</view></view><t-icon name="chevron-right" size="36rpx" /></view>
+    <view class="order-state roamly-panel">
+      <view class="order-state__title"><t-icon wx:if="{{order.status === 'PAID'}}" name="time" size="42rpx" /><t-icon wx:elif="{{order.status === 'REFUNDED'}}" name="check-circle-filled" size="42rpx" color="#36b37e" /><text wx:elif="{{order.status === 'REFUNDING'}}" class="order-state__icon">¥</text><text wx:else class="order-state__icon">!</text>{{order.status === 'REFUNDING' ? '退款中' : (order.status === 'PAID' ? '待到店使用' : order.statusText)}}</view>
+      <view class="order-state__sub">{{order.status === 'REFUNDING' ? '退款申请处理中，请耐心等待' : (order.status === 'REFUNDED' ? '退款已完成，可查看退款账单详情' : (order.status === 'PAID' ? ('请在 ' + (voucherExpireText || product.validEndTime || product.validityText || '有效期内') + ' 前到店消费') : (countdownText || '请尽快完成支付')))}}</view>
+    </view>
+
+    <view wx:if="{{order.status === 'PAID'}}" class="usage-limit">【使用限制】{{product.validityText || '请在商品有效期内到店使用'}}</view>
+
+    <view wx:if="{{shop}}" class="usage-shop roamly-panel">
+      <view class="usage-shop__header"><text>适用门店</text><text class="usage-shop__link" bind:tap="openShop">查看门店 ›</text></view>
+      <view class="usage-shop__name">{{shop.name}}</view>
+      <view class="usage-shop__address"><t-icon name="location" size="28rpx" />{{shop.address || '门店地址以服务端信息为准'}}</view>
+      <view wx:if="{{shop.openHours}}" class="usage-shop__hours"><t-icon name="time" size="28rpx" /><text class="open-state">营业中</text><text>{{shop.openHours}}</text></view>
+    </view>
+
+    <view wx:if="{{order.status === 'REFUNDING' || order.status === 'REFUNDED'}}" class="refund-progress roamly-panel {{order.status === 'REFUNDED' ? 'refund-progress--success' : ''}}"><view class="refund-progress__title"><t-icon name="{{order.status === 'REFUNDED' ? 'check-circle-filled' : 'time'}}" size="32rpx" />{{order.status === 'REFUNDED' ? '退款成功' : '退款处理中'}}<text wx:if="{{refundId}}" class="refund-progress__link" bind:tap="openRefundDetail">查看退款详情 ›</text></view><view class="refund-progress__text">{{order.status === 'REFUNDED' ? '退款已完成，资金将按原支付渠道退回。' : '退款申请已提交，券码暂不可使用；处理完成后可在退款账单中查看结果。'}}</view></view>
+
+    <view wx:if="{{vouchers.length}}" class="voucher-list roamly-panel">
+      <view class="order-product" bind:tap="openProduct"><app-image src="{{product.cover}}" custom-class="order-product__image" /><view class="order-product__copy"><view class="order-product__title">{{product.title || order.productTitle}} ›</view><view class="order-product__meta">{{product.validityText || '到店使用'}} · {{product.reservationRequired ? '需预约' : '免预约'}}</view><view class="order-product__price">实付 ¥{{order.payAmountText}} × {{order.quantity}}</view></view></view>
+      <view class="voucher-divider"></view>
+      <view class="voucher-list__title"><view class="voucher-list__heading"><text class="voucher-list__label">{{order.status === 'REFUNDING' ? '退款处理中的券' : '待使用券码'}}</text><text class="voucher-count">{{vouchers.length}}</text><text>张</text></view><view class="voucher-actions"><t-button wx:if="{{hasRefundableVoucher}}" size="small" variant="outline" bind:tap="openRefund">申请退款</t-button><t-button wx:if="{{hasUsableVoucher}}" size="small" theme="primary" bind:tap="openVoucher">查看券码</t-button><text class="sr-only">立即用券 · 到店取</text></view></view>
+      <view wx:for="{{vouchers}}" wx:key="id" class="voucher-line"><text wx:if="{{item.status !== 'REFUNDING'}}">• {{item.voucherCode}}</text><text wx:else>• 券码已冻结</text><text class="voucher-status {{item.status === 'REFUNDING' ? 'voucher-status--pending' : ''}}">{{item.statusText}}</text></view>
+    </view>
+
+    <view wx:if="{{order && !vouchers.length}}" class="order-product roamly-panel"><app-image src="{{product.cover}}" custom-class="order-product__image" /><view class="order-product__copy"><view class="order-product__title">{{product.title || order.productTitle}}</view><view class="order-product__meta">{{product.validityText || '到店使用'}} · {{product.reservationRequired ? '需预约' : '免预约'}}</view><view class="order-product__price">实付 ¥{{order.payAmountText}} × {{order.quantity}}</view></view></view>
+
     <view wx:if="{{order.status === 'PENDING_PAYMENT'}}" class="notice">模拟支付 · {{countdownText || '支付有效期 15 分钟'}}</view>
     <view wx:if="{{order.status === 'PENDING_PAYMENT'}}" class="action-row"><t-button block theme="danger" loading="{{paying}}" bind:tap="pay">模拟支付</t-button><t-button block variant="outline" loading="{{cancelling}}" bind:tap="cancel">取消订单</t-button></view>
-    <view wx:if="{{vouchers.length}}" class="voucher-list roamly-panel"><view class="line">券包明细</view><view wx:for="{{vouchers}}" wx:key="id" class="line"><text>第 {{index + 1}} 张券</text><text>{{item.statusText}}</text></view></view>
+
+    <view wx:if="{{shop && order.status !== 'PAID'}}" class="shop-summary roamly-panel"><text>订单门店</text><text>{{shop.name}} · {{shop.address || '门店信息'}}</text></view>
+    <view class="order-meta"><view>订单号 <text>{{order.orderNo}}</text></view><view>创建时间 <text>{{order.createdTime}}</text></view></view>
   </block>
 </view>
+<view wx:if="{{order && order.status !== 'PENDING_PAYMENT' && order.status !== 'CANCELED'}}" class="reuse-bar"><view class="reuse-action" bind:tap="openProduct">再来一单</view></view>

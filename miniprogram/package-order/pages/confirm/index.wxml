@@ -1,17 +1,20 @@
-<app-navbar title="确认订单" back />
+<app-navbar title="" back />
 
 <view class="page confirm-page page-enter">
   <view wx:if="{{loading}}" class="module-state roamly-panel"><t-loading size="42rpx" /> 正在确认价格与库存</view>
   <app-empty wx:elif="{{error && !product}}" description="{{error}}" action-text="重新加载" bind:action="retry" />
   <block wx:else>
     <view class="order-card roamly-panel">
-      <view class="shop-name">{{shop.name}}</view>
+      <view class="order-card__shop pressable" bind:tap="openShop">
+        <view class="shop-name">{{shop.name || '适用门店'}}</view>
+        <view class="shop-link"><text>门店详情</text><t-icon name="chevron-right" size="30rpx" /></view>
+      </view>
       <view class="product-row">
         <app-image src="{{product.cover}}" custom-class="product-image" />
         <view class="product-copy">
           <view class="product-title">{{product.title}}</view>
           <view class="product-validity">{{product.validityText}}</view>
-          <view class="unit-price">¥{{product.payAmountText}}</view>
+          <view class="product-price">¥{{product.payAmountText}}</view>
         </view>
       </view>
       <view class="quantity-row">
@@ -23,24 +26,43 @@
         </view>
       </view>
       <view wx:if="{{confirmation}}" class="stock-hint">当前库存 {{confirmation.availableStock}} 份，最多可购 {{confirmation.maxQuantity}} 份</view>
+      <view wx:if="{{product.perUserLimit}}" class="purchase-limit">商品每人限购 {{product.perUserLimit}} 份</view>
     </view>
 
-    <view wx:if="{{confirmation}}" class="amount-card roamly-panel">
-      <view class="section-title">金额明细</view>
-      <view class="amount-row"><text>商品总额</text><text>¥{{confirmation.totalAmountText}}</text></view>
-      <view class="amount-row discount"><text>服务端优惠</text><text>-¥{{confirmation.discountAmountText}}</text></view>
-      <view class="amount-row pay"><text>实付金额</text><text>¥{{confirmation.payAmountText}}</text></view>
-      <view class="server-note">价格、限购和库存以提交前服务端确认结果为准</view>
+    <view wx:if="{{product}}" class="amount-card roamly-panel">
+      <view class="amount-row amount-row--total"><text>商品总价 <text class="subtle">(共{{confirmation ? confirmation.quantity : quantity}}件)</text></text><text>¥{{confirmation ? confirmation.totalAmountText : fallbackTotalAmountText}}</text></view>
+      <view class="amount-divider"></view>
+      <view class="accordion-row" bind:tap="toggleSection" data-section="promotion">
+        <text>{{promotionLabel}}</text>
+        <view class="accordion-value"><text class="muted-value">暂无可用</text><t-icon name="{{expandedSection === 'promotion' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view>
+      </view>
+      <view wx:if="{{expandedSection === 'promotion'}}" class="accordion-detail">当前没有{{promotionLabel}}</view>
+      <view class="accordion-row" bind:tap="toggleSection" data-section="coupon">
+        <text>优惠券</text>
+        <view class="accordion-value"><text class="muted-value">暂无可用</text><t-icon name="{{expandedSection === 'coupon' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view>
+      </view>
+      <view wx:if="{{expandedSection === 'coupon'}}" class="accordion-detail">当前没有可用优惠券</view>
+      <view class="subtotal-row"><text>小计</text><text class="sr-only">应付金额</text><text class="pay-amount">¥{{confirmation ? confirmation.payAmountText : fallbackPayAmountText}}</text></view>
     </view>
+
+    <view wx:if="{{product}}" class="payment-card roamly-panel">
+      <view class="payment-card__row" bind:tap="toggleSection" data-section="payment">
+        <view class="payment-card__label">支付方式</view>
+        <view class="payment-card__value">Mock 支付 <t-icon name="{{expandedSection === 'payment' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view>
+      </view>
+      <view wx:if="{{expandedSection === 'payment'}}" class="payment-card__hint">提交后选择模拟支付成功、模拟支付失败或暂不支付</view>
+    </view>
+
+    <view wx:if="{{confirmation}}" class="server-note">价格、限购和库存以提交前服务端确认结果为准</view>
 
     <view wx:if="{{error}}" class="error-card roamly-panel">
-      <view>{{error}}</view>
+      <view class="error-title">{{confirmationErrorTitle || error}}</view>
       <view class="retry-link" bind:tap="retry">重新确认</view>
     </view>
   </block>
 </view>
 
 <view wx:if="{{product}}" class="submit-bar">
-  <view class="submit-total"><text>合计</text><view><text class="submit-currency">¥</text>{{confirmation.payAmountText || '0.00'}}</view></view>
+  <view class="submit-total"><view><text class="submit-currency">¥</text>{{confirmation ? confirmation.payAmountText : (fallbackPayAmountText || '0.00')}}</view><text>{{confirmation ? confirmation.quantity : quantity}}件</text></view>
   <view class="submit-action pressable {{!confirmation || refreshing ? 'submit-action--disabled' : ''}}" bind:tap="submit">{{submitting ? '提交中…' : (createdOrderId ? '查看订单' : '提交订单')}}</view>
 </view>

@@ -26,8 +26,19 @@ export function shopReviewsUrl(shopId: string): string {
   return `/package-shop/pages/reviews/index?id=${encodeURIComponent(shopId)}`;
 }
 
+export function shopListUrl(options: { productId?: string } = {}): string {
+  const query = options.productId
+    ? `?productId=${encodeURIComponent(options.productId)}`
+    : "";
+  return `/package-shop/pages/list/index${query}`;
+}
+
 export function voucherProductUrl(productId: string): string {
   return `/package-voucher/pages/product/index?id=${encodeURIComponent(productId)}`;
+}
+
+export function voucherNoticeUrl(productId: string): string {
+  return `/package-voucher/pages/notice/index?id=${encodeURIComponent(productId)}`;
 }
 
 export function orderConfirmUrl(productId: string): string {
@@ -38,6 +49,24 @@ export function orderDetailUrl(orderId: string): string {
   return `/package-order/pages/detail/index?id=${encodeURIComponent(orderId)}`;
 }
 
+export function orderResultUrl(
+  orderId: string,
+  paymentOutcome?: "FAILED" | "CANCELLED" | "UNAVAILABLE" | "SUCCESS",
+): string {
+  const query = [`id=${encodeURIComponent(orderId)}`];
+  if (paymentOutcome)
+    query.push(`payment=${encodeURIComponent(paymentOutcome)}`);
+  return `/package-order/pages/result/index?${query.join("&")}`;
+}
+
 export function voucherDetailUrl(voucherId: string): string {
   return `/package-voucher/pages/wallet/index?id=${encodeURIComponent(voucherId)}`;
+}
+
+export function refundUrl(voucherId: string): string {
+  return `/package-order/pages/refund/index?id=${encodeURIComponent(voucherId)}`;
+}
+
+export function refundDetailUrl(refundId: string): string {
+  return `/package-order/pages/refund-detail/index?id=${encodeURIComponent(refundId)}`;
 }

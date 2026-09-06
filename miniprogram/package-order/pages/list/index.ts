@@ -9,13 +9,14 @@ const PAGE_SIZE = 10;
 Page({
   data: {
     orders: [] as VoucherOrder[],
+    visibleOrders: [] as VoucherOrder[],
+    keyword: "",
     status: "ALL" as VoucherOrderStatusFilter,
     filters: [
-      { value: "ALL", label: "全部" },
-      { value: "PENDING_PAYMENT", label: "待支付" },
-      { value: "PAID", label: "已支付" },
-      { value: "CANCELED", label: "已取消" },
-      { value: "REFUNDED", label: "退款" },
+      { value: "ALL", label: "全部订单" },
+      { value: "PENDING_PAYMENT", label: "待付款" },
+      { value: "PAID", label: "可使用" },
+      { value: "REFUNDING", label: "退款/售后" },
     ] as Array<{ value: VoucherOrderStatusFilter; label: string }>,
     page: 1,
     hasMore: true,
@@ -52,6 +53,7 @@ Page({
       const orders = [...map.values()];
       this.setData({
         orders,
+        visibleOrders: filterOrders(orders, this.data.keyword),
         page: page + 1,
         hasMore: orders.length < result.total && result.items.length > 0,
         error: "",
@@ -70,8 +72,27 @@ Page({
       event.currentTarget.dataset.status,
     ) as VoucherOrderStatusFilter;
     if (status === this.data.status) return;
-    this.setData({ status, orders: [], page: 1, hasMore: true });
+    this.setData({
+      status,
+      orders: [],
+      visibleOrders: [],
+      page: 1,
+      hasMore: true,
+    });
     void this.loadOrders(true);
+  },
+  onKeyword(event: WechatMiniprogram.CustomEvent) {
+    const detail = event.detail as unknown as string | { value: string };
+    const keyword = typeof detail === "string" ? detail : detail.value;
+    this.setData({
+      keyword,
+      visibleOrders: filterOrders(this.data.orders, keyword),
+    });
+  },
+  search() {
+    this.setData({
+      visibleOrders: filterOrders(this.data.orders, this.data.keyword),
+    });
   },
   openOrder(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id || "");
@@ -108,3 +129,15 @@ Page({
   },
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
 });
+
+function filterOrders(orders: VoucherOrder[], keyword: string): VoucherOrder[] {
+  const normalized = keyword.trim().toLowerCase();
+  if (!normalized) return orders;
+  return orders.filter((order) =>
+    [order.productTitle, order.orderNo, order.id].some((value) =>
+      String(value || "")
+        .toLowerCase()
+        .includes(normalized),
+    ),
+  );
+}

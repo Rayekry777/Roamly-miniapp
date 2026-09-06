@@ -1,0 +1,43 @@
+<app-navbar title="" back />
+<view class="page result-page page-enter">
+  <view wx:if="{{loading}}" class="module-state"><t-loading size="42rpx" /> 正在读取订单</view>
+  <app-empty wx:elif="{{error || !detail}}" description="{{error || '订单不存在'}}" action-text="重新加载" bind:action="retry" />
+  <block wx:else>
+    <view class="result-hero">
+      <view class="result-icon {{detail.order.status === 'PAID' ? 'result-icon--success' : (paymentOutcome === 'FAILED' ? 'result-icon--failed' : 'result-icon--pending')}}">
+        <t-icon name="{{detail.order.status === 'PAID' ? 'check' : (paymentOutcome === 'FAILED' ? 'close' : 'time')}}" size="48rpx" color="#fff" />
+      </view>
+      <view class="result-title">{{paymentOutcome === 'FAILED' ? '支付失败' : (paymentOutcome === 'CANCELLED' ? '暂未支付' : (detail.order.status === 'PAID' ? '购买成功' : detail.order.statusText))}}</view>
+      <view wx:if="{{detail.order.status !== 'PAID'}}" class="result-amount">¥{{detail.order.payAmountText}}</view>
+      <view wx:if="{{detail.order.status !== 'PAID'}}" class="result-payment">{{paymentOutcome === 'FAILED' ? '本次模拟支付失败，订单仍保留' : (paymentOutcome === 'CANCELLED' ? '订单已保存，可稍后继续支付' : (paymentOutcome === 'UNAVAILABLE' ? '支付渠道暂不可用，订单已保存' : '支付方式：Mock 支付'))}}</view>
+      <view class="result-links">
+        <view bind:tap="openShops">适用门店列表 <t-icon name="chevron-right" size="28rpx" /></view>
+        <view bind:tap="openOrder">查看订单 <t-icon name="chevron-right" size="28rpx" /></view>
+      </view>
+    </view>
+
+    <view class="ticket-card roamly-panel">
+      <view class="ticket-card__head">
+        <app-image src="{{detail.product.cover}}" custom-class="ticket-card__cover" />
+        <view class="ticket-card__product">
+          <view class="ticket-card__title">{{detail.product.title}}</view>
+          <view class="ticket-card__shop">{{detail.shop.name}} · {{detail.product.validityText}}</view>
+        </view>
+        <view class="ticket-card__status">{{detail.order.status === 'PAID' ? ('待使用 ×' + (detail.vouchers.length || detail.order.quantity)) : detail.order.statusText}}</view>
+      </view>
+      <view wx:if="{{detail.vouchers.length}}" class="ticket-card__code">{{detail.vouchers[0].voucherCode}}</view>
+      <view wx:else class="ticket-card__pending">订单已保存，支付完成后将生成券码</view>
+      <view class="ticket-card__divider"><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view></view>
+      <view class="ticket-card__foot">
+        <view class="ticket-card__order">订单号 {{detail.order.orderNo}}<text wx:if="{{detail.vouchers.length > 1}}"> · 共{{detail.vouchers.length}}张券</text></view>
+        <view wx:if="{{detail.vouchers.length}}" class="ticket-card__qr" bind:tap="openVoucher"><t-icon name="scan" size="32rpx" /> 查看券码</view>
+      </view>
+    </view>
+
+    <view class="result-actions">
+      <t-button wx:if="{{detail.order.status === 'PENDING_PAYMENT'}}" theme="primary" loading="{{paying}}" bind:tap="pay">{{paymentOutcome === 'FAILED' ? '重新支付' : '再次支付'}}</t-button>
+      <t-button wx:if="{{detail.vouchers.length}}" theme="primary" bind:tap="openVoucher">立即用券</t-button>
+      <t-button variant="outline" bind:tap="openShops">适用门店</t-button>
+    </view>
+  </block>
+</view>

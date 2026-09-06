@@ -24,11 +24,22 @@
     },
     {
       "root": "package-voucher",
-      "pages": ["pages/product/index", "pages/wallet/index"]
+      "pages": [
+        "pages/product/index",
+        "pages/notice/index",
+        "pages/wallet/index"
+      ]
     },
     {
       "root": "package-order",
-      "pages": ["pages/list/index", "pages/detail/index", "pages/confirm/index"]
+      "pages": [
+        "pages/list/index",
+        "pages/detail/index",
+        "pages/confirm/index",
+        "pages/result/index",
+        "pages/refund/index",
+        "pages/refund-detail/index"
+      ]
     }
   ],
   "window": {

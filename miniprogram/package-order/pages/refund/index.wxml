@@ -1,0 +1,13 @@
+<app-navbar title="申请退款" back />
+<view class="page refund-page page-enter">
+  <view wx:if="{{loading}}" class="module-state"><t-loading size="42rpx" /> 正在读取券信息</view>
+  <app-empty wx:elif="{{error}}" description="{{error}}" action-text="返回券包" bind:action="goWallet" />
+  <block wx:else>
+    <view class="refund-product-card roamly-panel"><app-image src="{{voucher.shop.cover}}" custom-class="refund-product__image" /><view class="refund-product__title">{{voucher.productTitle || '团购券'}}</view></view>
+    <view class="refund-card roamly-panel"><view class="refund-title">退款数量</view><view class="quantity-row"><text>最多可退 1 张</text><view class="quantity-stepper"><text class="quantity-stepper__disabled">−</text><text>1</text><text class="quantity-stepper__disabled">＋</text></view></view></view>
+    <view class="refund-card roamly-panel refund-amount-card"><view class="refund-title">退款金额</view><text class="amount">¥{{refundAmountText}}</text><view class="amount-note">1-3 个工作日退还至原支付方，以实际退款金额为准</view></view>
+    <view class="refund-card roamly-panel"><view class="refund-title">退款原因 <text>*</text></view><view class="reason-select" bind:tap="chooseReason">{{reasonLabel || '请选择退款原因'}}<text>›</text></view><view class="refund-title note-title">退款说明</view><textarea maxlength="100" placeholder="补充退款原因详情，有助于平台更好地为您服务" value="{{note}}" bindinput="onNote" /><view class="count">{{note.length}}/100</view></view>
+    <view class="submit-refund"><view><text>退款金额</text><text class="amount">¥{{refundAmountText}}</text></view><t-button theme="primary" disabled="{{!reasonCode || submitting}}" loading="{{submitting}}" bind:tap="submit">提交退款</t-button></view>
+  </block>
+</view>
+<view wx:if="{{reasonVisible}}" class="reason-mask" catch:tap="closeReason"><view class="reason-sheet" catch:tap="noop"><view class="sheet-head"><view class="sheet-title">退款原因</view><view class="sheet-close" bind:tap="closeReason">×</view></view><view wx:for="{{reasons}}" wx:key="code" class="reason-row" data-code="{{item.code}}" bind:tap="selectReason">{{item.label}}<text class="reason-check {{draftReasonCode === item.code ? 'reason-check--active' : ''}}">{{draftReasonCode === item.code ? '✓' : ''}}</text></view><view class="reason-footer"><t-button variant="outline" bind:tap="closeReason">取消</t-button><t-button theme="primary" disabled="{{!draftReasonCode}}" bind:tap="confirmReason">确定</t-button></view></view></view>

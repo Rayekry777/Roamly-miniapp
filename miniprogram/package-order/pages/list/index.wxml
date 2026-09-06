@@ -1,15 +1,15 @@
-<app-navbar title="我的订单" back />
-<view class="page page-enter">
+<app-navbar title="" back />
+<view class="order-list-page page-enter">
+  <view class="order-search"><t-search value="{{keyword}}" shape="round" placeholder="搜索我的订单" bind:change="onKeyword" bind:submit="search" /><view class="order-category">全部分类 <t-icon name="chevron-down" size="28rpx" /></view></view>
   <view class="filters"><view wx:for="{{filters}}" wx:key="value" class="filter {{status === item.value ? 'filter--active' : ''}}" data-status="{{item.value}}" bind:tap="selectStatus">{{item.label}}</view></view>
   <view wx:if="{{loading && !orders.length}}" class="module-state"><t-loading size="42rpx" /> 正在加载订单</view>
   <app-empty wx:elif="{{error && !orders.length}}" description="{{error}}" action-text="重新加载" bind:action="retry" />
-  <app-empty wx:elif="{{!orders.length}}" description="暂无订单" />
+  <app-empty wx:elif="{{!visibleOrders.length}}" description="{{keyword ? '没有匹配的订单' : '暂无订单'}}" />
   <view wx:else class="stack">
-    <view wx:for="{{orders}}" wx:key="id" class="order-card roamly-panel" data-id="{{item.id}}" bind:tap="openOrder">
-      <view class="order-head"><text class="order-title">{{item.productTitle}}</text><text class="status">{{item.statusText}}</text></view>
-      <view class="meta">订单号 {{item.orderNo}} · {{item.createdTime}}</view>
-      <view class="amount">¥{{item.payAmountText}}</view>
-      <t-button wx:if="{{item.status === 'PENDING_PAYMENT'}}" size="small" variant="outline" loading="{{cancellingId === item.id}}" data-id="{{item.id}}" catch:tap="cancel">取消订单</t-button>
+    <view wx:for="{{visibleOrders}}" wx:key="id" class="order-card" data-id="{{item.id}}" bind:tap="openOrder">
+      <view class="order-head"><view class="order-brand"><view class="brand-icon">◆</view><text class="order-title">{{item.productTitle}}</text></view><text class="status">{{item.statusText}}</text></view>
+      <view class="order-body"><view class="order-thumb"><app-image wx:if="{{item.productCover}}" src="{{item.productCover}}" custom-class="order-thumb__image" mode="aspectFill" /><block wx:else><t-icon name="ticket" size="46rpx" /><text>团购券</text></block></view><view class="order-copy"><view class="order-copy__title">{{item.productTitle}}</view><view class="order-copy__price">{{item.quantity}} 张 · 实付 ¥{{item.payAmountText}}</view><view class="meta">下单时间 {{item.createdTime}}</view></view></view>
+      <view class="order-actions"><text class="order-date">订单号 {{item.orderNo}}</text><t-button wx:if="{{item.status === 'PENDING_PAYMENT'}}" size="small" variant="outline" loading="{{cancellingId === item.id}}" data-id="{{item.id}}" catch:tap="cancel">取消订单</t-button><t-button wx:if="{{item.status === 'PENDING_PAYMENT'}}" size="small" theme="primary" data-id="{{item.id}}" catch:tap="openOrder">去支付</t-button><t-button wx:elif="{{item.status === 'PAID'}}" size="small" theme="primary" data-id="{{item.id}}" catch:tap="openOrder">查看券码</t-button><t-button wx:else size="small" variant="outline" data-id="{{item.id}}" catch:tap="openOrder">查看详情</t-button></view>
     </view>
     <view wx:if="{{loading}}" class="list-footer"><t-loading size="36rpx" /> 加载中</view>
     <view wx:elif="{{!hasMore}}" class="list-footer">没有更多订单了</view>

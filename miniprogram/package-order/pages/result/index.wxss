@@ -1,0 +1,30 @@
+.result-page { min-height:100vh; padding:0 24rpx calc(48rpx + env(safe-area-inset-bottom)); background:var(--roamly-bg); }
+.result-hero { padding:54rpx 20rpx 34rpx; text-align:center; }
+.result-icon { display:flex; width:96rpx; height:96rpx; align-items:center; justify-content:center; margin:0 auto 18rpx; border-radius:50%; }
+.result-icon--success { background:var(--roamly-success); }
+.result-icon--pending { background:var(--roamly-warning); }
+.result-icon--failed { background:var(--roamly-primary); }
+.result-title { color:var(--roamly-text); font-size:42rpx; font-weight:800; }
+.result-amount { margin-top:12rpx; color:var(--roamly-text); font-size:42rpx; font-weight:760; }
+.result-payment { margin-top:8rpx; color:var(--roamly-muted); font-size:22rpx; }
+.result-links { display:flex; justify-content:center; gap:34rpx; margin-top:18rpx; color:var(--roamly-muted); font-size:24rpx; }
+.result-links view { display:flex; align-items:center; gap:3rpx; }
+.ticket-card { position:relative; overflow:hidden; margin:0 0 24rpx; padding:30rpx; border-radius:26rpx; }
+.ticket-card::before, .ticket-card::after { position:absolute; top:50%; width:28rpx; height:28rpx; border-radius:50%; background:var(--roamly-bg); content:""; transform:translateY(-50%); }
+.ticket-card::before { left:-15rpx; }.ticket-card::after { right:-15rpx; }
+.ticket-card__head { display:flex; align-items:flex-start; gap:16rpx; }
+.ticket-card__cover { width:112rpx !important; height:112rpx !important; flex:none; overflow:hidden; border-radius:16rpx; background:var(--roamly-bg); }
+.ticket-card__product { min-width:0; flex:1; }
+.ticket-card__title { min-width:0; overflow:hidden; color:var(--roamly-text); font-size:30rpx; font-weight:800; text-overflow:ellipsis; white-space:nowrap; }
+.ticket-card__status { flex:none; color:var(--roamly-primary); font-size:23rpx; }
+.ticket-card__shop { margin-top:12rpx; overflow:hidden; color:var(--roamly-muted); font-size:22rpx; text-overflow:ellipsis; white-space:nowrap; }
+.ticket-card__code { margin-top:26rpx; color:var(--roamly-text); font-size:40rpx; font-weight:820; letter-spacing:5rpx; }
+.ticket-card__pending { margin-top:26rpx; color:var(--roamly-muted); font-size:25rpx; }
+.ticket-card__divider { display:flex; justify-content:space-between; margin:26rpx -30rpx 20rpx; padding:0 26rpx; }
+.ticket-card__divider view { width:10rpx; height:10rpx; border-radius:50%; background:var(--roamly-border); }
+.ticket-card__foot { display:flex; align-items:center; justify-content:space-between; gap:12rpx; }
+.ticket-card__order { overflow:hidden; color:var(--roamly-muted); font-size:20rpx; text-overflow:ellipsis; white-space:nowrap; }
+.ticket-card__qr { display:flex; flex:none; align-items:center; gap:6rpx; color:var(--roamly-text); font-size:23rpx; }
+.result-actions { display:flex; gap:14rpx; padding:0 4rpx; }
+.result-actions t-button { flex:1; }
+.module-state { display:flex; min-height:240rpx; align-items:center; justify-content:center; gap:14rpx; color:var(--roamly-muted); }
