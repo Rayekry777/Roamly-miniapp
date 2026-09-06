@@ -10,6 +10,7 @@ import type {
 import { syncTabBar } from "../../utils/navigation";
 import { voucherProductUrl } from "../../utils/routes";
 import { createRequestScope } from "../../utils/scope";
+import { categoryIconUrl } from "../../utils/media";
 
 const PAGE_SIZE = 10;
 
@@ -71,7 +72,10 @@ Page({
     const city = cityResult.value;
     const types =
       typeResult.status === "fulfilled" && typeResult.value
-        ? typeResult.value.data || []
+        ? (typeResult.value.data || []).map((type) => ({
+            ...type,
+            icon: categoryIconUrl(type.icon, type.name),
+          }))
         : [];
     this.cityCode = city.code;
     this.initialized = true;
@@ -212,7 +216,7 @@ Page({
     });
   },
   errorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : "团购商品暂时加载失败";
+    return error instanceof Error ? error.message : "商品暂时加载失败";
   },
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
   cityCode: "",

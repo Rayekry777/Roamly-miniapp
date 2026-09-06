@@ -45,8 +45,10 @@ export function normalizeUserVoucher(value: UserVoucherResponse): UserVoucher {
 export function voucherStatusText(status: UserVoucher["status"]): string {
   return {
     UNUSED: "未使用",
+    PARTIALLY_USED: "部分使用",
     USED: "已使用",
     EXPIRED: "已过期",
+    REFUNDING: "退款中",
     REFUNDED: "已退款",
   }[status];
 }

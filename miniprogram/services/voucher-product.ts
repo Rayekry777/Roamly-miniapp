@@ -58,6 +58,7 @@ export const loadVoucherProductPage = async (
         shop,
         distance,
         distanceText: formatDistance(distance),
+        itemKey: product.id,
       };
     }),
   };
@@ -66,16 +67,9 @@ export const loadVoucherProductPage = async (
 export function normalizeVoucherProduct(
   value: VoucherProductResponse,
 ): VoucherProduct {
-  const payAmount = Number(value.payAmount ?? value.priceAmount) || 0;
-  const originalAmount = value.originalAmount ?? value.marketAmount;
-  const legacySaleType = String(value.saleType || "");
-  const productType =
-    value.productType ||
-    ((["PACKAGE", "CASH", "DISCOUNT", "MULTI_USE"] as const).includes(
-      legacySaleType as "PACKAGE" | "CASH" | "DISCOUNT" | "MULTI_USE",
-    )
-      ? (legacySaleType as VoucherProduct["productType"])
-      : "PACKAGE");
+  const payAmount = Number(value.payAmount) || 0;
+  const originalAmount = value.originalAmount;
+  const productType = value.productType || "PACKAGE";
   const saleStatus = value.saleStatus || value.status || "ON_SALE";
   const rawUsageRules = value.usageRuleRows || value.usageRules;
   const usageRuleRows = Array.isArray(rawUsageRules)
@@ -105,32 +99,29 @@ export function normalizeVoucherProduct(
       )
       .join("；") ||
     (typeof value.usageRules === "string" ? value.usageRules : undefined);
-  const cover =
-    value.cover ?? value.coverMedia?.contentPath ?? value.coverMedia?.url;
-  const savingAmount =
-    originalAmount === undefined
-      ? undefined
-      : Math.max(0, originalAmount - payAmount);
-  const discountRate =
-    originalAmount && originalAmount > payAmount
-      ? Math.round((payAmount / originalAmount) * 10)
-      : undefined;
+  const cover = value.cover;
+  const serverTags = (value.tags || [])
+    .map((tag) => String(tag.text || ""))
+    .filter(Boolean);
+  const voucherLabel = value.voucherLabel || undefined;
+  const displayTags = Array.from(
+    new Set([
+      ...(voucherLabel ? [voucherLabel] : []),
+      ...serverTags.filter((tag) => tag !== "到店可用" && tag !== "到店核销"),
+    ]),
+  );
   return {
     id: String(value.id),
     shopId: String(value.shopId),
     title: value.title,
-    subtitle: value.subtitle || value.subTitle || "到店可用",
+    subtitle: value.subtitle || "",
     cover: typeof cover === "string" ? imageUrl(cover) : imageUrl(cover?.url),
     payAmount,
     originalAmount,
-    discountAmount: value.discountAmount,
     payAmountText: formatAmount(payAmount),
-    originalAmountText:
-      originalAmount === undefined ? undefined : formatAmount(originalAmount),
-    stock: value.stock ?? value.availableStock,
+    stock: value.stock,
     soldCount: value.soldCount || 0,
-    perUserLimit: value.perUserLimit ?? value.purchaseLimit,
-    saleType: value.saleType || "NORMAL",
+    perUserLimit: value.perUserLimit,
     status: saleStatus,
     saleStartTime: value.saleStartTime,
     saleEndTime: value.saleEndTime,
@@ -159,8 +150,27 @@ export function normalizeVoucherProduct(
     refundAnytime: value.refundAnytime,
     refundExpired: value.refundExpired,
     benefitText: benefitText(productType, value),
-    savingText: savingAmount ? `省¥${formatAmount(savingAmount)}` : undefined,
-    discountText: discountRate ? `${discountRate}折` : undefined,
+    voucherLabel,
+    displayTags,
+    details: (value.details || []).map((detail, index) => ({
+      id: String(detail.id ?? index),
+      sectionType: detail.sectionType || "CUSTOM",
+      title: detail.title || "详情",
+      content: detail.content || "",
+      sortOrder: detail.sortOrder ?? index,
+    })),
+    tags: (value.tags || []).map((tag, index) => ({
+      id: String(tag.id ?? index),
+      text: tag.text || "",
+      iconKey: tag.iconKey || "info",
+      colorToken: tag.colorToken,
+      sortOrder: tag.sortOrder ?? index,
+    })),
+    cashRule: value.cashRule,
+    discountRule: value.discountRule,
+    multiUseRule: value.multiUseRule,
+    // Discount effects are intentionally not rendered; price facts remain available
+    // for compatibility and order/audit views.
   };
 }
 
@@ -170,8 +180,7 @@ function benefitText(
 ): string {
   if (type === "CASH" && value.faceValueAmount)
     return `抵扣¥${formatAmount(value.faceValueAmount)}`;
-  if (type === "DISCOUNT" && value.discountRateBps)
-    return `${(value.discountRateBps / 1000).toFixed(1).replace(/\.0$/, "")}折优惠`;
+  if (type === "DISCOUNT") return "到店核销";
   if (type === "MULTI_USE" && value.totalUseCount)
     return `${value.totalUseCount}次到店可用`;
   return value.validityTypeLabel || "到店团购";

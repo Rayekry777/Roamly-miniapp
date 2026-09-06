@@ -126,9 +126,9 @@ export class PostDraftStore {
   hasContent(): boolean {
     return Boolean(
       this.draft.title.trim() ||
-        this.draft.content.trim() ||
-        this.draft.media.length ||
-        this.draft.shopVisit,
+      this.draft.content.trim() ||
+      this.draft.media.length ||
+      this.draft.shopVisit,
     );
   }
 

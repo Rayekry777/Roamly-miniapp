@@ -32,6 +32,7 @@ Page({
       typeId: options.typeId || "",
       keyword: options.keyword ? decodeURIComponent(options.keyword) : "",
     });
+    this.productId = String(options.productId || "");
     void this.initialize();
   },
   onUnload() {
@@ -78,6 +79,7 @@ Page({
       const result = await this.scope?.run(
         loadShopPage({
           cityCode: this.cityCode,
+          productId: this.productId || undefined,
           typeId: this.data.typeId || undefined,
           keyword: this.data.keyword,
           sort: this.data.sort,
@@ -158,8 +160,20 @@ Page({
   openShop(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
     wx.navigateTo({ url: shopDetailUrl(event.detail.id) });
   },
+  navigateShop(
+    event: WechatMiniprogram.CustomEvent<{
+      latitude: number;
+      longitude: number;
+      name: string;
+      address: string;
+    }>,
+  ) {
+    const { latitude, longitude, name, address } = event.detail;
+    wx.openLocation({ latitude, longitude, name, address });
+  },
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
   cityCode: "",
+  productId: "",
   requestSequence: 0,
   searchTimer: undefined as ReturnType<typeof setTimeout> | undefined,
 });

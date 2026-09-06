@@ -1,7 +1,6 @@
 import type { MediaAsset } from "./media";
 import type { ShopSummary } from "./post";
 
-export type VoucherSaleType = "NORMAL" | "SECKILL";
 export type VoucherProductType = "PACKAGE" | "CASH" | "DISCOUNT" | "MULTI_USE";
 export type VoucherSaleStatus =
   | "SCHEDULED"
@@ -21,7 +20,13 @@ export type VoucherOrderStatus =
   | "CANCELED"
   | "REFUNDING"
   | "REFUNDED";
-export type UserVoucherStatus = "UNUSED" | "USED" | "EXPIRED" | "REFUNDED";
+export type UserVoucherStatus =
+  | "UNUSED"
+  | "PARTIALLY_USED"
+  | "USED"
+  | "EXPIRED"
+  | "REFUNDING"
+  | "REFUNDED";
 
 export interface VoucherProductResponse {
   id: string | number;
@@ -31,11 +36,9 @@ export interface VoucherProductResponse {
   cover?: MediaAsset | string;
   payAmount: number;
   originalAmount?: number;
-  discountAmount?: number;
   stock?: number;
   soldCount?: number;
   perUserLimit?: number;
-  saleType?: VoucherSaleType;
   status?: VoucherProductStatus;
   saleStartTime?: string;
   saleEndTime?: string;
@@ -54,21 +57,12 @@ export interface VoucherProductResponse {
     unit: string;
     unitPriceAmount?: number;
   }>;
-  productType?: VoucherProductType;
   productTypeLabel?: string;
-  subTitle?: string;
-  coverMedia?: { id?: string | number; contentPath?: string; url?: string };
-  coverMediaId?: string | number;
-  priceAmount?: number;
-  marketAmount?: number;
+  productType?: VoucherProductType;
   faceValueAmount?: number;
   minimumSpendAmount?: number;
-  discountRateBps?: number;
-  maximumDiscountAmount?: number;
   totalUseCount?: number;
   totalStock?: number;
-  availableStock?: number;
-  purchaseLimit?: number;
   saleStatus?: VoucherSaleStatus;
   saleStatusLabel?: string;
   validityTypeLabel?: string;
@@ -86,6 +80,37 @@ export interface VoucherProductResponse {
     closed?: boolean;
     periods?: Array<{ open?: string; close?: string }>;
   }>;
+  details?: Array<{
+    id?: string | number;
+    sectionType?: string;
+    title?: string;
+    content?: string;
+    sortOrder?: number;
+  }>;
+  tags?: Array<{
+    id?: string | number;
+    text?: string;
+    iconKey?: string;
+    colorToken?: string;
+    sortOrder?: number;
+  }>;
+  cashRule?: {
+    faceValueAmount?: number;
+    minimumSpendAmount?: number;
+    description?: string;
+  };
+  discountRule?: {
+    discountText?: string;
+    applicableScope?: string;
+    usagePeriodText?: string;
+    description?: string;
+  };
+  multiUseRule?: {
+    totalUseCount?: number;
+    useUnit?: string;
+    description?: string;
+  };
+  voucherLabel?: string;
 }
 
 export interface VoucherProduct {
@@ -96,13 +121,10 @@ export interface VoucherProduct {
   cover: string;
   payAmount: number;
   originalAmount?: number;
-  discountAmount?: number;
   payAmountText: string;
-  originalAmountText?: string;
   stock?: number;
   soldCount: number;
   perUserLimit?: number;
-  saleType: VoucherSaleType;
   status: VoucherProductStatus;
   saleStartTime?: string;
   saleEndTime?: string;
@@ -134,8 +156,25 @@ export interface VoucherProduct {
   refundAnytime?: boolean;
   refundExpired?: boolean;
   benefitText: string;
-  savingText?: string;
-  discountText?: string;
+  voucherLabel?: string;
+  displayTags?: string[];
+  details?: Array<{
+    id: string;
+    sectionType: string;
+    title: string;
+    content: string;
+    sortOrder: number;
+  }>;
+  tags?: Array<{
+    id: string;
+    text: string;
+    iconKey: string;
+    colorToken?: string;
+    sortOrder: number;
+  }>;
+  cashRule?: VoucherProductResponse["cashRule"];
+  discountRule?: VoucherProductResponse["discountRule"];
+  multiUseRule?: VoucherProductResponse["multiUseRule"];
 }
 
 export interface VoucherProductListItemResponse {
@@ -149,6 +188,8 @@ export interface VoucherProductListItem {
   shop: ShopSummary;
   distance?: number;
   distanceText: string;
+  /** Stable primitive key for wx:for; nested keys such as product.id are not supported by WXML. */
+  itemKey: string;
 }
 
 export interface VoucherProductListQuery {
@@ -189,6 +230,7 @@ export interface VoucherOrderResponse {
   cancelledTime?: string;
   expireTime?: string;
   paymentExpireTime?: string;
+  productCover?: string;
 }
 
 export interface VoucherOrder {
@@ -211,6 +253,7 @@ export interface VoucherOrder {
   cancelledTime?: string;
   expireTime?: string;
   paymentExpireTime?: string;
+  productCover?: string;
 }
 
 export interface VoucherOrderDetailResponse {
@@ -267,11 +310,21 @@ export interface VoucherOrderCreateRequest {
 }
 
 export interface VoucherPaymentRequest {
-  scenario: "MOCK_SUCCESS" | "MOCK_FAILURE";
+  scenario?: "MOCK_SUCCESS" | "MOCK_FAILURE";
 }
 
 export interface VoucherPaymentResponse {
-  transactionId: string | number;
+  paymentMode: "MOCK" | "WECHAT" | "DISABLED";
+  paymentAvailable: boolean;
+  unavailableMessage?: string;
+  paymentParams?: {
+    timeStamp: string;
+    nonceStr: string;
+    package: string;
+    signType: string;
+    paySign: string;
+  } | null;
+  transactionId?: string | number | null;
   orderId: string | number;
   status: "PENDING" | "SUCCEEDED" | "FAILED" | "CLOSED";
   amount: number;
@@ -286,8 +339,15 @@ export interface VoucherRefundResponse {
   amount: number;
   status: string;
   reason?: string;
+  description?: string;
+  reasonCode?: string;
+  quantity?: number;
   requestedTime?: string;
   processedTime?: string;
+  productTitle?: string;
+  paymentChannel?: string;
+  refundNo?: string;
+  merchantOrderNo?: string;
 }
 
 export interface VoucherOrderConfirmationResponse {
@@ -299,7 +359,6 @@ export interface VoucherOrderConfirmationResponse {
   minQuantity: number;
   maxQuantity: number;
   totalAmount: number;
-  discountAmount: number;
   payAmount: number;
   availableStock: number;
   serverTime: string;
@@ -315,14 +374,12 @@ export interface VoucherOrderConfirmation {
   minQuantity: number;
   maxQuantity: number;
   totalAmount: number;
-  discountAmount: number;
   payAmount: number;
   availableStock: number;
   serverTime: string;
   paymentExpireTime: string;
   unitAmountText: string;
   totalAmountText: string;
-  discountAmountText: string;
   payAmountText: string;
 }
 

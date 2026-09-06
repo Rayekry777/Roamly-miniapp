@@ -97,6 +97,7 @@ Page({
           },
           distance: this.data.shop?.distance,
           distanceText: this.data.shop?.distanceText || "",
+          itemKey: product.id,
         })),
         voucherStatus: "READY",
       });

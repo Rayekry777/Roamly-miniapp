@@ -8,9 +8,20 @@ describe("nearby and shop page contract", () => {
 
     expect(view).toContain("product-skeletons");
     expect(view).toContain('description="{{error}}"');
-    expect(view).toContain("当前筛选下没有找到可购买的团购");
+    expect(view).toContain("当前筛选下没有找到可购买的商品");
+    expect(view).not.toContain('bind:tap="openNearbyShops"');
+    expect(view).toContain('bind:tap="retryLocation"');
+    expect(
+      readFileSync("miniprogram/pages/nearby/index.wxss", "utf8"),
+    ).toContain("background: var(--roamly-bg)");
     expect(view).toContain('data-sort="DISTANCE"');
     expect(view).toContain('bind:tap="selectType"');
+    expect(
+      readFileSync(
+        "miniprogram/components/voucher-product-card/index.wxml",
+        "utf8",
+      ),
+    ).toContain("product-card__cover-wrap");
     expect(logic).toContain("requestSequence");
     expect(logic).toContain("searchTimer");
     expect(logic).toContain("mergeProducts");

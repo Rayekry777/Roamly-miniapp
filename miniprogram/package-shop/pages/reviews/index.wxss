@@ -22,6 +22,6 @@
 .score-picker { justify-content: flex-start; gap: 18rpx; margin: 24rpx 0; color: var(--roamly-muted); font-size: 24rpx; }
 .score-picker__stars { display: flex; gap: 10rpx; }
 .score-star { color: #d3d1da; font-size: 44rpx; }
-.score-star--active { color: #ff9a43; }
+.score-star--active { color: var(--roamly-primary); }
 .form-error { margin-top: 14rpx; color: var(--roamly-primary); font-size: 23rpx; }
 .review-editor__actions { justify-content: flex-end; gap: 20rpx; margin-top: 22rpx; }

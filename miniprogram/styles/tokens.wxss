@@ -1,14 +1,18 @@
 page {
   --roamly-primary: #ff5f57;
+  --roamly-primary-soft: rgba(255, 95, 87, 0.1);
+  --roamly-primary-pale: #fff3f1;
   --roamly-accent: #8275ff;
+  --roamly-success: #36b37e;
+  --roamly-warning: #d8a24a;
   --roamly-text: #242331;
   --roamly-muted: #8f8d99;
   --roamly-bg: #f4f5fb;
   --roamly-surface: #ffffff;
   --roamly-border: #ececf3;
   --roamly-control-radius: 32rpx;
-  --roamly-card-radius: 48rpx;
-  --roamly-shadow: 0 20rpx 56rpx rgba(45, 42, 80, 0.1);
+  --roamly-card-radius: 24rpx;
+  --roamly-shadow: 0 8rpx 24rpx rgba(36, 35, 49, 0.045);
   --td-brand-color: #ff5f57;
   --td-brand-color-active: #e94f49;
   --td-radius-default: 32rpx;

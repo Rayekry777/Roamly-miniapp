@@ -5,6 +5,7 @@
     "app-image": "/components/app-image/index",
     "app-empty": "/components/app-empty/index",
     "voucher-product-card": "/components/voucher-product-card/index",
+    "t-icon": "tdesign-miniprogram/icon/icon",
     "t-loading": "tdesign-miniprogram/loading/loading",
     "t-tag": "tdesign-miniprogram/tag/tag"
   }

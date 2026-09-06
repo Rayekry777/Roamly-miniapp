@@ -5,12 +5,16 @@ import { postDetailUrl, sectionDetailUrl } from "../miniprogram/utils/routes";
 describe("home feed contract", () => {
   it("renders independent recommendation and following entry points", () => {
     const view = readFileSync("miniprogram/pages/home/index.wxml", "utf8");
+    const controller = readFileSync("miniprogram/pages/home/index.ts", "utf8");
 
     expect(view).toContain('data-mode="RECOMMENDED"');
     expect(view).toContain('data-mode="FOLLOWING"');
     expect(view).toContain("<section-scroll");
     expect(view).toContain("<post-card");
     expect(view).toContain('bind:openhighlight="openHighlight"');
+    expect(view).not.toContain('class="home-voucher"');
+    expect(view).not.toContain('bind:tap="openVoucher"');
+    expect(controller).not.toContain("loadVoucherHighlights");
   });
 
   it("keeps post card in the agreed information order", () => {

@@ -1,4 +1,4 @@
-<app-navbar title="我的漫游" back="{{false}}">
+<app-navbar title="" back="{{false}}">
   <view
     wx:if="{{loggedIn}}"
     slot="right"
@@ -9,56 +9,31 @@
   </view>
 </app-navbar>
 
-<view class="page page-enter">
+<view class="me-page page-enter">
   <view wx:if="{{!loggedIn}}" class="login-state roamly-panel">
     <app-empty
-      description="登录后查看个人资料、签到和动态"
+      description="登录后查看个人资料、订单、券包和动态"
       action-text="去登录"
       bind:action="login"
     />
   </view>
   <block wx:else>
-    <view class="profile roamly-panel">
+    <view class="profile">
       <view class="profile__main">
         <view class="profile__avatar">
           <app-image src="{{user.icon}}" kind="avatar" />
         </view>
-        <view>
-          <view class="profile__name">{{user.nickName || "Roamly 用户"}}</view>
-          <view class="muted">ID {{user.id || "--"}}</view>
-        </view>
+        <view class="profile__copy"><view class="profile__name">{{user.nickName || "Roamly 用户"}}</view><view class="muted">ID {{user.id || "--"}}</view><view class="profile__stats-inline">个人资料与动态</view></view>
       </view>
-      <view class="profile__stats">
-        <view>
-          <text class="strong">{{signs}}</text>
-          <text>连续签到</text>
-        </view>
-        <view>
-          <text class="strong">{{user.id ? "已加入" : "--"}}</text>
-          <text>Roamly</text>
-        </view>
-      </view>
+      <view class="profile__link pressable" bind:tap="openProfile">个人主页 ›</view>
     </view>
 
-    <view class="menu roamly-panel">
-      <view class="menu__item pressable" bind:tap="sign">
-        <t-icon name="calendar-event" size="42rpx" />
-        <text>每日签到</text>
-        <text class="menu-status">{{signed ? "今日已签到" : "去签到"}}</text>
-        <t-icon name="chevron-right" />
-      </view>
-      <view class="menu__item pressable" bind:tap="publish">
-        <t-icon name="edit-2" size="42rpx" />
-        <text>发布动态</text>
-        <t-icon name="chevron-right" />
-      </view>
-      <view class="menu__item pressable" bind:tap="myPosts">
-        <t-icon name="file" size="42rpx" />
-        <text>我的动态</text>
-        <t-icon name="chevron-right" />
-      </view>
+    <view class="quick-grid roamly-panel">
+      <view class="quick-item pressable" bind:tap="openOrders"><view class="quick-icon"><t-icon name="file" size="42rpx" /></view><text>我的订单</text></view>
+      <view class="quick-item pressable" bind:tap="openWallet"><view class="quick-icon"><t-icon name="coupon" size="42rpx" /></view><text>我的券包</text></view>
+      <view class="quick-item pressable" bind:tap="publish"><view class="quick-icon"><t-icon name="edit-2" size="42rpx" /></view><text>发布动态</text></view>
+      <view class="quick-item pressable" bind:tap="myPosts"><view class="quick-icon"><t-icon name="chat" size="42rpx" /></view><text>我的动态</text></view>
     </view>
+
   </block>
 </view>
-
-<success-motion id="sign-motion" message="签到成功" />

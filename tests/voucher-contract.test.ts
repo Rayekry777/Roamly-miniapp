@@ -8,13 +8,16 @@ import {
   cancelMyOrder,
   createVoucherOrder,
   listMyOrders,
+  prepareMyOrderPayment,
 } from "../miniprogram/api/order";
+import { requestVoucherRefund } from "../miniprogram/api/refund";
 import {
   loadVoucherProduct,
   loadVoucherProductPage,
   normalizeVoucherProduct,
 } from "../miniprogram/services/voucher-product";
 import {
+  loadMyOrders,
   loadMyOrder,
   normalizeOrder,
   orderStatusText,
@@ -124,6 +127,20 @@ describe("voucher, order and wallet contracts", () => {
     });
   });
 
+  it("forces refund requests to the single-voucher contract", async () => {
+    await requestVoucherRefund(
+      "voucher-1",
+      { reasonCode: "OTHER", description: "说明", quantity: 9 },
+      "refund-contract-1",
+    );
+    expect(requestMock).toHaveBeenCalledWith(
+      "/v1/users/me/vouchers/voucher-1/refunds",
+      expect.objectContaining({
+        data: { reasonCode: "OTHER", description: "说明", quantity: 1 },
+      }),
+    );
+  });
+
   it("sends the backend-authoritative CANCELED order filter", async () => {
     await listMyOrders({ status: "CANCELED" });
     expect(requestMock).toHaveBeenCalledWith("/v1/users/me/orders", {
@@ -132,6 +149,51 @@ describe("voucher, order and wallet contracts", () => {
       showError: false,
     });
     expect(orderStatusText("CANCELED")).toBe("已取消");
+  });
+
+  it("adapts the backend order page and keeps refund aggregate filters server-side", async () => {
+    requestMock.mockResolvedValueOnce({
+      code: "OK",
+      message: "ok",
+      data: {
+        items: [
+          {
+            id: "6007",
+            shopId: "1",
+            productId: "3003",
+            productTitle: "退款订单",
+            quantity: 1,
+            unitAmount: 1000,
+            totalAmount: 1000,
+            payAmount: 1000,
+            status: "REFUNDED",
+            createdTime: "2026-09-03T15:00:00",
+          },
+        ],
+        page: 1,
+        size: 10,
+        total: 1,
+      },
+    });
+
+    const result = await loadMyOrders({ status: "REFUNDING" });
+
+    expect(requestMock).toHaveBeenCalledWith("/v1/users/me/orders", {
+      data: { page: 1, size: 10, status: "REFUNDING" },
+      auth: "required",
+      showError: false,
+    });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]!.statusText).toBe("已退款");
+    expect(result.total).toBe(1);
+  });
+
+  it("prepares payment through the side-effect-free payment capability endpoint", async () => {
+    await prepareMyOrderPayment("9007199254740997");
+    expect(requestMock).toHaveBeenCalledWith(
+      "/v1/users/me/orders/9007199254740997/payments/prepare",
+      { method: "POST", auth: "required", dedupe: false, showError: false },
+    );
   });
 
   it("adapts wrapped product detail and preserves large string ids", async () => {
@@ -219,5 +281,29 @@ describe("voucher, order and wallet contracts", () => {
     });
     expect(order.id).toBe("3");
     expect(order.statusText).toBe("待支付");
+  });
+
+  it("shows voucher face value and sale price without discount effects", () => {
+    const cash = normalizeVoucherProduct({
+      id: 1,
+      shopId: 2,
+      title: "代金券",
+      payAmount: 8000,
+      originalAmount: 10000,
+      faceValueAmount: 10000,
+      productType: "CASH",
+    });
+    const discount = normalizeVoucherProduct({
+      id: 2,
+      shopId: 2,
+      title: "折扣券",
+      payAmount: 8000,
+      originalAmount: 10000,
+      productType: "DISCOUNT",
+    });
+    expect(cash.benefitText).toBe("抵扣¥100.00");
+    expect(cash.payAmountText).toBe("80.00");
+    expect("discountText" in cash).toBe(false);
+    expect(discount.benefitText).toBe("到店核销");
   });
 });

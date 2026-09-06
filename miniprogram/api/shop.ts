@@ -23,6 +23,7 @@ export function listShops(
     size: query.size || 10,
   };
   if (query.typeId) data.typeId = query.typeId;
+  if (query.productId) data.productId = query.productId;
   if (keyword) {
     data.keyword = keyword;
   }

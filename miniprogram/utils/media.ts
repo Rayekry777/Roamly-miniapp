@@ -1,8 +1,8 @@
 import { getEnvironment } from "../config/env";
 
 const fallbacks = {
-  photo: "/assets/images/photo-placeholder.svg",
-  avatar: "/assets/images/avatar-placeholder.svg",
+  photo: "/assets/images/photo-placeholder.png",
+  avatar: "/assets/images/avatar-placeholder.png",
   category: "/assets/images/category-placeholder.svg",
 };
 const categoryIcons: Record<string, string> = {
@@ -17,6 +17,18 @@ const categoryIcons: Record<string, string> = {
   hpg: "party",
   jsyd: "fitness",
 };
+const categoryNameIcons: Array<[RegExp, string]> = [
+  [/美食|餐饮|餐厅|料理|小吃/, "food"],
+  [/休闲娱乐|休闲|娱乐|咖啡|甜品/, "party"],
+  [/运动|健身|瑜伽|球馆/, "fitness"],
+  [/美容|美发|美甲|美妆/, "beauty"],
+  [/亲子|儿童|游乐|乐园/, "kids"],
+  [/唱歌|KTV|ktv/, "ktv"],
+  [/按摩|推拿|足疗/, "massage"],
+  [/酒吧|清吧/, "bar"],
+  [/派对|聚会|轰趴/, "party"],
+  [/SPA|spa|水疗/, "spa"],
+];
 const downloadedImages = new Map<string, string>();
 
 export function splitImages(value?: string): string[] {
@@ -33,12 +45,9 @@ export function imageUrl(
   kind: keyof typeof fallbacks = "photo",
 ): string {
   if (!value) return fallbacks[kind];
+  if (value.startsWith("/assets/")) return value;
   const assetBaseUrl = getEnvironment().assetBaseUrl.replace(/\/$/, "");
-  if (value.startsWith("/types/")) {
-    const key = value.split("/").pop()?.split(".")[0]?.toLowerCase() || "";
-    const icon = categoryIcons[key];
-    return icon ? `/assets/images/category-${icon}.svg` : fallbacks.category;
-  }
+  if (kind === "category") return categoryIconUrl(value);
   if (
     value.startsWith("http://") &&
     !value.startsWith(`${assetBaseUrl}/`) &&
@@ -49,6 +58,15 @@ export function imageUrl(
   if (value.startsWith("/imgs/"))
     return fallbacks[kind === "avatar" ? "avatar" : "photo"];
   return `${assetBaseUrl}${value.startsWith("/") ? value : `/${value}`}`;
+}
+
+export function categoryIconUrl(value?: string, label?: string): string {
+  const raw = `${value || ""} ${label || ""}`.toLowerCase();
+  const key = value?.split("/").pop()?.split(".")[0]?.toLowerCase() || "";
+  const icon =
+    categoryIcons[key] ||
+    categoryNameIcons.find(([pattern]) => pattern.test(raw))?.[1];
+  return icon ? `/assets/images/category-${icon}.svg` : fallbacks.category;
 }
 
 export function imageError(kind: keyof typeof fallbacks = "photo"): string {

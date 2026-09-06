@@ -1,66 +1,64 @@
-<app-navbar title="团购详情" back />
+<app-navbar title="" back />
 
 <view class="page product-page page-enter">
   <view wx:if="{{loading}}" class="module-state roamly-panel"><t-loading size="42rpx" /> 正在加载团购商品</view>
   <app-empty wx:elif="{{error || !product}}" description="{{error || '团购商品不存在或已下架'}}" action-text="重新加载" bind:action="retry" />
   <block wx:else>
     <view class="hero">
-      <app-image src="{{product.cover}}" custom-class="hero__image" mode="aspectFill" />
+      <app-image src="{{product.cover}}" custom-class="hero__image" mode="aspectFit" />
       <view class="hero__badge">{{product.productTypeLabel}}</view>
     </view>
-    <view class="intro roamly-panel">
+    <view class="intro product-summary-card roamly-panel">
       <view class="price-line">
         <view class="price"><text>¥</text>{{product.payAmountText}}</view>
-        <view wx:if="{{product.originalAmountText}}" class="origin">门市价 ¥{{product.originalAmountText}}</view>
-        <view wx:if="{{product.savingText}}" class="saving">{{product.savingText}}</view>
       </view>
-      <view class="benefit">{{product.benefitText}}</view>
+      <view wx:if="{{product.displayTags && product.displayTags.length}}" class="benefit-tags">
+        <view wx:for="{{product.displayTags}}" wx:key="*this" class="benefit">{{item}}</view>
+      </view>
       <view class="product-title">{{product.title}}</view>
-      <view class="product-subtitle">{{product.subtitle}}</view>
-      <view class="intro__meta"><text>已售 {{product.soldCount}}</text><text>每人限购 {{product.perUserLimit || '不限'}}</text></view>
-      <view class="summary-row"><text>有效期</text><text>{{product.validityText}}</text><t-icon name="chevron-right" size="30rpx" /></view>
+      <view class="intro__meta"><text>已售 {{product.soldCount || 0}}</text><text>每人限购 {{product.perUserLimit || '不限'}}</text></view>
+      <view class="summary-row purchase-notice pressable" bind:tap="openNotice"><text>购买须知</text><text>{{product.validityText}} · {{product.reservationRequired ? '需预约' : '免预约'}}</text><t-icon name="chevron-right" size="30rpx" /></view>
       <view class="summary-row"><text>使用规则</text><text>{{product.reservationRequired ? '需预约' : '免预约'}} · {{product.stackable ? '可叠加' : '不可叠加'}}</text><t-icon name="chevron-right" size="30rpx" /></view>
     </view>
-    <view wx:if="{{product.packageItems.length}}" class="detail-section roamly-panel">
-      <view class="section-heading">套餐明细</view>
+    <view wx:if="{{product.details && product.details.length}}" class="detail-section roamly-panel">
+      <view class="section-heading">商品明细</view>
+      <view wx:for="{{product.details}}" wx:key="id" class="detail-copy"><view class="detail-subheading">{{item.title}}</view><view class="detail-copy__text">{{item.content}}</view></view>
+    </view>
+    <view wx:if="{{product.productType === 'DISCOUNT' && product.discountRule}}" class="detail-section roamly-panel">
+      <view class="section-heading">折扣券使用说明</view>
+      <view wx:if="{{product.discountRule.discountText}}" class="detail-copy">{{product.discountRule.discountText}}</view>
+      <view wx:if="{{product.discountRule.applicableScope}}" class="summary-row"><text>适用范围</text><text>{{product.discountRule.applicableScope}}</text></view>
+      <view wx:if="{{product.discountRule.usagePeriodText}}" class="summary-row"><text>使用时段</text><text>{{product.discountRule.usagePeriodText}}</text></view>
+      <view wx:if="{{product.discountRule.description}}" class="detail-copy">{{product.discountRule.description}}</view>
+    </view>
+    <view wx:if="{{product.packageItems.length && !(product.details && product.details.length)}}" class="detail-section roamly-panel">
+      <view class="section-heading">团购详情</view>
+      <view class="detail-subheading">套餐明细</view>
       <view wx:for="{{product.packageItems}}" wx:key="id" class="package-row"><text>{{item.name}}</text><text>{{item.quantity}} {{item.unit}}</text></view>
     </view>
-    <view class="detail-section roamly-panel">
-      <view class="section-heading">购买须知</view>
-      <view class="rule-group">
-        <view class="rule-label">有效期</view>
-        <view class="rule-value">{{product.validityText}}</view>
-        <view wx:if="{{product.validBeginTime || product.validEndTime}}" class="rule-note">{{product.validBeginTime || '即刻'}} 至 {{product.validEndTime || '长期'}}</view>
+    <view class="detail-section roamly-panel self-check">
+      <view class="section-heading">自助核销说明</view>
+      <view class="self-check__lead">下单后券码会自动到账，到店出示固定二维码即可核销</view>
+      <view class="self-check__steps">
+        <view class="self-check__step"><view class="self-check__mock"><t-icon name="file" size="44rpx" /><view class="self-check__mock-line"></view><view class="self-check__mock-line self-check__mock-line--short"></view></view><view class="self-check__number">1</view><text>打开我的券包</text></view>
+        <view class="self-check__arrow">›</view>
+        <view class="self-check__step"><view class="self-check__mock"><t-icon name="coupon" size="44rpx" /><view class="self-check__mock-line"></view><view class="self-check__mock-line self-check__mock-line--short"></view></view><view class="self-check__number">2</view><text>点击查看券码</text></view>
+        <view class="self-check__arrow">›</view>
+        <view class="self-check__step"><view class="self-check__mock"><t-icon name="scan" size="44rpx" /><view class="self-check__mock-line"></view><view class="self-check__mock-line self-check__mock-line--short"></view></view><view class="self-check__number">3</view><text>出示二维码核销</text></view>
       </view>
-      <view class="rule-group">
-        <view class="rule-label">可用时间</view>
-        <view wx:if="{{product.usageRuleRows.length}}" class="time-list">
-          <view wx:for="{{product.usageRuleRows}}" wx:key="dayOfWeek" class="time-row"><text>{{item.dayOfWeek}}</text><text>{{item.closed ? '不可用' : (item.periods[0].open + ' - ' + item.periods[0].close)}}</text></view>
-        </view>
-        <view wx:else class="rule-value">{{product.usageRules}}</view>
-      </view>
-      <view class="rule-group">
-      <view class="rule-label">使用规则</view>
-        <view class="rule-bullets">
-          <text>• {{product.reservationRequired ? (product.reservationNotice || '使用前请联系门店预约') : '无需预约，到店出示券码即可'}}</text>
-          <text>• {{product.stackable ? '可与门店其他优惠叠加' : '不可与门店其他优惠叠加'}}</text>
-          <text>• {{product.refundAnytime ? '未使用可随时退款' : '退款规则以订单说明为准'}}{{product.refundExpired ? '，过期可退' : ''}}</text>
-        </view>
-      </view>
-      <view class="rule-row"><view class="rule-label">线下消费</view><view class="rule-value">额外消费由顾客与商户自行线下微信支付</view></view>
     </view>
-    <view wx:if="{{shop}}" class="detail-section roamly-panel shop-card" bind:tap="openShop">
-      <view class="section-heading">适用门店</view>
-      <view class="shop-card__content">
+    <view wx:if="{{shop}}" class="detail-section roamly-panel shop-card">
+      <view class="section-heading pressable" bind:tap="openShopList"><text>适用门店</text><text class="shop-count">1 家适用门店 ›</text></view>
+      <view class="shop-card__content pressable" bind:tap="openShop">
         <app-image src="{{shop.cover}}" custom-class="shop-card__image" />
-        <view class="shop-card__copy"><view>{{shop.name}}</view><text class="shop-card__address">{{shop.address || '查看门店详情'}}</text></view>
+        <view class="shop-card__copy"><view>{{shop.name}}</view><view wx:if="{{shop.score}}" class="shop-card__rating">★★★★☆ {{shop.score}}</view><text class="shop-card__address">{{shop.address || '查看门店详情'}}</text></view>
         <t-icon name="chevron-right" size="34rpx" />
       </view>
     </view>
     <view wx:if="{{related.length}}" class="related-section">
       <view class="section-heading">本店其他团购</view>
       <view class="related-list">
-        <voucher-product-card wx:for="{{related}}" wx:key="product.id" item="{{item}}" compact-shop="{{true}}" bind:select="openRelated" />
+      <view wx:for="{{related}}" wx:key="itemKey" class="related-item pressable" data-id="{{item.product.id}}" bind:tap="openRelated"><app-image src="{{item.product.cover}}" custom-class="related-item__image" /><view class="related-item__copy"><view class="related-item__title">{{item.product.title}}</view><view class="related-item__sales">已售 {{item.product.soldCount || 0}}<text wx:if="{{item.product.voucherLabel}}"> · {{item.product.voucherLabel}}</text></view><view class="related-item__price"><text>¥{{item.product.payAmountText}}</text></view></view><view class="related-item__cta {{item.product.status !== 'ON_SALE' ? 'related-item__cta--disabled' : ''}}">{{item.product.status === 'ON_SALE' ? '抢购' : item.product.saleStatusLabel}}</view></view>
       </view>
     </view>
   </block>
@@ -68,5 +66,42 @@
 
 <view wx:if="{{product}}" class="purchase-bar">
   <view class="store-action pressable" bind:tap="openShop"><t-icon name="shop" size="38rpx" /><text>门店</text></view>
-  <view class="buy-action pressable {{product.status !== 'ON_SALE' ? 'buy-action--disabled' : ''}}" aria-disabled="{{product.status !== 'ON_SALE'}}" bind:tap="openConfirm">{{product.status === 'ON_SALE' ? (navigating ? '正在前往…' : '去确认订单') : product.saleStatusLabel}}</view>
+  <view class="buy-action pressable {{product.status !== 'ON_SALE' ? 'buy-action--disabled' : ''}}" aria-disabled="{{product.status !== 'ON_SALE'}}" bind:tap="openConfirm">
+    <text class="buy-action__label">{{product.status === 'ON_SALE' ? (navigating ? '正在前往…' : '立即购买') : product.saleStatusLabel}}</text>
+    <text wx:if="{{product.status === 'ON_SALE'}}" class="buy-action__price">¥{{product.payAmountText}}</text>
+  </view>
+</view>
+
+<view wx:if="{{confirmOpen}}" class="confirm-mask" bind:tap="closeConfirm">
+  <view class="confirm-sheet" catch:tap="noop">
+    <view class="confirm-sheet__header"><text>确认订单</text><view class="confirm-close pressable" bind:tap="closeConfirm"><t-icon name="close" size="34rpx" /></view></view>
+    <scroll-view scroll-y class="confirm-sheet__scroll">
+      <view class="confirm-product">
+        <app-image src="{{product.cover}}" custom-class="confirm-product__image" />
+        <view class="confirm-product__copy">
+          <view class="confirm-product__title">{{product.title}}</view>
+          <view class="confirm-product__validity">{{product.validityText}}</view>
+          <view class="confirm-product__bottom"><text class="confirm-product__price">¥{{product.payAmountText}}</text><view class="confirm-stepper">
+            <button class="confirm-stepper__button" disabled="{{!confirmation || confirmQuantity <= confirmation.minQuantity || confirmLoading}}" bind:tap="confirmDecrease">−</button>
+            <text class="confirm-stepper__value">{{confirmQuantity}}</text>
+            <button class="confirm-stepper__button" disabled="{{!confirmation || confirmQuantity >= confirmation.maxQuantity || confirmLoading}}" bind:tap="confirmIncrease">+</button>
+          </view></view>
+        </view>
+      </view>
+      <view wx:if="{{product.perUserLimit}}" class="confirm-limit">商品每人限购 {{product.perUserLimit}} 份</view>
+      <view class="confirm-amount">
+        <view class="confirm-amount__row confirm-amount__row--total"><text>商品总价 <text class="confirm-subtle">(共{{confirmation ? confirmation.quantity : confirmQuantity}}件)</text></text><text>¥{{confirmation ? confirmation.totalAmountText : product.payAmountText}}</text></view>
+        <view class="confirm-divider"></view>
+        <view class="confirm-dropdown" bind:tap="toggleConfirmSection" data-section="promotion"><text>活动优惠</text><view><text>暂无可用</text><t-icon name="{{confirmExpandedSection === 'promotion' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view></view>
+        <view wx:if="{{confirmExpandedSection === 'promotion'}}" class="confirm-dropdown__detail">当前没有可用活动优惠</view>
+        <view class="confirm-dropdown" bind:tap="toggleConfirmSection" data-section="coupon"><text>优惠券</text><view><text>暂无可用</text><t-icon name="{{confirmExpandedSection === 'coupon' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view></view>
+        <view wx:if="{{confirmExpandedSection === 'coupon'}}" class="confirm-dropdown__detail">当前没有可用优惠券</view>
+        <view class="confirm-amount__subtotal"><text>小计</text><text>¥{{confirmation ? confirmation.payAmountText : product.payAmountText}}</text></view>
+      </view>
+      <view class="confirm-payment" bind:tap="toggleConfirmSection" data-section="payment"><text>支付方式</text><view><text>Mock 支付</text><t-icon name="{{confirmExpandedSection === 'payment' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view></view>
+      <view wx:if="{{confirmExpandedSection === 'payment'}}" class="confirm-payment__detail">提交后选择模拟支付成功、模拟支付失败或暂不支付</view>
+      <view wx:if="{{confirmError}}" class="confirm-error"><text>{{confirmErrorTitle || confirmError}}</text><text class="confirm-error__detail">{{confirmError}}</text></view>
+    </scroll-view>
+    <view class="confirm-submit"><view class="confirm-submit__total"><text>¥</text>{{confirmation ? confirmation.payAmountText : product.payAmountText}}<text class="confirm-submit__count">{{confirmQuantity}}件</text></view><view class="confirm-submit__button {{!confirmation || confirmLoading || confirmSubmitting ? 'confirm-submit__button--disabled' : ''}}" bind:tap="submitConfirmation">{{confirmLoading ? '确认中…' : (confirmSubmitting ? '提交中…' : '提交订单')}}</view></view>
+  </view>
 </view>

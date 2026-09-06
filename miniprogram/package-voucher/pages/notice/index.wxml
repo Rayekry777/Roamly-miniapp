@@ -1,0 +1,45 @@
+<app-navbar title="购买须知" back />
+
+<view class="notice-page page-enter">
+  <view wx:if="{{loading}}" class="module-state roamly-panel"><t-loading size="42rpx" /> 正在加载购买须知</view>
+  <app-empty wx:elif="{{error || !product}}" description="{{error || '购买须知暂不可用'}}" action-text="重新加载" bind:action="retry" />
+  <block wx:else>
+    <view class="notice-card roamly-panel">
+      <view class="notice-title">购买须知</view>
+
+      <view class="notice-group notice-group--split">
+        <view class="notice-label"><t-icon name="check-circle-filled" size="38rpx" />有效期</view>
+        <view class="notice-value">{{product.validityText}}</view>
+        <view wx:if="{{product.validBeginTime || product.validEndTime}}" class="notice-muted">{{product.validBeginTime || '购买后生效'}} 至 {{product.validEndTime || '长期有效'}}</view>
+      </view>
+
+      <view class="notice-group notice-group--split">
+        <view class="notice-label"><t-icon name="time" size="38rpx" />使用时间</view>
+        <view wx:if="{{product.usageRuleRows.length}}" class="notice-hours">
+          <view wx:for="{{product.usageRuleRows}}" wx:key="dayOfWeek" class="notice-hour"><text>{{item.dayOfWeek}}</text><text>{{item.closed ? '不可用' : (item.periods[0].open + ' - ' + item.periods[0].close)}}</text></view>
+        </view>
+        <view wx:else class="notice-value">{{product.usageRules}}</view>
+      </view>
+
+      <view class="notice-group">
+        <view class="notice-label"><t-icon name="file" size="38rpx" />使用规则</view>
+        <view class="notice-list">
+          <text>• {{product.reservationRequired ? (product.reservationNotice || '使用前请联系门店预约') : '无需预约，到店出示券码即可'}}</text>
+          <text>• {{product.stackable ? '可与门店其他优惠叠加' : '不可与门店其他优惠叠加'}}</text>
+          <text>• {{product.refundAnytime ? '未使用可随时退款' : '退款规则以订单说明为准'}}{{product.refundExpired ? '，过期可退' : ''}}</text>
+          <text>• 每张券仅限本人使用，额外消费由顾客与商户自行线下微信支付</text>
+        </view>
+      </view>
+
+      <view wx:if="{{product.excludedDates && product.excludedDates.length}}" class="notice-group">
+        <view class="notice-label"><t-icon name="ticket" size="38rpx" />不可用日期</view>
+        <view class="notice-list"><text wx:for="{{product.excludedDates}}" wx:key="*this">• {{item}}</text></view>
+      </view>
+
+      <view class="notice-group notice-group--last">
+        <view class="notice-label"><text class="notice-label__yen">¥</text>价格和销量说明</view>
+        <view class="notice-list"><text>• 商品价格、库存和销量以服务端实时数据为准</text><text>• 购买前请确认适用门店、有效期和使用规则</text></view>
+      </view>
+    </view>
+  </block>
+</view>

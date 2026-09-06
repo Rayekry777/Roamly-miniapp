@@ -1,29 +1,17 @@
-<app-navbar title="附近" back="{{false}}" />
+<app-navbar title="" back="{{false}}" transparent="{{true}}" />
 
-<view class="page page-enter">
-  <view class="nearby-hero roamly-panel">
-    <view>
-      <view class="nearby-hero__title">{{cityName || "当前城市"}}附近团购</view>
-      <view class="nearby-hero__subtitle">发现现在就值得去的好店好价</view>
+<view class="nearby-page page-enter">
+  <view class="nearby-header">
+    <view class="nearby-location" bind:tap="retryLocation" aria-role="button" aria-label="重新定位">
+      <t-icon name="location" size="32rpx" />
+      <text>{{cityName || "当前城市"}}</text>
+      <text wx:if="{{locationStatus === 'LOCATING'}}" class="nearby-location__status">定位中</text>
     </view>
-    <view
-      class="nearby-hero__location pressable"
-      bind:tap="retryLocation"
-      aria-role="button"
-      aria-label="重新获取当前位置"
-    >
-      <t-icon name="location" size="38rpx" />
+    <view class="nearby-search">
+      <t-search value="{{keyword}}" shape="round" placeholder="搜索商品或商户" bind:change="onKeyword" bind:submit="search" />
+      <view class="nearby-scan" aria-label="扫码"><t-icon name="scan" size="34rpx" /></view>
+      <view class="nearby-search-button" bind:tap="search">搜索</view>
     </view>
-  </view>
-
-  <view class="nearby-search roamly-panel">
-    <t-search
-      value="{{keyword}}"
-      shape="round"
-      placeholder="搜索商品或商户"
-      bind:change="onKeyword"
-      bind:submit="search"
-    />
   </view>
 
   <scroll-view class="type-scroll" scroll-x enhanced show-scrollbar="{{false}}">
@@ -33,7 +21,8 @@
         data-id=""
         bind:tap="selectType"
       >
-        全部
+        <app-image src="" kind="category" mode="aspectFit" custom-class="chip-icon" />
+        <text>全部</text>
       </view>
       <view
         wx:for="{{types}}"
@@ -42,7 +31,8 @@
         data-id="{{item.id}}"
         bind:tap="selectType"
       >
-        {{item.name}}
+        <app-image src="{{item.icon}}" kind="category" mode="aspectFit" custom-class="chip-icon" />
+        <text>{{item.name}}</text>
       </view>
     </view>
   </scroll-view>
@@ -93,13 +83,13 @@
 
   <app-empty
     wx:elif="{{!products.length}}"
-    description="当前筛选下没有找到可购买的团购"
+    description="当前筛选下没有找到可购买的商品"
   />
 
   <view wx:else class="product-list">
     <voucher-product-card
       wx:for="{{products}}"
-      wx:key="product.id"
+      wx:key="itemKey"
       item="{{item}}"
       bind:select="openProduct"
     />

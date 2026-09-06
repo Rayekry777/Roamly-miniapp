@@ -64,7 +64,7 @@
       <view wx:else class="stack">
         <voucher-product-card
           wx:for="{{vouchers}}"
-          wx:key="product.id"
+          wx:key="itemKey"
           item="{{item}}"
           compact-shop="{{true}}"
           bind:select="openVoucher"

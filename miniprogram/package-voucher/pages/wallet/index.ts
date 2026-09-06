@@ -1,10 +1,29 @@
 import { loadMyVoucher, loadMyVouchers } from "../../../services/user-voucher";
 import type { UserVoucher, UserVoucherStatusFilter } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
+import { refundUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
-import { requestVoucherRefund, issueVoucherQrToken } from "../../../api/refund";
+import { issueVoucherQrToken } from "../../../api/refund";
+import {
+  Ecc,
+  QrCode,
+} from "../../../miniprogram_npm/tdesign-miniprogram/common/shared/qrcode/qrcodegen";
 
 const PAGE_SIZE = 10;
+
+type QrCell = { id: string; dark: boolean };
+type QrRow = { id: string; cells: QrCell[] };
+
+const createQrRows = (value: string): QrRow[] =>
+  QrCode.encodeText(value, Ecc.MEDIUM)
+    .getModules()
+    .map((cells, rowIndex) => ({
+      id: `row-${rowIndex}`,
+      cells: cells.map((dark, cellIndex) => ({
+        id: `${rowIndex}-${cellIndex}`,
+        dark,
+      })),
+    }));
 
 Page({
   data: {
@@ -13,8 +32,10 @@ Page({
     filters: [
       { value: "ALL", label: "全部" },
       { value: "UNUSED", label: "未使用" },
+      { value: "PARTIALLY_USED", label: "部分使用" },
       { value: "USED", label: "已使用" },
       { value: "EXPIRED", label: "已过期" },
+      { value: "REFUNDING", label: "退款中" },
       { value: "REFUNDED", label: "已退款" },
     ] as Array<{ value: UserVoucherStatusFilter; label: string }>,
     page: 1,
@@ -23,8 +44,10 @@ Page({
     error: "",
     qrVisible: false,
     qrToken: "",
-    qrSeconds: 0,
+    qrVoucherCode: "",
+    qrRows: [] as QrRow[],
     qrLoading: false,
+    pageStyle: "overflow: auto;",
   },
   onLoad(options) {
     this.scope = createRequestScope();
@@ -37,16 +60,7 @@ Page({
     }
   },
   onUnload() {
-    this.stopQrTimer();
     this.scope?.close();
-  },
-  onHide() {
-    this.stopQrTimer();
-  },
-  onShow() {
-    if (this.data.qrVisible && this.qrVoucherId && this.data.qrSeconds <= 0) {
-      void this.issueQr(this.qrVoucherId);
-    }
   },
   onPullDownRefresh() {
     void this.loadList(true).finally(() => wx.stopPullDownRefresh());
@@ -110,95 +124,60 @@ Page({
     const id = String(event.currentTarget.dataset.id || "");
     const voucher = this.data.vouchers.find((item) => item.id === id);
     if (!voucher || voucher.status !== "UNUSED") return;
-    const modal = await new Promise<boolean>((resolve) =>
-      wx.showModal({
-        title: "申请退款",
-        content: "确认申请这张券的退款吗？",
-        success: (r) => resolve(r.confirm),
-        fail: () => resolve(false),
-      }),
-    );
-    if (!modal) return;
-    try {
-      const result = await requestVoucherRefund(
-        id,
-        "消费者申请退款",
-        `refund-${id}-${Date.now()}`,
-      );
-      if (!result.data) throw new Error("退款响应格式异常");
-      wx.showToast({ title: "退款成功", icon: "success" });
-      if (this.voucherId) void this.loadDetail();
-      else void this.loadList(true);
-    } catch (error) {
-      wx.showToast({
-        title: error instanceof Error ? error.message : "退款失败",
-        icon: "none",
-      });
-    }
+    wx.navigateTo({ url: refundUrl(id) });
   },
   async showQr(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id || "");
     if (!id) return;
     this.qrVoucherId = id;
+    const voucher = this.data.vouchers.find((item) => item.id === id);
     this.setData({
       qrVisible: true,
       qrToken: "",
-      qrSeconds: 0,
+      qrVoucherCode: voucher?.voucherCode || "",
+      qrRows: [],
       qrLoading: true,
+      pageStyle: "overflow: hidden;",
     });
     await this.issueQr(id);
   },
   async issueQr(id: string) {
-    this.stopQrTimer();
     this.setData({ qrLoading: true });
     try {
       const result = await issueVoucherQrToken(id);
-      if (!result.data?.token || !result.data.expiresAt)
-        throw new Error("二维码响应格式异常");
-      const seconds = Math.max(
-        1,
-        Math.ceil((Date.parse(result.data.expiresAt) - Date.now()) / 1000),
-      );
+      if (!result.data?.token) throw new Error("二维码响应格式异常");
       this.setData({
         qrToken: result.data.token,
-        qrSeconds: seconds,
+        qrRows: createQrRows(result.data.token),
         qrLoading: false,
       });
-      this.startQrTimer();
     } catch (error) {
-      this.setData({ qrLoading: false, qrToken: "", qrSeconds: 0 });
+      this.setData({ qrLoading: false, qrToken: "", qrRows: [] });
       wx.showToast({
         title: error instanceof Error ? error.message : "二维码生成失败",
         icon: "none",
       });
     }
   },
-  startQrTimer() {
-    this.stopQrTimer();
-    this.qrTimer = setInterval(() => {
-      if (!this.data.qrVisible) return this.stopQrTimer();
-      const seconds = this.data.qrSeconds - 1;
-      if (seconds > 0) this.setData({ qrSeconds: seconds });
-      else if (this.qrVoucherId) void this.issueQr(this.qrVoucherId);
-    }, 1000);
-  },
-  stopQrTimer() {
-    if (this.qrTimer) clearInterval(this.qrTimer);
-    this.qrTimer = undefined;
-  },
   closeQr() {
-    this.stopQrTimer();
     this.setData({
       qrVisible: false,
       qrToken: "",
-      qrSeconds: 0,
+      qrVoucherCode: "",
+      qrRows: [],
       qrLoading: false,
+      pageStyle: "overflow: auto;",
     });
     this.qrVoucherId = "";
   },
-  noop() {},
+  retryQr() {
+    if (this.qrVoucherId && !this.data.qrLoading)
+      void this.issueQr(this.qrVoucherId);
+  },
+  noop() {
+    return;
+  },
   voucherId: "",
   qrVoucherId: "",
-  qrTimer: undefined as ReturnType<typeof setInterval> | undefined,
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
 });

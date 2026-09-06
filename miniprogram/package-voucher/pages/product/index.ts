@@ -8,8 +8,15 @@ import type {
   VoucherProductListItem,
 } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
-import { orderConfirmUrl, shopDetailUrl } from "../../../utils/routes";
+import {
+  shopDetailUrl,
+  shopListUrl,
+  orderResultUrl,
+  voucherNoticeUrl,
+} from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
+import { confirmOrder, createOrder } from "../../../services/order";
+import { openVoucherPayment } from "../../../services/payment-flow";
 
 Page({
   data: {
@@ -19,6 +26,16 @@ Page({
     loading: true,
     error: "",
     navigating: false,
+    confirmOpen: false,
+    confirmLoading: false,
+    confirmError: "",
+    confirmErrorTitle: "",
+    confirmation: null as
+      | import("../../../types").VoucherOrderConfirmation
+      | null,
+    confirmQuantity: 1,
+    confirmExpandedSection: "" as "promotion" | "coupon" | "payment" | "",
+    confirmSubmitting: false,
   },
   onLoad(options) {
     this.productId = String(options.id || options.productId || "");
@@ -64,7 +81,12 @@ Page({
         related: products
           .filter((product) => product.id !== currentId)
           .slice(0, 4)
-          .map((product) => ({ product, shop, distanceText: "" })),
+          .map((product) => ({
+            product,
+            shop,
+            distanceText: "",
+            itemKey: product.id,
+          })),
       });
     } catch {
       this.setData({ related: [] });
@@ -74,16 +96,112 @@ Page({
     const product = this.data.product;
     if (this.data.navigating || !product || product.status !== "ON_SALE")
       return;
-    const url = orderConfirmUrl(this.productId);
-    if (!requireLogin(url)) return;
-    this.setData({ navigating: true });
-    wx.navigateTo({
-      url,
-      fail: () => {
-        this.setData({ navigating: false });
-        wx.showToast({ title: "确认订单页打开失败，请重试", icon: "none" });
-      },
+    // 购买确认现在以内嵌底部面板呈现，深链仍可直接打开 orderConfirmUrl 页面。
+    // 旧版路由失败提示“确认订单页打开失败，请重试”仅保留在深链场景。
+    if (!requireLogin()) return;
+    this.setData({
+      confirmOpen: true,
+      confirmLoading: true,
+      confirmError: "",
+      confirmErrorTitle: "",
+      confirmation: null,
+      confirmQuantity: 1,
+      confirmExpandedSection: "",
     });
+    void this.refreshConfirmation(1);
+  },
+  closeConfirm() {
+    if (this.data.confirmSubmitting) return;
+    this.setData({ confirmOpen: false });
+  },
+  noop() {},
+  async refreshConfirmation(quantity: number) {
+    this.setData({ confirmLoading: true, confirmError: "" });
+    try {
+      const confirmation = await this.scope?.run(
+        confirmOrder(this.productId, quantity),
+      );
+      if (!confirmation) return;
+      this.setData({
+        confirmation,
+        confirmQuantity: confirmation.quantity,
+        confirmErrorTitle: "",
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "订单确认失败";
+      this.setData({
+        confirmation: null,
+        confirmError: message,
+        confirmErrorTitle: message.includes("限购")
+          ? "超过每人限购数量"
+          : message.includes("库存") || message.includes("下架")
+            ? "库存不足或商品已下架"
+            : "暂时无法确认订单",
+      });
+    } finally {
+      this.setData({ confirmLoading: false });
+    }
+  },
+  toggleConfirmSection(event: WechatMiniprogram.TouchEvent) {
+    const section = String(event.currentTarget.dataset.section || "");
+    if (!["promotion", "coupon", "payment"].includes(section)) return;
+    this.setData({
+      confirmExpandedSection:
+        this.data.confirmExpandedSection === section
+          ? ""
+          : (section as "promotion" | "coupon" | "payment"),
+    });
+  },
+  confirmDecrease() {
+    const min = this.data.confirmation?.minQuantity || 1;
+    const next = Math.max(min, this.data.confirmQuantity - 1);
+    if (next !== this.data.confirmQuantity) void this.refreshConfirmation(next);
+  },
+  confirmIncrease() {
+    const max = this.data.confirmation?.maxQuantity || 1;
+    const next = Math.min(max, this.data.confirmQuantity + 1);
+    if (next !== this.data.confirmQuantity) void this.refreshConfirmation(next);
+  },
+  async submitConfirmation() {
+    if (
+      this.data.confirmSubmitting ||
+      this.data.confirmLoading ||
+      !this.data.confirmation
+    )
+      return;
+    this.setData({ confirmSubmitting: true, confirmError: "" });
+    try {
+      const order = await createOrder(
+        this.productId,
+        this.data.confirmQuantity,
+      );
+      let paymentOutcome: "FAILED" | "CANCELLED" | "UNAVAILABLE" | "SUCCESS" =
+        "SUCCESS";
+      try {
+        const payment = await openVoucherPayment(order.id);
+        paymentOutcome = payment.outcome;
+      } catch (paymentError) {
+        paymentOutcome = "UNAVAILABLE";
+        wx.showToast({
+          title:
+            paymentError instanceof Error
+              ? paymentError.message
+              : "支付未完成，订单已保存",
+          icon: "none",
+        });
+      }
+      wx.redirectTo({ url: orderResultUrl(order.id, paymentOutcome) });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "订单创建失败，请重新确认";
+      this.setData({
+        confirmError: message,
+        confirmErrorTitle: "订单提交失败",
+      });
+      await this.refreshConfirmation(this.data.confirmQuantity);
+    } finally {
+      this.setData({ confirmSubmitting: false });
+    }
   },
   retry() {
     void this.loadProduct();
@@ -96,8 +214,24 @@ Page({
         wx.showToast({ title: "门店页打开失败，请重试", icon: "none" }),
     });
   },
-  openRelated(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
-    const id = event.detail.id;
+  openShopList() {
+    if (!this.data.product?.id) return;
+    wx.navigateTo({
+      url: shopListUrl({ productId: this.data.product.id }),
+      fail: () =>
+        wx.showToast({ title: "适用门店打开失败，请重试", icon: "none" }),
+    });
+  },
+  openNotice() {
+    if (!this.data.product?.id) return;
+    wx.navigateTo({
+      url: voucherNoticeUrl(this.data.product.id),
+      fail: () =>
+        wx.showToast({ title: "购买须知打开失败，请重试", icon: "none" }),
+    });
+  },
+  openRelated(event: WechatMiniprogram.TouchEvent) {
+    const id = String(event.currentTarget.dataset.id || "");
     if (!id) return;
     wx.navigateTo({
       url: `/package-voucher/pages/product/index?id=${encodeURIComponent(id)}`,

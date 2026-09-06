@@ -1,17 +1,15 @@
 import { refreshCurrentUser, signOut } from "../../services/auth";
-import * as userService from "../../services/user";
 import { authStore } from "../../store/auth";
 import {
   navigateToLogin,
   requireLogin,
   syncTabBar,
 } from "../../utils/navigation";
+import { userProfileUrl } from "../../utils/routes";
 
 Page({
   data: {
     user: authStore.user,
-    signs: 0,
-    signed: false,
     loading: false,
     loggedIn: authStore.isLoggedIn(),
   },
@@ -20,27 +18,18 @@ Page({
     const loggedIn = authStore.isLoggedIn();
     this.setData({ loggedIn });
     if (loggedIn) void this.loadUser();
-    else this.setData({ user: null, signs: 0, signed: false, loading: false });
+    else this.setData({ user: null, loading: false });
   },
   async loadUser() {
     this.setData({ loading: true });
     try {
-      const [user, signs] = await Promise.all([
-        refreshCurrentUser(),
-        userService.signCount(),
-      ]);
-      this.setData({ user, signs: signs.data || 0 });
+      const user = await refreshCurrentUser();
+      this.setData({ user });
     } catch {
       this.setData({ loggedIn: authStore.isLoggedIn(), user: authStore.user });
     } finally {
       this.setData({ loading: false });
     }
-  },
-  async sign() {
-    if (!requireLogin("/pages/me/index") || this.data.signed) return;
-    await userService.signIn();
-    this.setData({ signed: true, signs: this.data.signs + 1 });
-    this.selectComponent("#sign-motion")?.show();
   },
   login() {
     navigateToLogin("/pages/me/index");
@@ -53,12 +42,24 @@ Page({
     if (requireLogin())
       wx.navigateTo({ url: "/package-post/pages/mine/index" });
   },
+  openProfile() {
+    const id = this.data.user?.id;
+    if (id) wx.navigateTo({ url: userProfileUrl(String(id)) });
+  },
+  openOrders() {
+    if (requireLogin())
+      wx.navigateTo({ url: "/package-order/pages/list/index" });
+  },
+  openWallet() {
+    if (requireLogin())
+      wx.navigateTo({ url: "/package-voucher/pages/wallet/index" });
+  },
   async logout() {
     try {
       await signOut();
     } catch {
       /* 请求层已经提示网络错误，本地会话仍需退出 */
     }
-    this.setData({ user: null, signs: 0, signed: false, loggedIn: false });
+    this.setData({ user: null, loggedIn: false });
   },
 });

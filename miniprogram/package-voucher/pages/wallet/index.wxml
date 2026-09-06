@@ -1,30 +1,43 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="wallet-root">
 <app-navbar title="我的券包" back />
-<view class="page page-enter">
+<view class="wallet-page page-enter">
   <view wx:if="{{!voucherId}}" class="filters"><view wx:for="{{filters}}" wx:key="value" class="filter {{status === item.value ? 'filter--active' : ''}}" data-status="{{item.value}}" bind:tap="selectStatus">{{item.label}}</view></view>
   <view wx:if="{{loading && !vouchers.length}}" class="module-state"><t-loading size="42rpx" /> 正在加载券包</view>
   <app-empty wx:elif="{{error && !vouchers.length}}" description="{{error}}" action-text="重新加载" bind:action="retry" />
   <app-empty wx:elif="{{!vouchers.length}}" description="暂无符合条件的券" />
   <view wx:else class="stack">
-    <view wx:for="{{vouchers}}" wx:key="id" class="voucher-card roamly-panel">
-      <view class="voucher-card__head"><text class="voucher-card__title">{{item.productTitle}}</text><text class="status">{{item.statusText}}</text></view>
-      <view class="shop">{{item.shop.name}}</view>
-      <view class="code" wx:if="{{item.status === 'UNUSED'}}">券码：{{item.voucherCode}}</view>
-      <view class="meta">有效期：{{item.validFrom || '购买后生效'}} 至 {{item.expireTime || '以商户规则为准'}}</view>
-    <view class="rules">{{item.usageRules}}</view>
-    <view class="rules">额外消费由顾客与商户自行线下微信支付</view>
-      <t-button wx:if="{{item.status === 'UNUSED'}}" size="small" variant="outline" data-id="{{item.id}}" catch:tap="refund">申请退款</t-button>
-      <t-button wx:if="{{item.status === 'UNUSED'}}" size="small" data-id="{{item.id}}" catch:tap="showQr">出示二维码</t-button>
+    <view wx:for="{{vouchers}}" wx:key="id" class="voucher-card roamly-panel voucher-card--{{item.status}}">
+      <view class="voucher-card__head"><view class="voucher-card__title"><view class="voucher-brand"><t-icon name="ticket" size="28rpx" /></view><text>{{item.productTitle}}</text></view><text class="status">{{item.statusText}}</text></view>
+      <view class="voucher-card__body"><app-image src="{{item.shop.cover}}" custom-class="voucher-thumb" /><view class="voucher-card__copy"><view class="shop">{{item.shop.name}}</view><view class="meta">有效期：{{item.validFrom || '购买后生效'}} 至 {{item.expireTime || '以商户规则为准'}}</view></view></view>
+      <view class="code" wx:if="{{item.status === 'UNUSED' || item.status === 'PARTIALLY_USED'}}"><text>券码</text><text>{{item.voucherCode}}</text></view>
+      <view class="code code--frozen" wx:elif="{{item.status === 'REFUNDING'}}"><text>券码</text><text>退款处理中，暂不可使用</text></view>
+      <view class="rules">{{item.usageRules}}</view>
+      <view class="rules">额外消费由顾客与商户自行线下微信支付</view>
+      <view class="voucher-actions"><t-button wx:if="{{item.status === 'UNUSED'}}" size="small" variant="outline" data-id="{{item.id}}" catch:tap="refund">申请退款</t-button><t-button wx:if="{{item.status === 'UNUSED' || item.status === 'PARTIALLY_USED'}}" size="small" data-id="{{item.id}}" catch:tap="showQr">查看券码</t-button></view>
     </view>
     <view wx:if="{{loading}}" class="list-footer"><t-loading size="36rpx" /> 加载中</view>
     <view wx:elif="{{!hasMore && !voucherId}}" class="list-footer">没有更多券了</view>
   </view>
 </view>
-<view wx:if="{{qrVisible}}" class="qr-mask" catch:tap="closeQr">
-  <view class="qr-dialog" catch:tap="noop">
-    <view class="qr-dialog__head"><text>动态券二维码</text><text class="qr-close" bind:tap="closeQr">关闭</text></view>
+<view wx:if="{{qrVisible}}" class="qr-mask" catch:tap="noop" catch:touchmove="noop">
+  <view class="qr-dialog" catch:tap="noop" catch:touchmove="noop">
+    <view class="qr-dialog__head"><text>券码</text></view>
     <view wx:if="{{qrLoading}}" class="qr-loading"><t-loading size="48rpx" /> 正在生成</view>
-    <t-qrcode wx:elif="{{qrToken}}" value="{{qrToken}}" size="240" level="M" include-margin />
-    <view wx:if="{{qrToken}}" class="qr-countdown">{{qrSeconds}} 秒后自动刷新</view>
-    <view class="qr-tip">请将二维码交给商户扫码核销</view>
+    <block wx:elif="{{qrToken}}">
+      <view class="voucher-barcode"></view>
+      <view class="qr-code-frame">
+        <view class="qr-grid">
+          <view wx:for="{{qrRows}}" wx:key="id" wx:for-item="row" class="qr-row">
+            <view wx:for="{{row.cells}}" wx:key="id" wx:for-item="cell" class="qr-cell {{cell.dark ? 'qr-cell--dark' : ''}}"></view>
+          </view>
+        </view>
+      </view>
+      <view class="qr-voucher-code">{{qrVoucherCode}}</view>
+    </block>
+    <view wx:elif="{{qrVisible}}" class="qr-error">二维码生成失败<t-button size="small" variant="outline" bind:tap="retryQr">重新生成</t-button></view>
+    <view class="qr-tip">请将券码和二维码交给商户扫码核销</view>
   </view>
+  <view class="qr-dialog__close" bindtap="closeQr" catchtouchmove="noop" aria-label="关闭"><text>×</text></view>
+</view>
 </view>

@@ -67,8 +67,10 @@ export interface PostCard {
   createdTime: string;
 }
 
-export interface PostCardResponse
-  extends Omit<PostCard, "media" | "highlightComment"> {
+export interface PostCardResponse extends Omit<
+  PostCard,
+  "media" | "highlightComment"
+> {
   media: PostMediaResponse[];
   highlightComment?: HighlightCommentResponse;
 }
@@ -84,8 +86,10 @@ export interface ShopSummaryResponse {
   score?: number;
 }
 
-export interface PostDetailResponse
-  extends Omit<PostCardResponse, "contentPreview" | "highlightComment"> {
+export interface PostDetailResponse extends Omit<
+  PostCardResponse,
+  "contentPreview" | "highlightComment"
+> {
   content: string;
   shop?: ShopSummaryResponse;
   editable: boolean;

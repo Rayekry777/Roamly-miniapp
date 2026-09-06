@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { imageUrl, splitImages } from "../miniprogram/utils/media";
+import {
+  categoryIconUrl,
+  imageUrl,
+  splitImages,
+} from "../miniprogram/utils/media";
 
 describe("imageUrl", () => {
   beforeEach(() =>
@@ -19,10 +23,26 @@ describe("imageUrl", () => {
     );
   });
   it("为空图片返回本地占位图", () => {
-    expect(imageUrl()).toBe("/assets/images/photo-placeholder.svg");
+    expect(imageUrl()).toBe("/assets/images/photo-placeholder.png");
+  });
+  it("保留本地 SVG 资源路径", () => {
+    expect(imageUrl("/assets/images/category-food.svg", "category")).toBe(
+      "/assets/images/category-food.svg",
+    );
   });
   it("旧分类图标使用本地 SVG", () => {
     expect(imageUrl("/types/ms.png", "category")).toBe(
+      "/assets/images/category-food.svg",
+    );
+  });
+  it("按分类名称选择对应 SVG", () => {
+    expect(categoryIconUrl("/types/unknown.png", "运动健身")).toBe(
+      "/assets/images/category-fitness.svg",
+    );
+    expect(categoryIconUrl("/types/unknown.png", "休闲娱乐")).toBe(
+      "/assets/images/category-party.svg",
+    );
+    expect(categoryIconUrl("/types/unknown.png", "美食")).toBe(
       "/assets/images/category-food.svg",
     );
   });

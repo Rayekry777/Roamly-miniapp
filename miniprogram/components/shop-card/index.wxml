@@ -1,19 +1,21 @@
 <view
-  class="shop-card pressable"
+  class="shop-card {{compact ? 'shop-card--compact' : ''}} pressable"
   bind:tap="onSelect"
   aria-role="button"
   aria-label="查看{{shop.name}}商户详情"
 >
-  <app-image custom-class="cover" src="{{shop.cover}}" />
+  <view wx:if="{{!compact}}" class="cover-wrap">
+    <app-image wx:if="{{shop.cover}}" src="{{shop.cover}}" custom-class="cover" mode="aspectFill" />
+    <view wx:else class="cover cover--empty"><t-icon name="shop" size="44rpx" /></view>
+  </view>
   <view class="content">
     <view class="title">{{shop.name}}</view>
     <view class="rating">
-      <t-icon name="star-filled" size="28rpx" color="#ff9a43" />
-      {{scoreText}}
-      <text>{{shop.comments}} 条评价</text>
+      <text class="stars">{{scoreStars}}</text>
+      {{scoreText}} 分
     </view>
-    <view class="meta">{{shop.area || "城市漫游"}} · 人均 ¥{{shop.avgPrice || "--"}}</view>
-    <view class="meta">{{shop.distanceText}} · 月售 {{shop.sold}}</view>
+    <view class="meta">{{shop.address || shop.area || "地址信息暂缺"}}</view>
+    <view class="meta">{{shop.openHours || "营业时间暂未提供"}}{{shop.distanceText ? ' · ' + shop.distanceText : ''}}</view>
   </view>
-  <t-icon name="chevron-right" size="30rpx" color="#aaa8b3" />
+  <view wx:if="{{shop.longitude != null && shop.latitude != null}}" class="shop-actions"><view catch:tap="onNavigate"><t-icon name="location" size="42rpx" /><text>导航</text></view></view>
 </view>

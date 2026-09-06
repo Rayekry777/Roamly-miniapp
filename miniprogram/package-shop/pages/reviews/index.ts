@@ -287,9 +287,9 @@ Page({
   isUserCancel(error: unknown): boolean {
     return Boolean(
       error &&
-        typeof error === "object" &&
-        "errMsg" in error &&
-        /cancel/i.test(String((error as { errMsg?: string }).errMsg)),
+      typeof error === "object" &&
+      "errMsg" in error &&
+      /cancel/i.test(String((error as { errMsg?: string }).errMsg)),
     );
   },
   shopId: "",

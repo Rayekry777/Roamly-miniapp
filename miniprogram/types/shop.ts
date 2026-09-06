@@ -45,6 +45,7 @@ export interface Shop {
 
 export interface ShopListQuery {
   cityCode: string;
+  productId?: string;
   typeId?: string;
   keyword?: string;
   sort: ShopSort;

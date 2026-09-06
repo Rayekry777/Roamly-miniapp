@@ -1,21 +1,21 @@
 <view class="product-card pressable" bind:tap="select" aria-role="button" aria-label="查看{{item.product.title}}">
-  <app-image custom-class="product-card__cover" src="{{item.product.cover}}" mode="aspectFill" />
+  <view class="product-card__cover-wrap">
+    <app-image custom-class="product-card__cover" src="{{item.product.cover}}" mode="aspectFill" />
+  </view>
   <view class="product-card__body">
     <view class="product-card__title">{{item.product.title}}</view>
     <view class="product-card__tags">
-      <text>{{item.product.productTypeLabel}}</text>
-      <text>{{item.product.validityText}}</text>
+      <text wx:for="{{item.product.displayTags}}" wx:key="*this" class="product-card__tag">{{item}}</text>
+      <text wx:if="{{!item.product.displayTags || !item.product.displayTags.length}}" class="product-card__tag">{{item.product.voucherLabel || item.product.productTypeLabel}}</text>
     </view>
     <view wx:if="{{!compactShop}}" class="product-card__shop">
+      <text class="product-card__shop-label">可用门店</text>
       <text class="product-card__shop-name">{{item.shop.name}}</text>
-      <text wx:if="{{item.distanceText}}">{{item.distanceText}}</text>
     </view>
-    <view class="product-card__sales">已售 {{item.product.soldCount}} · {{item.product.benefitText}}</view>
+    <view class="product-card__sales">已售 {{item.product.soldCount}}</view>
     <view class="product-card__bottom">
       <view class="product-card__price">
         <text class="product-card__currency">¥</text><text class="product-card__amount">{{item.product.payAmountText}}</text>
-        <text wx:if="{{item.product.originalAmountText}}" class="product-card__origin">¥{{item.product.originalAmountText}}</text>
-        <text wx:if="{{item.product.discountText}}" class="product-card__saving">{{item.product.discountText}}</text>
       </view>
       <view class="product-card__cta" catch:tap="select">抢购</view>
     </view>
