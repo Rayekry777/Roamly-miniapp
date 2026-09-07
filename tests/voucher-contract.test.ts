@@ -101,7 +101,12 @@ describe("voucher, order and wallet contracts", () => {
 
   it("keeps order writes non-deduplicated and filters optional status", async () => {
     await createVoucherOrder("7", { quantity: 1 }, "stage22-miniapp-1");
-    await listMyOrders({ page: 2, size: 20, status: "PAID" });
+    await listMyOrders({
+      page: 2,
+      size: 20,
+      status: "PAID",
+      productType: "CASH",
+    });
     await cancelMyOrder("8");
     expect(requestMock).toHaveBeenNthCalledWith(
       1,
@@ -115,7 +120,7 @@ describe("voucher, order and wallet contracts", () => {
       },
     );
     expect(requestMock).toHaveBeenNthCalledWith(2, "/v1/users/me/orders", {
-      data: { page: 2, size: 20, status: "PAID" },
+      data: { page: 2, size: 20, status: "PAID", productType: "CASH" },
       auth: "required",
       showError: false,
     });
@@ -278,9 +283,13 @@ describe("voucher, order and wallet contracts", () => {
       payAmount: 9900,
       status: "PENDING_PAYMENT",
       createdTime: "2026-09-03",
+      productType: "CASH",
+      productTypeLabel: "代金券",
     });
     expect(order.id).toBe("3");
     expect(order.statusText).toBe("待支付");
+    expect(order.productType).toBe("CASH");
+    expect(order.productTypeLabel).toBe("代金券");
   });
 
   it("shows voucher face value and sale price without discount effects", () => {

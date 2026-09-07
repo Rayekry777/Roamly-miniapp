@@ -7,6 +7,7 @@ import type {
   VoucherOrderConfirmationResponse,
   VoucherOrderResponse,
   VoucherOrderStatusFilter,
+  VoucherProductType,
   VoucherPaymentResponse,
   UserVoucher,
 } from "../types";
@@ -69,6 +70,7 @@ export async function loadMyOrders(
     page?: number;
     size?: number;
     status?: VoucherOrderStatusFilter;
+    productType?: VoucherProductType;
   } = {},
 ): Promise<PageResult<VoucherOrder>> {
   const result = await orderApi.listMyOrders(query);
@@ -160,6 +162,8 @@ export function normalizeOrder(value: VoucherOrderResponse): VoucherOrder {
     totalAmountText: formatAmount(value.totalAmount),
     payAmountText: formatAmount(value.payAmount),
     productCover: value.productCover ? imageUrl(value.productCover) : undefined,
+    productType: value.productType,
+    productTypeLabel: value.productTypeLabel,
     statusText: orderStatusText(value.status),
   };
 }

@@ -66,4 +66,23 @@ describe("nearby and shop page contract", () => {
     expect(service).toContain("商户动态响应格式异常");
     expect(service).not.toContain("mock");
   });
+
+  it("keeps the shop detail page free from unused Lottie and null image inputs", () => {
+    const detail = readFileSync(
+      "miniprogram/package-shop/pages/detail/index.wxml",
+      "utf8",
+    );
+    const detailConfig = readFileSync(
+      "miniprogram/package-shop/pages/detail/index.json",
+      "utf8",
+    );
+    const voucherCard = readFileSync(
+      "miniprogram/components/voucher-product-card/index.wxml",
+      "utf8",
+    );
+
+    expect(detailConfig).not.toContain("success-motion");
+    expect(detail).toContain('src="{{item || \'\'}}"');
+    expect(voucherCard).toContain('src="{{item.product.cover || \'\'}}"');
+  });
 });

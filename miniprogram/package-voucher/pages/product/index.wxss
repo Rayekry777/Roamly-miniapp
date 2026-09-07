@@ -57,7 +57,6 @@
 .related-item__title { overflow: hidden; font-size: 25rpx; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
 .related-item__sales { margin-top: 10rpx; color: var(--roamly-muted); font-size: 21rpx; }
 .related-item__price { display: flex; align-items: baseline; gap: 10rpx; margin-top: 10rpx; color: var(--roamly-primary); font-size: 29rpx; font-weight: 800; }
-.related-item__price text:last-child { color: var(--roamly-muted); font-size: 20rpx; font-weight: 400; text-decoration: line-through; }
 .related-item__cta { padding: 15rpx 22rpx; border-radius: 999rpx; background: var(--roamly-primary); color: #fff; font-size: 22rpx; font-weight: 750; }
 .related-item__cta--disabled { background: var(--roamly-border); color: var(--roamly-muted); }
 .purchase-bar { position: fixed; z-index: 999; right: 0; bottom: 0; left: 0; display: flex; min-height: 112rpx; align-items: center; gap: 20rpx; padding: 14rpx 28rpx calc(14rpx + env(safe-area-inset-bottom)); box-sizing: border-box; border-top: 1rpx solid var(--roamly-border); background: #fff; box-shadow: 0 -8rpx 28rpx rgba(36, 35, 49, .08); }

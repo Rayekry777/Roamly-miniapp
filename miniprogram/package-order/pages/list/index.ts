@@ -1,5 +1,9 @@
 import { cancelOrder, loadMyOrders } from "../../../services/order";
-import type { VoucherOrder, VoucherOrderStatusFilter } from "../../../types";
+import type {
+  VoucherOrder,
+  VoucherOrderStatusFilter,
+  VoucherProductTypeFilter,
+} from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
 import { orderDetailUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
@@ -12,6 +16,16 @@ Page({
     visibleOrders: [] as VoucherOrder[],
     keyword: "",
     status: "ALL" as VoucherOrderStatusFilter,
+    productType: "ALL" as VoucherProductTypeFilter,
+    productTypeLabel: "全部分类",
+    categoryVisible: false,
+    productTypeOptions: [
+      { value: "ALL" as VoucherProductTypeFilter, label: "全部分类" },
+      { value: "PACKAGE" as VoucherProductTypeFilter, label: "套餐券" },
+      { value: "CASH" as VoucherProductTypeFilter, label: "代金券" },
+      { value: "DISCOUNT" as VoucherProductTypeFilter, label: "折扣券" },
+      { value: "MULTI_USE" as VoucherProductTypeFilter, label: "次卡" },
+    ],
     filters: [
       { value: "ALL", label: "全部订单" },
       { value: "PENDING_PAYMENT", label: "待付款" },
@@ -29,6 +43,10 @@ Page({
     if (requireLogin("/package-order/pages/list/index"))
       void this.loadOrders(true);
   },
+  onShow() {
+    // Returning from the detail page makes the list actionable again.
+    this.openingOrder = false;
+  },
   onUnload() {
     this.scope?.close();
   },
@@ -43,7 +61,13 @@ Page({
     this.setData({ loading: true, error: reset ? "" : this.data.error });
     try {
       const result = await this.scope?.run(
-        loadMyOrders({ page, size: PAGE_SIZE, status: this.data.status }),
+        loadMyOrders({
+          page,
+          size: PAGE_SIZE,
+          status: this.data.status,
+          productType:
+            this.data.productType === "ALL" ? undefined : this.data.productType,
+        }),
       );
       if (!result) return;
       const map = new Map(
@@ -81,6 +105,31 @@ Page({
     });
     void this.loadOrders(true);
   },
+  toggleCategory() {
+    this.setData({ categoryVisible: !this.data.categoryVisible });
+  },
+  selectProductType(event: WechatMiniprogram.TouchEvent) {
+    const productType = String(
+      event.currentTarget.dataset.type || "ALL",
+    ) as VoucherProductTypeFilter;
+    const option = this.data.productTypeOptions.find(
+      (item) => item.value === productType,
+    );
+    if (!option || productType === this.data.productType) {
+      this.setData({ categoryVisible: false });
+      return;
+    }
+    this.setData({
+      productType,
+      productTypeLabel: option.label,
+      categoryVisible: false,
+      orders: [],
+      visibleOrders: [],
+      page: 1,
+      hasMore: true,
+    });
+    void this.loadOrders(true);
+  },
   onKeyword(event: WechatMiniprogram.CustomEvent) {
     const detail = event.detail as unknown as string | { value: string };
     const keyword = typeof detail === "string" ? detail : detail.value;
@@ -96,7 +145,15 @@ Page({
   },
   openOrder(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id || "");
-    if (id) wx.navigateTo({ url: orderDetailUrl(id) });
+    if (!id || this.openingOrder) return;
+    this.openingOrder = true;
+    wx.navigateTo({
+      url: orderDetailUrl(id),
+      fail: () => {
+        this.openingOrder = false;
+        wx.showToast({ title: "订单详情打开失败，请重试", icon: "none" });
+      },
+    });
   },
   async cancel(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id || "");
@@ -127,6 +184,7 @@ Page({
   retry() {
     void this.loadOrders(true);
   },
+  openingOrder: false,
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
 });
 

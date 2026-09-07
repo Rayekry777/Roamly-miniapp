@@ -20,11 +20,13 @@
       <view class="review-card__head">
         <app-image custom-class="review-card__avatar" src="{{item.author.icon}}" kind="avatar" mode="aspectFill" />
         <view class="review-card__identity"><view class="review-card__name">{{item.author.nickName}}</view><view class="review-card__meta">{{item.createdTime}}</view></view>
-        <view class="review-card__score">{{item.score}}.0</view>
+        <view class="review-card__score-area">
+          <t-button wx:if="{{item.editable}}" theme="primary" variant="text" size="small" data-id="{{item.id}}" bind:tap="editReview">编辑</t-button>
+          <view class="review-card__score">{{item.score}}.0</view>
+        </view>
       </view>
       <view class="review-card__badges">
         <t-tag wx:if="{{item.verifiedConsumption}}" theme="success" variant="light">已消费</t-tag>
-        <t-button wx:if="{{item.editable}}" theme="primary" variant="text" size="small" data-id="{{item.id}}" bind:tap="editReview">编辑</t-button>
       </view>
       <view class="review-card__content">{{item.content}}</view>
       <view wx:if="{{item.media.length}}" class="review-media-grid"><app-image wx:for="{{item.media}}" wx:key="id" custom-class="review-media-image" src="{{item.url}}" mode="aspectFill" /></view>

@@ -1,6 +1,6 @@
 <view class="product-card pressable" bind:tap="select" aria-role="button" aria-label="查看{{item.product.title}}">
   <view class="product-card__cover-wrap">
-    <app-image custom-class="product-card__cover" src="{{item.product.cover}}" mode="aspectFill" />
+    <app-image custom-class="product-card__cover" src="{{item.product.cover || ''}}" mode="aspectFill" />
   </view>
   <view class="product-card__body">
     <view class="product-card__title">{{item.product.title}}</view>

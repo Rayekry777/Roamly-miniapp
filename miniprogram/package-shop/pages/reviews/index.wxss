@@ -10,6 +10,7 @@
 .review-card__identity { min-width: 0; flex: 1; }
 .review-card__name { font-size: 28rpx; font-weight: 700; }
 .review-card__meta { margin-top: 6rpx; color: var(--roamly-muted); font-size: 20rpx; }
+.review-card__score-area { display: flex; flex: none; align-items: center; gap: 8rpx; }
 .review-card__score { color: var(--roamly-primary); font-size: 34rpx; font-weight: 800; }
 .review-card__badges { display: flex; align-items: center; gap: 10rpx; min-height: 48rpx; margin-top: 14rpx; }
 .review-card__content { margin-top: 14rpx; color: var(--roamly-text); font-size: 27rpx; line-height: 1.65; white-space: pre-wrap; }

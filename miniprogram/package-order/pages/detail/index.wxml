@@ -13,7 +13,7 @@
     <view wx:if="{{shop}}" class="usage-shop roamly-panel">
       <view class="usage-shop__header"><text>适用门店</text><text class="usage-shop__link" bind:tap="openShop">查看门店 ›</text></view>
       <view class="usage-shop__name">{{shop.name}}</view>
-      <view class="usage-shop__address"><t-icon name="location" size="28rpx" />{{shop.address || '门店地址以服务端信息为准'}}</view>
+      <view class="usage-shop__address">{{shop.address || '门店地址以服务端信息为准'}}</view>
       <view wx:if="{{shop.openHours}}" class="usage-shop__hours"><t-icon name="time" size="28rpx" /><text class="open-state">营业中</text><text>{{shop.openHours}}</text></view>
     </view>
 

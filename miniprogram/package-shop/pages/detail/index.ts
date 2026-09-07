@@ -140,6 +140,21 @@ Page({
   openReviews() {
     wx.navigateTo({ url: shopReviewsUrl(this.shopId) });
   },
+  navigateShop() {
+    const shop = this.data.shop;
+    if (!shop || shop.longitude == null || shop.latitude == null) {
+      wx.showToast({ title: "暂无门店定位信息", icon: "none" });
+      return;
+    }
+    wx.openLocation({
+      latitude: shop.latitude,
+      longitude: shop.longitude,
+      name: shop.name,
+      address: shop.address || "",
+      fail: () =>
+        wx.showToast({ title: "导航打开失败，请重试", icon: "none" }),
+    });
+  },
   retryShop() {
     void this.loadShop();
   },

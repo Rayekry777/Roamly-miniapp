@@ -6,6 +6,7 @@ import type {
   VoucherOrderCreateRequest,
   VoucherOrderResponse,
   VoucherOrderStatusFilter,
+  VoucherProductType,
   VoucherPaymentRequest,
   VoucherPaymentResponse,
 } from "../types";
@@ -42,6 +43,7 @@ export function listMyOrders(
     page?: number;
     size?: number;
     status?: VoucherOrderStatusFilter;
+    productType?: VoucherProductType;
   } = {},
 ): Promise<Result<PageResult<VoucherOrderResponse>>> {
   const data: Record<string, unknown> = {
@@ -49,6 +51,7 @@ export function listMyOrders(
     size: query.size || 10,
   };
   if (query.status && query.status !== "ALL") data.status = query.status;
+  if (query.productType) data.productType = query.productType;
   return request("/v1/users/me/orders", {
     data,
     auth: "required",

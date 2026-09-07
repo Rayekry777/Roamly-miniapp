@@ -31,14 +31,23 @@ describe("团购券参考图视觉层级契约", () => {
   });
 
   it("商品详情按首图、摘要、须知、门店和购买栏排列", () => {
+    const productPage = read(
+      "miniprogram/package-voucher/pages/product/index.wxml",
+    );
     appearsInOrder(
-      read("miniprogram/package-voucher/pages/product/index.wxml"),
+      productPage,
       'class="hero"',
       "product-summary-card",
       "purchase-notice",
       "shop-card",
       "purchase-bar",
     );
+    expect(productPage).toContain(
+      '<view class="related-item__price"><text>¥{{item.product.payAmountText}}</text></view>',
+    );
+    expect(
+      read("miniprogram/package-voucher/pages/product/index.wxss"),
+    ).not.toContain(".related-item__price text:last-child");
   });
 
   it("订单与支付页面保留参考图的卡片层级", () => {
@@ -67,9 +76,10 @@ describe("团购券参考图视觉层级契约", () => {
     expect(read("miniprogram/package-order/pages/list/index.wxml")).toContain(
       "t-search",
     );
-    expect(read("miniprogram/package-order/pages/list/index.wxml")).toContain(
-      "visibleOrders",
-    );
+    const orders = read("miniprogram/package-order/pages/list/index.wxml");
+    expect(orders).toContain("visibleOrders");
+    expect(orders).toContain("productTypeOptions");
+    expect(orders).toContain('bind:tap="selectProductType"');
   });
 
   it("到店使用、券码和退款页面保持状态先于操作的顺序", () => {

@@ -29,7 +29,7 @@
 .voucher-list__label { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .voucher-count { color: var(--roamly-primary); }
 .voucher-actions { display: flex; width:100%; flex:none; align-items: center; justify-content:flex-end; gap: 10rpx; }
-.voucher-actions t-button { flex: none; }
+.voucher-actions t-button { width:154rpx; flex: none; }
 .voucher-line { display: flex; align-items: center; justify-content: space-between; padding: 14rpx 0 0; color: var(--roamly-text); font-size: 22rpx; }
 .voucher-status { color: var(--roamly-primary); }
 .voucher-status--pending { color: var(--roamly-warning); }

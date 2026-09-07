@@ -2,6 +2,7 @@ import type { MediaAsset } from "./media";
 import type { ShopSummary } from "./post";
 
 export type VoucherProductType = "PACKAGE" | "CASH" | "DISCOUNT" | "MULTI_USE";
+export type VoucherProductTypeFilter = VoucherProductType | "ALL";
 export type VoucherSaleStatus =
   | "SCHEDULED"
   | "ON_SALE"
@@ -231,6 +232,8 @@ export interface VoucherOrderResponse {
   expireTime?: string;
   paymentExpireTime?: string;
   productCover?: string;
+  productType?: VoucherProductType;
+  productTypeLabel?: string;
 }
 
 export interface VoucherOrder {
@@ -254,6 +257,8 @@ export interface VoucherOrder {
   expireTime?: string;
   paymentExpireTime?: string;
   productCover?: string;
+  productType?: VoucherProductType;
+  productTypeLabel?: string;
 }
 
 export interface VoucherOrderDetailResponse {

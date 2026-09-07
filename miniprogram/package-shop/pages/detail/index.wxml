@@ -15,11 +15,16 @@
   <block wx:else>
     <swiper class="gallery" indicator-dots autoplay interval="3500">
       <swiper-item wx:for="{{shop.images.length ? shop.images : ['']}}" wx:key="*this">
-        <app-image src="{{item}}" />
+        <app-image src="{{item || ''}}" />
       </swiper-item>
     </swiper>
 
-    <view class="detail roamly-panel">
+    <view
+      class="detail roamly-panel pressable"
+      bind:tap="navigateShop"
+      aria-role="button"
+      aria-label="导航到{{shop.name}}"
+    >
       <view class="detail__head">
         <view class="detail__identity">
           <view class="eyebrow">{{shop.area || "ROAMLY 推荐"}}</view>
