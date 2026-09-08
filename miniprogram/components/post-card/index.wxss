@@ -30,6 +30,7 @@
   width: 72rpx;
   height: 72rpx;
   overflow: hidden;
+  flex: none;
   border-radius: 50%;
 }
 

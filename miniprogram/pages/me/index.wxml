@@ -1,13 +1,4 @@
-<app-navbar title="" back="{{false}}">
-  <view
-    wx:if="{{loggedIn}}"
-    slot="right"
-    class="logout pressable"
-    bind:tap="logout"
-  >
-    <t-icon name="logout" size="40rpx" />
-  </view>
-</app-navbar>
+<app-navbar title="" back="{{false}}" />
 
 <view class="me-page page-enter">
   <view wx:if="{{!loggedIn}}" class="login-state roamly-panel">
@@ -25,7 +16,7 @@
         </view>
         <view class="profile__copy"><view class="profile__name">{{user.nickName || "Roamly 用户"}}</view><view class="muted">ID {{user.id || "--"}}</view><view class="profile__stats-inline">个人资料与动态</view></view>
       </view>
-      <view class="profile__link pressable" bind:tap="openProfile">个人主页 ›</view>
+      <view class="profile__link pressable" bind:tap="openProfile">个人信息 ›</view>
     </view>
 
     <view class="quick-grid roamly-panel">

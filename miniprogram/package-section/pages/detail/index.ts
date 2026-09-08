@@ -10,6 +10,7 @@ import {
 } from "../../../services/section";
 import { authStore } from "../../../store/auth";
 import { cityStore } from "../../../store/city";
+import { syncCityPreference } from "../../../services/city";
 import { sectionStore } from "../../../store/section";
 import type {
   City,
@@ -323,6 +324,7 @@ Page({
     if (!city) return;
     const changed = city.code !== this.data.selectedCity?.code;
     cityStore.select(city);
+    syncCityPreference(city.code);
     this.setData({
       selectedCity: city,
       cityPickerVisible: false,

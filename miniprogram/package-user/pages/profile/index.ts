@@ -1,20 +1,20 @@
 import { loadUserPostPage } from "../../../services/post";
 import { checkFollow, followUser } from "../../../services/follow";
-import { getUser, getUserInfo } from "../../../services/user";
+import { getPublicProfile } from "../../../services/user";
 import { authStore } from "../../../store/auth";
-import type { PostCard, UserDTO, UserInfo } from "../../../types";
+import type { PostCard, PublicUserProfile } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
 import { postDetailUrl } from "../../../utils/routes";
 
 Page({
   data: {
-    user: null as UserDTO | null,
-    info: null as UserInfo | null,
+    user: null as PublicUserProfile | null,
     posts: [] as PostCard[],
     postsError: "",
     following: false,
     loading: true,
     toggling: false,
+    currentUserId: authStore.user?.id || "",
   },
   onLoad(options) {
     this.userId = String(options.id || "");
@@ -22,15 +22,11 @@ Page({
   },
   async load() {
     try {
-      const [userResult, infoResult, postsResult] = await Promise.allSettled([
-        getUser(this.userId),
-        getUserInfo(this.userId),
+      const [userResult, postsResult] = await Promise.allSettled([
+        getPublicProfile(this.userId),
         loadUserPostPage(this.userId, 1),
       ]);
-      if (
-        userResult.status !== "fulfilled" ||
-        infoResult.status !== "fulfilled"
-      ) {
+      if (userResult.status !== "fulfilled" || !userResult.value.data) {
         throw new Error("用户资料暂时无法加载");
       }
       const following = authStore.isLoggedIn()
@@ -38,7 +34,7 @@ Page({
         : false;
       this.setData({
         user: userResult.value.data,
-        info: infoResult.value.data,
+        currentUserId: authStore.user?.id || "",
         posts:
           postsResult.status === "fulfilled" ? postsResult.value.items : [],
         postsError:
@@ -46,7 +42,7 @@ Page({
         following,
       });
     } catch {
-      this.setData({ user: null, info: null, posts: [], following: false });
+      this.setData({ user: null, posts: [], following: false });
     } finally {
       this.setData({ loading: false });
     }

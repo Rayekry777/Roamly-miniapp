@@ -1,9 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { loginByCode } from "../miniprogram/services/auth";
+import {
+  loginByCode,
+  loginByPassword,
+  registerAndLogin,
+  requestAuthCode,
+} from "../miniprogram/services/auth";
 import { authStore } from "../miniprogram/store/auth";
 
 const apiMocks = vi.hoisted(() => ({
   login: vi.fn(),
+  register: vi.fn(),
+  passwordLogin: vi.fn(),
+  sendCode: vi.fn(),
   getMe: vi.fn(),
 }));
 
@@ -15,6 +23,9 @@ describe("login flow", () => {
   beforeEach(() => {
     storage.clear();
     apiMocks.login.mockReset();
+    apiMocks.register.mockReset();
+    apiMocks.passwordLogin.mockReset();
+    apiMocks.sendCode.mockReset();
     apiMocks.getMe.mockReset();
     vi.stubGlobal("wx", {
       getStorageSync: (key: string) => storage.get(key) || "",
@@ -65,5 +76,61 @@ describe("login flow", () => {
     expect(storage.get("roamly_satoken_v1")).toBeUndefined();
     expect(authStore.token).toBe("");
     expect(authStore.user).toBeNull();
+  });
+
+  it("注册与密码登录复用同一会话落地流程", async () => {
+    const user = { id: "7", nickName: "漫游者ABCD1234", icon: "" };
+    const token = {
+      code: "OK",
+      message: "操作成功",
+      data: {
+        tokenType: "Bearer",
+        accessToken: "new-token",
+        expiresIn: 2592000,
+      },
+    };
+    apiMocks.register.mockResolvedValue(token);
+    apiMocks.passwordLogin.mockResolvedValue(token);
+    apiMocks.getMe.mockResolvedValue({
+      code: "OK",
+      message: "操作成功",
+      data: user,
+    });
+
+    await registerAndLogin("13800138000", "123456", "Roamly123", "Roamly123");
+    await loginByPassword("13800138000", "Roamly123");
+
+    expect(apiMocks.register).toHaveBeenCalledWith(
+      "13800138000",
+      "123456",
+      "Roamly123",
+      "Roamly123",
+    );
+    expect(apiMocks.passwordLogin).toHaveBeenCalledWith(
+      "13800138000",
+      "Roamly123",
+    );
+  });
+
+  it("验证码请求显式携带登录或注册场景", async () => {
+    apiMocks.sendCode.mockResolvedValue({
+      code: "OK",
+      message: "操作成功",
+      data: null,
+    });
+
+    await requestAuthCode("13800138000", "LOGIN");
+    await requestAuthCode("13900139000", "REGISTRATION");
+
+    expect(apiMocks.sendCode).toHaveBeenNthCalledWith(
+      1,
+      "13800138000",
+      "LOGIN",
+    );
+    expect(apiMocks.sendCode).toHaveBeenNthCalledWith(
+      2,
+      "13900139000",
+      "REGISTRATION",
+    );
   });
 });

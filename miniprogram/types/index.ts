@@ -33,16 +33,20 @@ export interface UserDTO {
   nickName: string;
   icon: string;
 }
-export interface UserInfo {
-  userId: string;
-  city?: string;
-  introduce?: string;
-  fans?: number;
-  followee?: number;
-  gender?: number;
-  birthday?: string;
-  credits?: number;
-  level?: number;
+export type SmsCodeScene = "LOGIN" | "REGISTRATION";
+export type UserGender = "UNDISCLOSED" | "MALE" | "FEMALE";
+export interface CurrentUserProfile extends UserDTO {
+  phone: string;
+  gender: UserGender;
+  birthday: string | null;
+  nicknameEditable: boolean;
+  nicknameEditableAt: string | null;
+}
+export interface PublicUserProfile extends UserDTO {
+  gender: UserGender;
+  followee: number;
+  fans: number;
+  postCount: number;
 }
 
 export * from "./city";

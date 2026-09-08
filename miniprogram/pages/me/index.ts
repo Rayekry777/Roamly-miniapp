@@ -1,11 +1,10 @@
-import { refreshCurrentUser, signOut } from "../../services/auth";
+import { refreshCurrentUser } from "../../services/auth";
 import { authStore } from "../../store/auth";
 import {
   navigateToLogin,
   requireLogin,
   syncTabBar,
 } from "../../utils/navigation";
-import { userProfileUrl } from "../../utils/routes";
 
 Page({
   data: {
@@ -43,8 +42,8 @@ Page({
       wx.navigateTo({ url: "/package-post/pages/mine/index" });
   },
   openProfile() {
-    const id = this.data.user?.id;
-    if (id) wx.navigateTo({ url: userProfileUrl(String(id)) });
+    if (requireLogin())
+      wx.navigateTo({ url: "/package-user/pages/account/index" });
   },
   openOrders() {
     if (requireLogin())
@@ -53,13 +52,5 @@ Page({
   openWallet() {
     if (requireLogin())
       wx.navigateTo({ url: "/package-voucher/pages/wallet/index" });
-  },
-  async logout() {
-    try {
-      await signOut();
-    } catch {
-      /* 请求层已经提示网络错误，本地会话仍需退出 */
-    }
-    this.setData({ user: null, loggedIn: false });
   },
 });

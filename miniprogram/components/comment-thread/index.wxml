@@ -10,6 +10,7 @@
     bind:reply="onReply"
     bind:like="onLike"
     bind:delete="onDelete"
+    bind:openauthor="onOpenAuthor"
   />
 
   <view wx:if="{{thread.replies.length || thread.hasMoreReplies}}" class="comment-thread__replies">
@@ -27,6 +28,7 @@
         bind:reply="onReply"
         bind:like="onLike"
         bind:delete="onDelete"
+        bind:openauthor="onOpenAuthor"
       />
     </view>
     <view

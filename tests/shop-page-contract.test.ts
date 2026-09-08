@@ -63,6 +63,9 @@ describe("nearby and shop page contract", () => {
     const service = readFileSync("miniprogram/services/shop.ts", "utf8");
 
     expect(view).toContain('description="{{postError}}"');
+    expect(view).toContain("related-post__avatar");
+    expect(view).toContain("src=\"{{item.author.icon || ''}}\"");
+    expect(view).toContain('catch:tap="openAuthor"');
     expect(service).toContain("商户动态响应格式异常");
     expect(service).not.toContain("mock");
   });
@@ -82,7 +85,7 @@ describe("nearby and shop page contract", () => {
     );
 
     expect(detailConfig).not.toContain("success-motion");
-    expect(detail).toContain('src="{{item || \'\'}}"');
-    expect(voucherCard).toContain('src="{{item.product.cover || \'\'}}"');
+    expect(detail).toContain("src=\"{{item || ''}}\"");
+    expect(voucherCard).toContain("src=\"{{item.product.cover || ''}}\"");
   });
 });

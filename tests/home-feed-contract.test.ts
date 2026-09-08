@@ -32,6 +32,8 @@ describe("home feed contract", () => {
 
     expect(order.every((index) => index >= 0)).toBe(true);
     expect(order).toEqual([...order].sort((left, right) => left - right));
+    expect(view).toContain('class="post-card__avatar"');
+    expect(view).toContain("src=\"{{post.author.icon || ''}}\"");
   });
 
   it("passes comment focus without converting string ids", () => {

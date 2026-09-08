@@ -227,6 +227,9 @@ Page({
       wx.navigateTo({ url: userProfileUrl(this.data.post.author.id) });
     }
   },
+  openCommentAuthor(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
+    wx.navigateTo({ url: userProfileUrl(event.detail.id) });
+  },
   openSection() {
     if (this.data.post) {
       wx.navigateTo({ url: sectionDetailUrl(this.data.post.section.id) });

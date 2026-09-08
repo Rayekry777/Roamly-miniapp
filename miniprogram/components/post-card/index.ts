@@ -48,6 +48,11 @@ Component({
         commentId: event.detail.id,
       });
     },
+    onOpenHighlightAuthor(
+      event: WechatMiniprogram.CustomEvent<{ id: string }>,
+    ) {
+      this.triggerEvent("openauthor", event.detail);
+    },
     post(): PostCard {
       return this.data.post as PostCard;
     },

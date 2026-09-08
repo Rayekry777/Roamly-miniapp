@@ -1,5 +1,5 @@
 <view class="highlight pressable" bind:tap="onOpen" aria-role="button" aria-label="查看热门评论">
-  <app-image custom-class="highlight__avatar" src="{{comment.author.icon}}" kind="avatar" />
+  <view catch:tap="onOpenAuthor"><app-image custom-class="highlight__avatar" src="{{comment.author.icon}}" kind="avatar" /></view>
   <view class="highlight__body">
     <view class="highlight__meta">
       <text class="highlight__name">{{comment.author.nickName || "Roamly 用户"}}</text>

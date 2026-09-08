@@ -133,6 +133,7 @@
           bind:like="toggleCommentLike"
           bind:delete="deleteOwnComment"
           bind:loadreplies="loadMoreReplies"
+          bind:openauthor="openCommentAuthor"
         />
         <view class="list-footer">
           {{commentsLoading ? "正在加载更多" : commentsHasMore ? "继续上滑加载" : "讨论已经到底了"}}

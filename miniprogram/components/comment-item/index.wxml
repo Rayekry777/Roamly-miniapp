@@ -1,5 +1,5 @@
 <view class="comment-item {{root ? 'comment-item--root' : 'comment-item--reply'}}">
-  <view class="comment-item__avatar">
+  <view class="comment-item__avatar pressable" bind:tap="onOpenAuthor">
     <app-image src="{{comment.author.icon}}" kind="avatar" />
   </view>
   <view class="comment-item__body">

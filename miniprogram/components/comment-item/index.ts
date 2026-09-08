@@ -19,6 +19,9 @@ Component({
     },
   },
   methods: {
+    onOpenAuthor() {
+      this.triggerEvent("openauthor", { id: this.comment().author.id });
+    },
     onReply() {
       const comment = this.comment();
       if (comment.status === "DELETED") return;

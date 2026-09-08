@@ -1,5 +1,4 @@
 .me-page { min-height:100vh; padding:24rpx 24rpx calc(150rpx + env(safe-area-inset-bottom)); background:var(--roamly-bg); }
-.logout { display:flex; width:72rpx; height:72rpx; align-items:center; justify-content:center; border-radius:50%; background:#fff; }
 .login-state { margin-top:48rpx; padding:28rpx 0; }
 .profile { position:relative; padding:34rpx 24rpx 28rpx; border-radius:28rpx; background:#fff; box-shadow:var(--roamly-shadow); }
 .profile__main { display:flex; align-items:center; gap:24rpx; }

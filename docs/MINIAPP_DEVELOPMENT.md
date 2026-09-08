@@ -1,8 +1,8 @@
 # Roamly 消费者小程序契约
 
 ```yaml
-version: 9
-updatedAt: 2026-09-06
+version: 10
+updatedAt: 2026-09-08
 scope: 消费者页面、交互、接口消费与客户端状态
 reviewStatus: accepted
 designStatus: 已冻结
@@ -42,7 +42,7 @@ deviceAcceptanceStatus: 未确认
 | 商户点评           | `/v1/shops/{shopId}/reviews/**`                                           | 已实现 |
 | 团购商品与购买须知 | `/v1/shops/{shopId}/voucher-products`、`/v1/voucher-products/{productId}` | 已实现 |
 | 订单与券包 Demo    | `/v1/users/me/orders/**`、`/v1/users/me/vouchers/**`                      | 已实现 |
-| 用户中心           | `/v1/users/**`、登录和资料                                                | 已实现 |
+| 用户中心           | `/v1/users/**`、显式注册、短信/密码登录、个人信息与账号安全               | 已实现 |
 
 ## 客户端协议规则
 
@@ -51,6 +51,14 @@ deviceAcceptanceStatus: 未确认
 - `PENDING_PAYMENT`（待支付）、`PAID`（已支付）、`CANCELED`（已取消）、`REFUNDING`（退款中）、`REFUNDED`（已退款）必须使用中文展示文案。
 - 401 清理消费者会话并保留草稿和回跳意图；403、404、409、429、503 保留各自语义，不统一转换成网络错误。
 - 空数组展示真实空态；只有响应结构不符合契约时报告“响应格式异常”，不得生成假数据。
+
+## 消费者账号与个人资料（v10）
+
+- 登录页默认验证码登录；验证码下方左侧注册、右侧密码登录，三种模式原地切换。
+- 注册使用 `/v1/auth/registrations`，必须设置 8–64 位且同时含字母和数字的密码；验证码登录只允许已有账号。
+- “我的”进入个人信息页，仅展示头像、昵称、手机号、密码、性别和生日；昵称按北京时间自然日每天最多修改一次，性别和生日在选择器确认后自动保存，退出登录入口位于个人信息页底部。
+- 公开用户主页由内容流头像进入，直接消费 `/v1/users/{userId}/profile`，仅展示头像、昵称、性别、关注/粉丝/动态数，不展示手机号、生日或城市。
+- 手机号换绑和密码修改成功后清理本地会话并回到登录页；头像上传失败会清理临时媒体，城市切换以 best-effort 同步内部偏好。
 
 ## 交易扩展
 

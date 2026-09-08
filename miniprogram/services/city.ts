@@ -1,4 +1,6 @@
 import { listCities } from "../api/city";
+import { updateCityPreference } from "../api/user";
+import { authStore } from "../store/auth";
 import { cityStore } from "../store/city";
 import type { City } from "../types";
 
@@ -18,6 +20,11 @@ export async function loadAvailableCities(): Promise<City[]> {
     throw new Error("城市列表返回格式异常，请稍后重试");
   }
   return result.data;
+}
+
+export function syncCityPreference(cityCode: string): void {
+  if (!authStore.isLoggedIn() || !cityCode) return;
+  void updateCityPreference(cityCode).catch(() => undefined);
 }
 
 export async function locateForNearby(): Promise<{

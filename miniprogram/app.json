@@ -20,7 +20,13 @@
     },
     {
       "root": "package-user",
-      "pages": ["pages/login/index", "pages/profile/index"]
+      "pages": [
+        "pages/login/index",
+        "pages/profile/index",
+        "pages/account/index",
+        "pages/phone-change/index",
+        "pages/password-change/index"
+      ]
     },
     {
       "root": "package-voucher",

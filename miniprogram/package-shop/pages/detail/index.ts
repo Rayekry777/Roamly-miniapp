@@ -2,8 +2,12 @@ import { loadShopDetail, loadShopPostPage } from "../../../services/shop";
 import { listVoucherProducts } from "../../../services/voucher-product";
 import { cityStore } from "../../../store/city";
 import type { PostCard, Shop, VoucherProductListItem } from "../../../types";
-import { postDetailUrl, voucherProductUrl } from "../../../utils/routes";
-import { shopReviewsUrl } from "../../../utils/routes";
+import {
+  postDetailUrl,
+  shopReviewsUrl,
+  userProfileUrl,
+  voucherProductUrl,
+} from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 
 type ModuleStatus = "IDLE" | "LOADING" | "READY" | "ERROR";
@@ -137,6 +141,10 @@ Page({
     const postId = String(event.currentTarget.dataset.id || "");
     if (postId) wx.navigateTo({ url: postDetailUrl(postId) });
   },
+  openAuthor(event: WechatMiniprogram.TouchEvent) {
+    const userId = String(event.currentTarget.dataset.userId || "");
+    if (userId) wx.navigateTo({ url: userProfileUrl(userId) });
+  },
   openReviews() {
     wx.navigateTo({ url: shopReviewsUrl(this.shopId) });
   },
@@ -151,8 +159,7 @@ Page({
       longitude: shop.longitude,
       name: shop.name,
       address: shop.address || "",
-      fail: () =>
-        wx.showToast({ title: "导航打开失败，请重试", icon: "none" }),
+      fail: () => wx.showToast({ title: "导航打开失败，请重试", icon: "none" }),
     });
   },
   retryShop() {

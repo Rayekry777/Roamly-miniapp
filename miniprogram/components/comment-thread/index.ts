@@ -8,6 +8,9 @@ Component({
     highlightedId: { type: String, value: "" },
   },
   methods: {
+    onOpenAuthor(event: WechatMiniprogram.CustomEvent) {
+      this.triggerEvent("openauthor", event.detail);
+    },
     onReply(event: WechatMiniprogram.CustomEvent) {
       this.triggerEvent("reply", event.detail);
     },

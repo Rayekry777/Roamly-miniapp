@@ -6,7 +6,12 @@
       aria-role="button"
       aria-label="查看{{post.author.nickName || 'Roamly 用户'}}的主页"
     >
-      <app-image custom-class="post-card__avatar" src="{{post.author.icon}}" kind="avatar" />
+      <app-image
+        class="post-card__avatar"
+        custom-class="post-card__avatar"
+        src="{{post.author.icon || ''}}"
+        kind="avatar"
+      />
       <view class="post-card__identity">
         <view class="post-card__name">{{post.author.nickName || "Roamly 用户"}}</view>
         <view class="post-card__time">{{displayTime}}</view>
@@ -67,5 +72,6 @@
     wx:if="{{post.highlightComment}}"
     comment="{{post.highlightComment}}"
     bind:open="onOpenHighlight"
+    bind:openauthor="onOpenHighlightAuthor"
   />
 </view>

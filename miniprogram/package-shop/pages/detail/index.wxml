@@ -115,10 +115,31 @@
           data-id="{{item.id}}"
           bind:tap="openPost"
         >
-          <view class="related-post__section">{{item.section.name}}</view>
+          <view
+            class="related-post__author"
+            data-user-id="{{item.author.id}}"
+            catch:tap="openAuthor"
+            aria-role="button"
+            aria-label="查看{{item.author.nickName || 'Roamly 用户'}}的主页"
+          >
+            <app-image
+              class="related-post__avatar"
+              custom-class="related-post__avatar"
+              src="{{item.author.icon || ''}}"
+              kind="avatar"
+              mode="aspectFill"
+            />
+            <view class="related-post__author-copy">
+              <view class="related-post__author-name">
+                {{item.author.nickName || "Roamly 用户"}}
+              </view>
+              <view class="related-post__time">{{item.createdTime}}</view>
+            </view>
+          </view>
           <view class="related-post__title">{{item.title || item.contentPreview}}</view>
           <view class="related-post__meta">
-            {{item.author.nickName}} · {{item.likedCount}} 赞 · {{item.commentCount}} 评论
+            <text># {{item.section.name}}</text>
+            <text>{{item.likedCount}} 赞 · {{item.commentCount}} 评论</text>
           </view>
         </view>
       </view>
