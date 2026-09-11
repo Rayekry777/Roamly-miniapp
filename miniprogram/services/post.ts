@@ -10,7 +10,7 @@ import type {
 import type { ApiError } from "../utils/request";
 import { adaptPostCard, adaptPostDetail } from "./post-card";
 import { cityStore } from "../store/city";
-import { ensureLocatedCity } from "./city";
+import { ensureRealLocation } from "./city";
 
 export async function loadMyPostPage(
   page = 1,
@@ -102,7 +102,11 @@ export function buildPostCreateRequest(draft: PostDraft): PostCreateRequest {
     shopVisit: draft.shopVisit,
   };
   const location = cityStore.getState();
-  if (location.locationStatus === "READY" && location.longitude !== undefined && location.latitude !== undefined) {
+  if (
+    location.locationStatus === "READY" &&
+    location.longitude !== undefined &&
+    location.latitude !== undefined
+  ) {
     request.longitude = location.longitude;
     request.latitude = location.latitude;
     request.locationLabel = location.locationContext?.locationLabel;
@@ -118,7 +122,7 @@ export function buildPostCreateRequest(draft: PostDraft): PostCreateRequest {
 }
 
 export async function publishPost(draft: PostDraft): Promise<IdResponse> {
-  await ensureLocatedCity();
+  await ensureRealLocation();
   const request = buildPostCreateRequest(draft);
   return createPost(request).then(
     (result) => {

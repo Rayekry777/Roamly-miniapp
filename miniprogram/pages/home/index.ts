@@ -1,7 +1,10 @@
 import {
-  ensureLocatedCity,
+  ensureDiscoveryContext,
+  ensureRealLocation,
+  loadAvailableCities,
   locationFailureMessage,
   openLocationSettings,
+  syncCityPreference,
 } from "../../services/city";
 import {
   loadFeedPage,
@@ -43,7 +46,12 @@ Page({
     likingIds: {} as Record<string, boolean>,
     followingIds: {} as Record<string, boolean>,
     locationLabel: "",
+    locationSource: "",
     locationStatus: "LOCATING",
+    cityReady: false,
+    cityPickerVisible: false,
+    cityLoading: false,
+    cities: [] as Array<{ code: string; name: string }>,
   },
   onLoad() {
     this.scope = createRequestScope();
@@ -54,13 +62,31 @@ Page({
   onShow() {
     syncTabBar(this);
     const loggedIn = authStore.isLoggedIn();
-    const selectedCityCode = cityStore.getState().selectedCity?.code || "";
+    const locationState = cityStore.getState();
+    const selectedCityCode = locationState.selectedCity?.code || "";
+    const locationKey = `${locationState.selectionMode}:${selectedCityCode}:${locationState.locationContext?.districtCode || ""}`;
     const cityChanged = Boolean(
-      selectedCityCode && selectedCityCode !== this.cityCode,
+      selectedCityCode && locationKey !== this.locationKey,
     );
     if (cityChanged) {
       this.cityCode = selectedCityCode;
+      this.locationKey = locationKey;
       feedStore.resetFeed("RECOMMENDED");
+      const context = locationState.locationContext;
+      this.setData({
+        locationLabel: formatLocationArea(
+          locationState.selectedCity?.name || "",
+          locationState.selectionMode === "REAL_LOCATION"
+            ? context?.districtName
+            : undefined,
+        ),
+        locationSource: locationSourceLabel(locationState.selectionMode),
+        locationStatus:
+          locationState.selectionMode === "REAL_LOCATION"
+            ? "READY"
+            : locationState.locationStatus,
+        cityReady: true,
+      });
     }
     this.setData({
       loggedIn,
@@ -100,7 +126,7 @@ Page({
   },
   async initializeHome() {
     const sectionPromise = this.scope?.run(loadHomeSections());
-    const cityPromise = this.scope?.run(ensureLocatedCity());
+    const cityPromise = this.scope?.run(ensureDiscoveryContext());
     const [sectionResult, cityResult] = await Promise.allSettled([
       sectionPromise,
       cityPromise,
@@ -122,12 +148,17 @@ Page({
     this.initialized = true;
     if (cityResult.status === "fulfilled" && cityResult.value) {
       this.cityCode = cityResult.value.code;
+      this.locationKey = this.locationKeyFor(cityResult.value);
       this.setData({
         locationLabel: formatLocationArea(
           cityResult.value.name,
-          cityResult.value.districtName,
+          cityResult.value.selectionMode === "REAL_LOCATION"
+            ? cityResult.value.districtName
+            : "",
         ),
-        locationStatus: "READY",
+        locationSource: locationSourceLabel(cityResult.value.selectionMode),
+        locationStatus: cityStore.getState().locationStatus,
+        cityReady: true,
       });
       if (feedStore.shouldLoad("RECOMMENDED")) {
         await this.loadFeed("RECOMMENDED");
@@ -154,6 +185,7 @@ Page({
   },
   async loadFeed(mode: HomeFeedMode, refresh = false) {
     if (!feedStore.startLoading(mode, refresh)) return;
+    const requestLocationKey = this.locationKey;
     if (mode === this.data.mode) {
       this.setData({ feedError: "" });
       this.syncCurrentFeed();
@@ -161,18 +193,21 @@ Page({
 
     try {
       if (mode === "RECOMMENDED" && !this.cityCode) {
-        const city = await this.scope?.run(ensureLocatedCity(true));
+        const city = await this.scope?.run(ensureDiscoveryContext());
         if (!city) return;
         this.cityCode = city.code;
       }
 
       const current = feedStore.getState(mode);
       const location = cityStore.getState();
+      const coordinates =
+        location.selectionMode === "REAL_LOCATION"
+          ? { longitude: location.longitude, latitude: location.latitude }
+          : {};
       const page = await this.scope?.run(
         loadFeedPage(mode, {
           cityCode: this.cityCode,
-          longitude: location.longitude,
-          latitude: location.latitude,
+          ...coordinates,
           cursor:
             !refresh && current.items.length > 0
               ? (current.nextCursor ?? undefined)
@@ -185,6 +220,9 @@ Page({
         }),
       );
       if (!page) return;
+      if (mode === "RECOMMENDED" && requestLocationKey !== this.locationKey) {
+        return;
+      }
       feedStore.applyPage(mode, page, refresh);
     } catch (error) {
       feedStore.finishLoading(mode);
@@ -219,36 +257,72 @@ Page({
     if (feedStore.shouldLoad(mode)) void this.loadFeed(mode);
   },
   async retryFeed() {
-    if (this.data.locationStatus !== "READY") {
-      const denied = this.data.locationStatus === "DENIED";
-      this.setData({ locationStatus: "LOCATING", feedError: "" });
-      try {
-        if (denied) {
-          const granted = await openLocationSettings();
-          if (!granted) {
-            this.setData({
-              locationStatus: "DENIED",
-              feedError: "定位失败，请在微信设置中允许访问位置后重试",
-            });
-            return;
-          }
-        }
-        const city = await this.scope?.run(ensureLocatedCity(true));
-        if (!city) throw new Error("定位解析失败");
-        this.cityCode = city.code;
-        this.setData({
-          locationLabel: formatLocationArea(city.name, city.districtName),
-          locationStatus: "READY",
-        });
-      } catch (error) {
-        this.setData({
-          locationStatus: "FAILED",
-          feedError: locationFailureMessage(error),
-        });
-        return;
-      }
-    }
     await this.loadFeed(this.data.mode, true);
+  },
+  async restoreLocation() {
+    this.setData({ locationStatus: "LOCATING", feedError: "" });
+    try {
+      if (cityStore.getState().locationStatus === "DENIED") {
+        const granted = await openLocationSettings();
+        if (!granted)
+          throw new Error("定位失败，请在微信设置中允许访问位置后重试");
+      }
+      const context = await this.scope?.run(ensureRealLocation(true));
+      if (!context) throw new Error("定位解析失败");
+      this.cityCode = context.code;
+      this.locationKey = this.locationKeyFor(context);
+      feedStore.resetFeed("RECOMMENDED");
+      this.setData({
+        locationLabel: formatLocationArea(context.name, context.districtName),
+        locationSource: "当前定位",
+        locationStatus: "READY",
+        cityReady: true,
+      });
+      await this.loadFeed(this.data.mode, true);
+    } catch (error) {
+      this.setData({
+        locationStatus: cityStore.getState().locationStatus,
+        feedError: locationFailureMessage(error),
+      });
+    }
+  },
+  async openCityPicker() {
+    if (this.data.cityLoading) return;
+    this.setData({ cityLoading: true });
+    try {
+      const cities = await this.scope?.run(loadAvailableCities());
+      if (cities) this.setData({ cities, cityPickerVisible: true });
+    } catch (error) {
+      wx.showToast({
+        title: error instanceof Error ? error.message : "城市列表加载失败",
+        icon: "none",
+      });
+    } finally {
+      this.setData({ cityLoading: false });
+    }
+  },
+  closeCityPicker() {
+    this.setData({ cityPickerVisible: false });
+  },
+  noop() {},
+  selectCity(event: WechatMiniprogram.TouchEvent) {
+    const code = String(event.currentTarget.dataset.code || "");
+    const city = this.data.cities.find((item) => item.code === code);
+    if (!city) return;
+    cityStore.select(city);
+    syncCityPreference(city.code);
+    this.cityCode = city.code;
+    this.locationKey = `MANUAL_CITY:${city.code}:`;
+    feedStore.resetFeed("RECOMMENDED");
+    this.setData({
+      cityPickerVisible: false,
+      locationLabel: city.name,
+      locationSource: "已选择",
+      locationStatus: "IDLE",
+      cityReady: true,
+      feedError: "",
+    });
+    void this.loadFeed("RECOMMENDED", true);
   },
   retrySections() {
     if (this.data.sectionLoading) return;
@@ -362,9 +436,25 @@ Page({
   },
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
   cityCode: "",
+  locationKey: "",
   initialized: false,
+  locationKeyFor(context: {
+    code: string;
+    selectionMode?: string;
+    districtCode?: string;
+  }) {
+    return `${context.selectionMode || "DEFAULT_CITY"}:${context.code}:${context.districtCode || ""}`;
+  },
 });
 
-function formatLocationArea(cityName: string, districtName: string): string {
+function formatLocationArea(cityName: string, districtName?: string): string {
   return districtName ? `${cityName} · ${districtName}` : cityName;
+}
+
+function locationSourceLabel(mode?: string): string {
+  return mode === "REAL_LOCATION"
+    ? "当前定位"
+    : mode === "MANUAL_CITY"
+      ? "已选择"
+      : "默认城市";
 }

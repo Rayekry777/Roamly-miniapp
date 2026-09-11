@@ -1,13 +1,16 @@
 import {
-  ensureLocatedCity,
+  ensureDiscoveryContext,
+  loadAvailableCities,
   locateForNearby,
   locationFailureMessage,
+  syncCityPreference,
 } from "../../../services/city";
 import { listShopTypes, loadShopPage } from "../../../services/shop";
 import { cityStore } from "../../../store/city";
 import type { Shop, ShopSort, ShopType } from "../../../types";
 import { shopDetailUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
+import { syncTabBar } from "../../../utils/navigation";
 
 const PAGE_SIZE = 10;
 
@@ -28,6 +31,10 @@ Page({
     loading: true,
     hasMore: true,
     error: "",
+    selectedCity: null as { code: string; name: string } | null,
+    cityPickerVisible: false,
+    cityLoading: false,
+    cities: [] as Array<{ code: string; name: string }>,
   },
   onLoad(options) {
     this.scope = createRequestScope();
@@ -37,6 +44,24 @@ Page({
     });
     this.productId = String(options.productId || "");
     void this.initialize();
+  },
+  onShow() {
+    syncTabBar(this);
+    const selectedCity = cityStore.getState().selectedCity;
+    const selectionMode = cityStore.getState().selectionMode;
+    if (
+      this.initialized &&
+      selectedCity &&
+      `${selectionMode}:${selectedCity.code}` !== this.locationKey
+    ) {
+      this.cityCode = selectedCity.code;
+      this.locationKey = `${selectionMode}:${selectedCity.code}`;
+      if (selectionMode !== "REAL_LOCATION" && this.data.sort === "DISTANCE") {
+        this.setData({ sort: "POPULAR" });
+      }
+      this.setData({ selectedCity });
+      void this.loadShops(true);
+    }
   },
   onUnload() {
     this.scope?.close();
@@ -50,7 +75,7 @@ Page({
   },
   async initialize() {
     const [cityResult, typeResult] = await Promise.allSettled([
-      this.scope?.run(ensureLocatedCity()),
+      this.scope?.run(ensureDiscoveryContext()),
       this.scope?.run(listShopTypes()),
     ]);
     if (cityResult.status !== "fulfilled" || !cityResult.value) {
@@ -64,13 +89,16 @@ Page({
     }
     const city = cityResult.value;
     this.cityCode = city.code;
+    this.locationKey = `${city.selectionMode || "DEFAULT_CITY"}:${city.code}`;
     this.setData({
+      selectedCity: { code: city.code, name: city.name },
       types:
         typeResult.status === "fulfilled" && typeResult.value
           ? typeResult.value.data || []
           : [],
       loading: false,
     });
+    this.initialized = true;
     await this.loadShops(true);
   },
   async loadShops(reset: boolean) {
@@ -78,6 +106,10 @@ Page({
     const sequence = reset ? ++this.requestSequence : this.requestSequence;
     const page = reset ? 1 : this.data.page;
     const location = cityStore.getState();
+    const coordinates =
+      location.selectionMode === "REAL_LOCATION"
+        ? { longitude: location.longitude, latitude: location.latitude }
+        : {};
     this.setData({ loading: true, error: reset ? "" : this.data.error });
     try {
       const result = await this.scope?.run(
@@ -89,8 +121,7 @@ Page({
           sort: this.data.sort,
           page,
           size: PAGE_SIZE,
-          longitude: location.longitude,
-          latitude: location.latitude,
+          ...coordinates,
         }),
       );
       if (!result || sequence !== this.requestSequence) return;
@@ -135,6 +166,10 @@ Page({
     const sort = String(event.currentTarget.dataset.sort) as ShopSort;
     if (sort === this.data.sort) return;
     if (sort === "DISTANCE") {
+      if (cityStore.getState().selectionMode !== "REAL_LOCATION") {
+        wx.showToast({ title: "恢复定位后可使用距离排序", icon: "none" });
+        return;
+      }
       const location = cityStore.getState();
       const ready =
         location.locationStatus === "READY" &&
@@ -161,6 +196,40 @@ Page({
   retry() {
     void this.loadShops(true);
   },
+  async openCityPicker() {
+    if (this.data.cityLoading) return;
+    this.setData({ cityLoading: true });
+    try {
+      const cities = await this.scope?.run(loadAvailableCities());
+      if (cities) this.setData({ cities, cityPickerVisible: true });
+    } catch (error) {
+      wx.showToast({
+        title: error instanceof Error ? error.message : "城市列表加载失败",
+        icon: "none",
+      });
+    } finally {
+      this.setData({ cityLoading: false });
+    }
+  },
+  closeCityPicker() {
+    this.setData({ cityPickerVisible: false });
+  },
+  noop() {},
+  selectCity(event: WechatMiniprogram.TouchEvent) {
+    const code = String(event.currentTarget.dataset.code || "");
+    const city = this.data.cities.find((item) => item.code === code);
+    if (!city) return;
+    cityStore.select(city);
+    syncCityPreference(city.code);
+    this.cityCode = city.code;
+    this.locationKey = `${cityStore.getState().selectionMode}:${city.code}`;
+    this.setData({
+      selectedCity: city,
+      cityPickerVisible: false,
+      ...(this.data.sort === "DISTANCE" ? { sort: "POPULAR" } : {}),
+    });
+    void this.loadShops(true);
+  },
   openShop(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
     wx.navigateTo({ url: shopDetailUrl(event.detail.id) });
   },
@@ -178,6 +247,8 @@ Page({
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,
   cityCode: "",
   productId: "",
+  initialized: false,
+  locationKey: "",
   requestSequence: 0,
   searchTimer: undefined as ReturnType<typeof setTimeout> | undefined,
 });

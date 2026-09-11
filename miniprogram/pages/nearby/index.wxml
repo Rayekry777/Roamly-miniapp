@@ -2,6 +2,10 @@
 
 <view class="nearby-page page-enter">
   <view class="nearby-header">
+    <view class="nearby-city" bind:tap="openCityPicker">
+      <t-icon name="location" size="28rpx" />
+      <text>{{selectedCity ? selectedCity.name : '杭州'}} · 切换城市</text>
+    </view>
     <view class="nearby-location-a11y" bind:tap="retryLocation" aria-role="button" aria-label="重新定位">重新定位</view>
     <view class="nearby-search">
       <t-search value="{{keyword}}" shape="round" placeholder="搜索商品或商户" bind:change="onKeyword" bind:submit="search" />
@@ -97,5 +101,20 @@
       {{error}}，点击重试
     </view>
     <view wx:elif="{{!hasMore}}" class="list-footer">已经逛到底了</view>
+  </view>
+</view>
+
+<view wx:if="{{cityPickerVisible}}" class="city-picker" catch:tap="closeCityPicker">
+  <view class="city-picker__panel" catch:tap="noop">
+    <view class="city-picker__header">
+      <view>
+        <view class="city-picker__title">切换城市</view>
+        <view class="city-picker__hint">按所选城市浏览，不代表当前真实位置</view>
+      </view>
+      <view class="city-picker__close pressable" bind:tap="closeCityPicker"><t-icon name="close" size="36rpx" /></view>
+    </view>
+    <scroll-view class="city-picker__list" scroll-y>
+      <view wx:for="{{cities}}" wx:key="code" class="city-picker__item" data-code="{{item.code}}" bind:tap="selectCity"><text>{{item.name}}</text></view>
+    </scroll-view>
   </view>
 </view>

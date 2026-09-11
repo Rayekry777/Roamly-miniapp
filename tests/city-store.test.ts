@@ -33,6 +33,7 @@ describe("city store", () => {
     expect(store.getState()).toEqual({
       selectedCity: { code: "HANGZHOU", name: "杭州" },
       locationStatus: "FAILED",
+      selectionMode: "REAL_LOCATION",
     });
 
     store.setLocation("READY", { longitude: 120.1, latitude: 30.2 });
@@ -40,6 +41,7 @@ describe("city store", () => {
     expect(store.getState()).toEqual({
       selectedCity: { code: "SHANGHAI", name: "上海" },
       locationStatus: "IDLE",
+      selectionMode: "MANUAL_CITY",
     });
   });
 });

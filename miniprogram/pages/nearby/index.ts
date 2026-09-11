@@ -1,7 +1,9 @@
 import {
-  ensureLocatedCity,
+  ensureDiscoveryContext,
+  loadAvailableCities,
   locateForNearby,
   locationFailureMessage,
+  syncCityPreference,
 } from "../../services/city";
 import { listShopTypes } from "../../services/shop";
 import { loadVoucherProductPage } from "../../services/voucher-product";
@@ -31,6 +33,10 @@ Page({
     refreshing: false,
     error: "",
     locationStatus: "IDLE",
+    selectedCity: null as { code: string; name: string } | null,
+    cityPickerVisible: false,
+    cityLoading: false,
+    cities: [] as Array<{ code: string; name: string }>,
   },
   onLoad() {
     this.scope = createRequestScope();
@@ -39,12 +45,18 @@ Page({
   onShow() {
     syncTabBar(this);
     const selectedCity = cityStore.getState().selectedCity;
+    const selectionMode = cityStore.getState().selectionMode;
     if (
       this.initialized &&
       selectedCity &&
-      selectedCity.code !== this.cityCode
+      `${selectionMode}:${selectedCity.code}` !== this.locationKey
     ) {
       this.cityCode = selectedCity.code;
+      this.locationKey = `${selectionMode}:${selectedCity.code}`;
+      if (selectionMode !== "REAL_LOCATION" && this.data.sort === "DISTANCE") {
+        this.setData({ sort: "RECOMMENDED" });
+      }
+      this.setData({ selectedCity });
       void this.loadProducts(true);
     }
   },
@@ -60,7 +72,7 @@ Page({
   },
   async initialize() {
     const [cityResult, typeResult] = await Promise.allSettled([
-      this.scope?.run(ensureLocatedCity()),
+      this.scope?.run(ensureDiscoveryContext()),
       this.scope?.run(listShopTypes()),
     ]);
     if (cityResult.status !== "fulfilled" || !cityResult.value) {
@@ -82,11 +94,13 @@ Page({
           }))
         : [];
     this.cityCode = city.code;
+    this.locationKey = `${cityStore.getState().selectionMode}:${city.code}`;
     this.initialized = true;
     this.setData({
       types,
       loading: false,
       error: "",
+      selectedCity: { code: city.code, name: city.name },
     });
     await this.loadProducts(true);
   },
@@ -104,6 +118,10 @@ Page({
     const sequence = reset ? ++this.requestSequence : this.requestSequence;
     const page = reset ? 1 : this.data.page;
     const location = cityStore.getState();
+    const coordinates =
+      location.selectionMode === "REAL_LOCATION"
+        ? { longitude: location.longitude, latitude: location.latitude }
+        : {};
     this.setData({ loading: true, error: reset ? "" : this.data.error });
 
     try {
@@ -115,8 +133,7 @@ Page({
           sort: this.data.sort,
           page,
           size: PAGE_SIZE,
-          longitude: location.longitude,
-          latitude: location.latitude,
+          ...coordinates,
         }),
       );
       if (!result || sequence !== this.requestSequence) return;
@@ -160,6 +177,10 @@ Page({
     const sort = String(event.currentTarget.dataset.sort) as VoucherProductSort;
     if (sort === this.data.sort) return;
     if (sort === "DISTANCE") {
+      if (cityStore.getState().selectionMode !== "REAL_LOCATION") {
+        wx.showToast({ title: "恢复定位后可使用距离排序", icon: "none" });
+        return;
+      }
       const located = await this.resolveLocation(true);
       if (!located) {
         this.setData({ sort: "RECOMMENDED" });
@@ -204,7 +225,40 @@ Page({
     }
   },
   retryLocation() {
-    void this.resolveLocation(true);
+    void this.resolveLocation(true).then((ready) => {
+      if (ready) void this.loadProducts(true);
+    });
+  },
+  async openCityPicker() {
+    if (this.data.cityLoading) return;
+    this.setData({ cityLoading: true });
+    try {
+      const cities = await this.scope?.run(loadAvailableCities());
+      if (cities) this.setData({ cities, cityPickerVisible: true });
+    } catch (error) {
+      wx.showToast({
+        title: error instanceof Error ? error.message : "城市列表加载失败",
+        icon: "none",
+      });
+    } finally {
+      this.setData({ cityLoading: false });
+    }
+  },
+  closeCityPicker() {
+    this.setData({ cityPickerVisible: false });
+  },
+  noop() {},
+  selectCity(event: WechatMiniprogram.TouchEvent) {
+    const code = String(event.currentTarget.dataset.code || "");
+    const city = this.data.cities.find((item) => item.code === code);
+    if (!city) return;
+    cityStore.select(city);
+    syncCityPreference(city.code);
+    this.cityCode = city.code;
+    this.locationKey = `MANUAL_CITY:${city.code}`;
+    this.setData({ selectedCity: city, cityPickerVisible: false });
+    if (this.data.sort === "DISTANCE") this.setData({ sort: "RECOMMENDED" });
+    void this.loadProducts(true);
   },
   retry() {
     if (!this.initialized) void this.initialize();
@@ -226,6 +280,7 @@ Page({
   requestSequence: 0,
   searchTimer: undefined as ReturnType<typeof setTimeout> | undefined,
   locationPromise: undefined as Promise<boolean> | undefined,
+  locationKey: "",
 });
 
 function mergeProducts(

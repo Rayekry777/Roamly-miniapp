@@ -8,11 +8,32 @@ describe("nearby location service", () => {
       setStorageSync: vi.fn(),
       getStorageSync: vi.fn(() => ""),
       getLocation: vi.fn(),
+      request: vi.fn(),
     });
     cityStore.select({ code: "330100", name: "杭州" });
   });
 
   it("stores valid coordinates after locating", async () => {
+    vi.mocked(wx.request).mockImplementation((options) => {
+      options.success?.({
+        statusCode: 200,
+        data: {
+          code: "OK",
+          message: "",
+          data: {
+            cityCode: "330100",
+            cityName: "杭州",
+            districtCode: "330106",
+            districtName: "西湖区",
+            locationLabel: "杭州·西湖区",
+            longitude: 120.1,
+            latitude: 30.2,
+            locationStatus: "READY",
+          },
+        },
+      } as never);
+      return undefined as never;
+    });
     vi.mocked(wx.getLocation).mockImplementation((options) => {
       options.success?.({
         longitude: 120.1,
@@ -44,6 +65,7 @@ describe("nearby location service", () => {
     expect(cityStore.getState()).toEqual({
       selectedCity: { code: "330100", name: "杭州" },
       locationStatus: "DENIED",
+      selectionMode: "DEFAULT_CITY",
     });
   });
 
@@ -75,6 +97,7 @@ describe("nearby location service", () => {
     expect(cityStore.getState()).toEqual({
       selectedCity: { code: "310100", name: "上海" },
       locationStatus: "IDLE",
+      selectionMode: "MANUAL_CITY",
     });
   });
 });

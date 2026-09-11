@@ -1,4 +1,4 @@
-import { ensureLocatedCity } from "../../../services/city";
+import { ensureDiscoveryContext } from "../../../services/city";
 import {
   deleteTemporaryImage,
   uploadTemporaryImage,
@@ -296,7 +296,7 @@ Page({
     try {
       const [sections, city] = await Promise.all([
         this.scope?.run(loadHomeSections()),
-        this.scope?.run(ensureLocatedCity()),
+        this.scope?.run(ensureDiscoveryContext()),
       ]);
       if (!sections || !city) return;
       const availableSections = sections.filter((item) => item.allowShopVisit);
