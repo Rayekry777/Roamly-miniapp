@@ -2,12 +2,11 @@
 
 <view class="page page-enter">
   <view class="shop-list-toolbar">
-    <view class="shop-city">{{cityName || '当前城市'}} <t-icon name="chevron-down" size="28rpx" /></view>
     <view class="shop-list-search">
     <t-search
       value="{{keyword}}"
       shape="round"
-      placeholder="搜索城市/区域/地点"
+      placeholder="搜索门店/区域/地点"
       bind:change="onKeyword"
       bind:submit="search"
     />

@@ -1,4 +1,8 @@
-import { ensureSelectedCity, locateForNearby } from "../../../services/city";
+import {
+  ensureLocatedCity,
+  locateForNearby,
+  locationFailureMessage,
+} from "../../../services/city";
 import { listShopTypes, loadShopPage } from "../../../services/shop";
 import { cityStore } from "../../../store/city";
 import type { Shop, ShopSort, ShopType } from "../../../types";
@@ -10,7 +14,6 @@ const PAGE_SIZE = 10;
 Page({
   data: {
     title: "发现好店",
-    cityName: "",
     keyword: "",
     types: [] as ShopType[],
     shops: [] as Shop[],
@@ -47,20 +50,21 @@ Page({
   },
   async initialize() {
     const [cityResult, typeResult] = await Promise.allSettled([
-      this.scope?.run(ensureSelectedCity()),
+      this.scope?.run(ensureLocatedCity()),
       this.scope?.run(listShopTypes()),
     ]);
     if (cityResult.status !== "fulfilled" || !cityResult.value) {
       this.setData({
         loading: false,
-        error: "当前暂无可用城市，请稍后重试",
+        error: locationFailureMessage(
+          cityResult.status === "rejected" ? cityResult.reason : undefined,
+        ),
       });
       return;
     }
     const city = cityResult.value;
     this.cityCode = city.code;
     this.setData({
-      cityName: city.name,
       types:
         typeResult.status === "fulfilled" && typeResult.value
           ? typeResult.value.data || []

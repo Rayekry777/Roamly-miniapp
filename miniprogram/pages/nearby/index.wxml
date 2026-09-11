@@ -2,11 +2,7 @@
 
 <view class="nearby-page page-enter">
   <view class="nearby-header">
-    <view class="nearby-location" bind:tap="retryLocation" aria-role="button" aria-label="重新定位">
-      <t-icon name="location" size="32rpx" />
-      <text>{{cityName || "当前城市"}}</text>
-      <text wx:if="{{locationStatus === 'LOCATING'}}" class="nearby-location__status">定位中</text>
-    </view>
+    <view class="nearby-location-a11y" bind:tap="retryLocation" aria-role="button" aria-label="重新定位">重新定位</view>
     <view class="nearby-search">
       <t-search value="{{keyword}}" shape="round" placeholder="搜索商品或商户" bind:change="onKeyword" bind:submit="search" />
       <view class="nearby-scan" aria-label="扫码"><t-icon name="scan" size="34rpx" /></view>

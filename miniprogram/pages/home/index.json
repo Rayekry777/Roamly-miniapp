@@ -7,6 +7,7 @@
     "app-empty": "/components/app-empty/index",
     "post-card": "/components/post-card/index",
     "section-scroll": "/components/section-scroll/index",
-    "t-skeleton": "tdesign-miniprogram/skeleton/skeleton"
+    "t-skeleton": "tdesign-miniprogram/skeleton/skeleton",
+    "t-icon": "tdesign-miniprogram/icon/icon"
   }
 }

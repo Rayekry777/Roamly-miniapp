@@ -54,6 +54,20 @@ export function request<
       },
       success(response) {
         if (response.statusCode === 401) {
+          // 推荐流等可选登录接口携带了过期 token 时，清掉旧会话并
+          // 以游客身份自动重试，避免首页被误报为“当前会话已失效”。
+          if (authMode === "optional" && token) {
+            authStore.clear();
+            request<T, TBody>(path, {
+              ...options,
+              auth: "optional",
+              dedupe: false,
+              showError: false,
+            })
+              .then(resolve)
+              .catch(reject);
+            return;
+          }
           authStore.clear();
           if (authMode === "required") navigateToLogin();
           reject(

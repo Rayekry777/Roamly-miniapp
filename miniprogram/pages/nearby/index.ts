@@ -1,4 +1,8 @@
-import { ensureSelectedCity, locateForNearby } from "../../services/city";
+import {
+  ensureLocatedCity,
+  locateForNearby,
+  locationFailureMessage,
+} from "../../services/city";
 import { listShopTypes } from "../../services/shop";
 import { loadVoucherProductPage } from "../../services/voucher-product";
 import { cityStore } from "../../store/city";
@@ -16,7 +20,6 @@ const PAGE_SIZE = 10;
 
 Page({
   data: {
-    cityName: "",
     keyword: "",
     typeId: "",
     sort: "RECOMMENDED" as VoucherProductSort,
@@ -42,7 +45,6 @@ Page({
       selectedCity.code !== this.cityCode
     ) {
       this.cityCode = selectedCity.code;
-      this.setData({ cityName: selectedCity.name });
       void this.loadProducts(true);
     }
   },
@@ -58,13 +60,15 @@ Page({
   },
   async initialize() {
     const [cityResult, typeResult] = await Promise.allSettled([
-      this.scope?.run(ensureSelectedCity()),
+      this.scope?.run(ensureLocatedCity()),
       this.scope?.run(listShopTypes()),
     ]);
     if (cityResult.status !== "fulfilled" || !cityResult.value) {
       this.setData({
         loading: false,
-        error: "当前暂无可用城市，请稍后重试",
+        error: locationFailureMessage(
+          cityResult.status === "rejected" ? cityResult.reason : undefined,
+        ),
       });
       return;
     }
@@ -80,13 +84,11 @@ Page({
     this.cityCode = city.code;
     this.initialized = true;
     this.setData({
-      cityName: city.name,
       types,
       loading: false,
       error: "",
     });
     await this.loadProducts(true);
-    void this.resolveLocation(false);
   },
   async refresh() {
     this.setData({ refreshing: true });

@@ -1,6 +1,20 @@
 <app-navbar title="Roamly" back="{{false}}" />
 
 <view class="home-page page-enter">
+  <view class="home-location">
+    <t-icon name="location" size="30rpx" />
+    <text wx:if="{{locationStatus === 'READY'}}">{{locationLabel}}</text>
+    <text wx:elif="{{locationStatus === 'LOCATING'}}" class="home-location__muted">正在定位…</text>
+    <text wx:else class="home-location__muted">定位失败，点击重试</text>
+    <text class="home-location__refresh" bind:tap="retryFeed">{{locationStatus === 'LOCATING' ? '定位中' : '重新定位'}}</text>
+  </view>
+  <view wx:if="{{locationStatus === 'FAILED' || locationStatus === 'DENIED'}}" class="home-location-error">
+    <t-icon name="location" size="56rpx" />
+    <text>{{locationStatus === 'DENIED' ? '未获得定位权限，暂时无法加载本地内容' : '定位失败，暂时无法加载本地内容'}}</text>
+    <view class="home-location-error__action" bind:tap="retryFeed">重新定位</view>
+  </view>
+
+  <block wx:if="{{locationStatus === 'READY'}}">
   <view class="home-tabs" aria-role="tablist">
     <view
       class="home-tab {{mode === 'RECOMMENDED' ? 'home-tab--active' : ''}}"
@@ -87,4 +101,5 @@
       </view>
     </block>
   </view>
+  </block>
 </view>

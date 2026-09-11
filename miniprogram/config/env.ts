@@ -20,8 +20,8 @@ const environments: Record<EnvVersion, EnvironmentConfig> = {
 };
 
 const deviceDevelopEnvironment: EnvironmentConfig = {
-  apiBaseUrl: "http://192.168.2.106:8081",
-  assetBaseUrl: "http://192.168.2.106:8081",
+  apiBaseUrl: "http://192.168.2.105:8081",
+  assetBaseUrl: "http://192.168.2.105:8081",
 };
 
 export function getEnvironment(): EnvironmentConfig {

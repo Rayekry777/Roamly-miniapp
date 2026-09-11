@@ -1,4 +1,8 @@
-import { ensureSelectedCity } from "../../services/city";
+import {
+  ensureLocatedCity,
+  locationFailureMessage,
+  openLocationSettings,
+} from "../../services/city";
 import {
   loadFeedPage,
   loadHomeSections,
@@ -38,6 +42,8 @@ Page({
     currentUserId: authStore.user?.id || "",
     likingIds: {} as Record<string, boolean>,
     followingIds: {} as Record<string, boolean>,
+    locationLabel: "",
+    locationStatus: "LOCATING",
   },
   onLoad() {
     this.scope = createRequestScope();
@@ -94,7 +100,7 @@ Page({
   },
   async initializeHome() {
     const sectionPromise = this.scope?.run(loadHomeSections());
-    const cityPromise = this.scope?.run(ensureSelectedCity());
+    const cityPromise = this.scope?.run(ensureLocatedCity());
     const [sectionResult, cityResult] = await Promise.allSettled([
       sectionPromise,
       cityPromise,
@@ -116,11 +122,25 @@ Page({
     this.initialized = true;
     if (cityResult.status === "fulfilled" && cityResult.value) {
       this.cityCode = cityResult.value.code;
+      this.setData({
+        locationLabel: formatLocationArea(
+          cityResult.value.name,
+          cityResult.value.districtName,
+        ),
+        locationStatus: "READY",
+      });
       if (feedStore.shouldLoad("RECOMMENDED")) {
         await this.loadFeed("RECOMMENDED");
       }
     } else {
-      this.setData({ feedError: "当前暂无可用城市，请稍后重试" });
+      const locationError =
+        cityResult.status === "rejected" ? cityResult.reason : undefined;
+      const locationStatus = cityStore.getState().locationStatus;
+      this.cityCode = "";
+      this.setData({
+        locationStatus: locationStatus === "DENIED" ? "DENIED" : "FAILED",
+        feedError: locationFailureMessage(locationError),
+      });
     }
 
     if (
@@ -141,15 +161,18 @@ Page({
 
     try {
       if (mode === "RECOMMENDED" && !this.cityCode) {
-        const city = await this.scope?.run(ensureSelectedCity());
+        const city = await this.scope?.run(ensureLocatedCity(true));
         if (!city) return;
         this.cityCode = city.code;
       }
 
       const current = feedStore.getState(mode);
+      const location = cityStore.getState();
       const page = await this.scope?.run(
         loadFeedPage(mode, {
           cityCode: this.cityCode,
+          longitude: location.longitude,
+          latitude: location.latitude,
           cursor:
             !refresh && current.items.length > 0
               ? (current.nextCursor ?? undefined)
@@ -195,8 +218,37 @@ Page({
     }
     if (feedStore.shouldLoad(mode)) void this.loadFeed(mode);
   },
-  retryFeed() {
-    void this.loadFeed(this.data.mode, true);
+  async retryFeed() {
+    if (this.data.locationStatus !== "READY") {
+      const denied = this.data.locationStatus === "DENIED";
+      this.setData({ locationStatus: "LOCATING", feedError: "" });
+      try {
+        if (denied) {
+          const granted = await openLocationSettings();
+          if (!granted) {
+            this.setData({
+              locationStatus: "DENIED",
+              feedError: "定位失败，请在微信设置中允许访问位置后重试",
+            });
+            return;
+          }
+        }
+        const city = await this.scope?.run(ensureLocatedCity(true));
+        if (!city) throw new Error("定位解析失败");
+        this.cityCode = city.code;
+        this.setData({
+          locationLabel: formatLocationArea(city.name, city.districtName),
+          locationStatus: "READY",
+        });
+      } catch (error) {
+        this.setData({
+          locationStatus: "FAILED",
+          feedError: locationFailureMessage(error),
+        });
+        return;
+      }
+    }
+    await this.loadFeed(this.data.mode, true);
   },
   retrySections() {
     if (this.data.sectionLoading) return;
@@ -312,3 +364,7 @@ Page({
   cityCode: "",
   initialized: false,
 });
+
+function formatLocationArea(cityName: string, districtName: string): string {
+  return districtName ? `${cityName} · ${districtName}` : cityName;
+}

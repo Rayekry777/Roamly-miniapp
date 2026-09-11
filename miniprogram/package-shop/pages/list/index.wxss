@@ -1,6 +1,6 @@
 .page { min-height:100vh; padding-left:36rpx; padding-right:36rpx; background:#fff; }
+
 .shop-list-toolbar { display:flex; align-items:center; gap:18rpx; margin-top:18rpx; padding-bottom:12rpx; }
-.shop-city { display:flex; flex:none; align-items:center; gap:4rpx; color:var(--roamly-text); font-size:26rpx; }
 
 .shop-list-search {
   overflow: hidden;
