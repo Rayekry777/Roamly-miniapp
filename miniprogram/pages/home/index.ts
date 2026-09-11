@@ -309,6 +309,15 @@ Page({
     const code = String(event.currentTarget.dataset.code || "");
     const city = this.data.cities.find((item) => item.code === code);
     if (!city) return;
+    const currentLocation = cityStore.getState();
+    // 再次选择当前真实定位城市时保持 REAL_LOCATION，不能意外清除区县和坐标。
+    if (
+      currentLocation.selectionMode === "REAL_LOCATION" &&
+      currentLocation.selectedCity?.code === city.code
+    ) {
+      this.setData({ cityPickerVisible: false });
+      return;
+    }
     cityStore.select(city);
     syncCityPreference(city.code);
     this.cityCode = city.code;

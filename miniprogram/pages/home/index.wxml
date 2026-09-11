@@ -9,7 +9,8 @@
     <text class="home-location__refresh" bind:tap="restoreLocation">{{locationStatus === 'LOCATING' ? '定位中' : '恢复定位'}}</text>
     <text class="home-location__refresh" bind:tap="openCityPicker">切换城市</text>
   </view>
-  <view wx:if="{{locationStatus === 'FAILED' || locationStatus === 'DENIED'}}" class="home-location-error">
+  <!-- 错误状态只保留一个：内容请求失败时优先展示网络错误，避免与定位错误重复占位。 -->
+  <view wx:if="{{!feedError && (locationStatus === 'FAILED' || locationStatus === 'DENIED')}}" class="home-location-error">
     <t-icon name="location" size="56rpx" />
     <text>{{locationStatus === 'DENIED' ? '未获得定位权限，当前按城市浏览' : '定位不可用，当前按城市浏览'}}</text>
     <view class="home-location-error__action" bind:tap="restoreLocation">重新定位</view>

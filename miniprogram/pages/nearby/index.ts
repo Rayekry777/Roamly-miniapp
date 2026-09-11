@@ -1,9 +1,7 @@
 import {
   ensureDiscoveryContext,
-  loadAvailableCities,
   locateForNearby,
   locationFailureMessage,
-  syncCityPreference,
 } from "../../services/city";
 import { listShopTypes } from "../../services/shop";
 import { loadVoucherProductPage } from "../../services/voucher-product";
@@ -34,9 +32,6 @@ Page({
     error: "",
     locationStatus: "IDLE",
     selectedCity: null as { code: string; name: string } | null,
-    cityPickerVisible: false,
-    cityLoading: false,
-    cities: [] as Array<{ code: string; name: string }>,
   },
   onLoad() {
     this.scope = createRequestScope();
@@ -228,37 +223,6 @@ Page({
     void this.resolveLocation(true).then((ready) => {
       if (ready) void this.loadProducts(true);
     });
-  },
-  async openCityPicker() {
-    if (this.data.cityLoading) return;
-    this.setData({ cityLoading: true });
-    try {
-      const cities = await this.scope?.run(loadAvailableCities());
-      if (cities) this.setData({ cities, cityPickerVisible: true });
-    } catch (error) {
-      wx.showToast({
-        title: error instanceof Error ? error.message : "城市列表加载失败",
-        icon: "none",
-      });
-    } finally {
-      this.setData({ cityLoading: false });
-    }
-  },
-  closeCityPicker() {
-    this.setData({ cityPickerVisible: false });
-  },
-  noop() {},
-  selectCity(event: WechatMiniprogram.TouchEvent) {
-    const code = String(event.currentTarget.dataset.code || "");
-    const city = this.data.cities.find((item) => item.code === code);
-    if (!city) return;
-    cityStore.select(city);
-    syncCityPreference(city.code);
-    this.cityCode = city.code;
-    this.locationKey = `MANUAL_CITY:${city.code}`;
-    this.setData({ selectedCity: city, cityPickerVisible: false });
-    if (this.data.sort === "DISTANCE") this.setData({ sort: "RECOMMENDED" });
-    void this.loadProducts(true);
   },
   retry() {
     if (!this.initialized) void this.initialize();

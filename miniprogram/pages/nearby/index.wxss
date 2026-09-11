@@ -1,5 +1,6 @@
 .nearby-page { min-height: 100vh; margin-top: -88rpx; padding-top: 88rpx; padding-bottom: calc(148rpx + env(safe-area-inset-bottom)); background: var(--roamly-bg); }
 .nearby-header { padding: 8rpx 24rpx 24rpx; background: var(--roamly-bg); }
+.nearby-location-placeholder { height: 40rpx; }
 .nearby-location-a11y { position: absolute; width: 1rpx; height: 1rpx; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .nearby-search { position: relative; display: flex; align-items: center; margin-top: 0; padding-right: 116rpx; border: 1rpx solid var(--roamly-border); border-radius: 999rpx; background: #f7f7f9; }
 .nearby-search t-search { flex: 1; }
