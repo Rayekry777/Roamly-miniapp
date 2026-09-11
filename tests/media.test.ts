@@ -60,7 +60,7 @@ describe("imageUrl", () => {
       getDeviceInfo: () => ({ platform: "android" }),
     });
     expect(imageUrl("/blogs/a.webp")).toBe(
-      "http://192.168.2.106:8081/blogs/a.webp",
+      "http://192.168.2.105:8081/blogs/a.webp",
     );
   });
 });

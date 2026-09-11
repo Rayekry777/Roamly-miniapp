@@ -1,4 +1,4 @@
-import { ensureSelectedCity } from "../../../services/city";
+import { ensureLocatedCity } from "../../../services/city";
 import {
   deleteTemporaryImage,
   uploadTemporaryImage,
@@ -13,7 +13,14 @@ import { listPublishShopOptions } from "../../../services/shop";
 import { feedStore } from "../../../store/feed";
 import { postDraftStore } from "../../../store/post-draft";
 import type { SectionSummary, ShopSummary } from "../../../types";
-import { choosePostImages } from "../../../utils/post-media";
+import {
+  editImageForUpload,
+  imageFileSize,
+  isImageEditCanceled,
+  prepareImageForEdit,
+} from "../../../utils/image";
+import { imageUrl } from "../../../utils/media";
+import { choosePostImages, validatePostImage } from "../../../utils/post-media";
 import { createRequestScope } from "../../../utils/scope";
 
 Page({
@@ -104,6 +111,66 @@ Page({
   retryImage(event: WechatMiniprogram.CustomEvent<{ path: string }>) {
     void this.uploadOne(event.detail.path);
   },
+  async editImage(
+    event: WechatMiniprogram.CustomEvent<{ path: string; url?: string }>,
+  ) {
+    if (this.data.draft.submitting) return;
+    const localPath = event.detail.path;
+    const previous = postDraftStore
+      .getState()
+      .media.find((item) => item.localPath === localPath);
+    if (!previous) return;
+    if (previous.status === "UPLOADING") {
+      wx.showToast({ title: "图片上传完成后再编辑", icon: "none" });
+      return;
+    }
+    try {
+      // 草稿可能跨页面/跨启动恢复，微信原临时文件已失效时改用已上传
+      // 的公开媒体地址下载到新的临时文件，再交给系统编辑器，避免编辑器
+      // 打开失效路径后出现白底或空白结果。
+      const editablePath = await prepareImageForEdit(
+        localPath,
+        event.detail.url ||
+          (previous.asset ? imageUrl(previous.asset.url) : ""),
+      );
+      const editedPath = await editImageForUpload(editablePath);
+      // 部分微信版本在未做任何操作时会原样返回输入路径；此时无需重复
+      // 上传、替换媒体或产生新的临时记录。
+      if (editedPath === editablePath) {
+        wx.showToast({ title: "图片未修改", icon: "none" });
+        return;
+      }
+      const validation = await validatePostImage({
+        tempFilePath: editedPath,
+        size: imageFileSize(editedPath),
+      } as WechatMiniprogram.MediaFile);
+      if (validation) {
+        wx.showToast({ title: validation, icon: "none" });
+        return;
+      }
+      const asset = await uploadTemporaryImage(editedPath, "POST");
+      const stillExists = postDraftStore
+        .getState()
+        .media.some((item) => item.localPath === localPath);
+      if (!stillExists) {
+        await deleteTemporaryImage(asset.id).catch(() => undefined);
+        return;
+      }
+      postDraftStore.replaceMedia(localPath, {
+        localPath: editedPath,
+        asset,
+        status: "DONE",
+      });
+      this.syncDraft();
+      if (previous.asset) {
+        await deleteTemporaryImage(previous.asset.id).catch(() => undefined);
+      }
+    } catch (error) {
+      if (!isImageEditCanceled(error)) {
+        wx.showToast({ title: this.errorMessage(error), icon: "none" });
+      }
+    }
+  },
   async removeImage(event: WechatMiniprogram.CustomEvent<{ path: string }>) {
     const removed = postDraftStore.removeMedia(event.detail.path);
     this.syncDraft();
@@ -127,7 +194,7 @@ Page({
     });
     this.syncDraft();
     try {
-      const asset = await uploadTemporaryImage(localPath);
+      const asset = await uploadTemporaryImage(localPath, "POST");
       const stillExists = postDraftStore
         .getState()
         .media.some((item) => item.localPath === localPath);
@@ -229,7 +296,7 @@ Page({
     try {
       const [sections, city] = await Promise.all([
         this.scope?.run(loadHomeSections()),
-        this.scope?.run(ensureSelectedCity()),
+        this.scope?.run(ensureLocatedCity()),
       ]);
       if (!sections || !city) return;
       const availableSections = sections.filter((item) => item.allowShopVisit);

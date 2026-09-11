@@ -9,6 +9,8 @@ import type {
 } from "../types";
 import type { ApiError } from "../utils/request";
 import { adaptPostCard, adaptPostDetail } from "./post-card";
+import { cityStore } from "../store/city";
+import { ensureLocatedCity } from "./city";
 
 export async function loadMyPostPage(
   page = 1,
@@ -99,6 +101,12 @@ export function buildPostCreateRequest(draft: PostDraft): PostCreateRequest {
     content: draft.content.trim(),
     shopVisit: draft.shopVisit,
   };
+  const location = cityStore.getState();
+  if (location.locationStatus === "READY" && location.longitude !== undefined && location.latitude !== undefined) {
+    request.longitude = location.longitude;
+    request.latitude = location.latitude;
+    request.locationLabel = location.locationContext?.locationLabel;
+  }
   const mediaIds = draft.media.map((item) => item.asset!.id);
   if (mediaIds.length) request.mediaIds = mediaIds;
   if (title) request.title = title;
@@ -110,6 +118,7 @@ export function buildPostCreateRequest(draft: PostDraft): PostCreateRequest {
 }
 
 export async function publishPost(draft: PostDraft): Promise<IdResponse> {
+  await ensureLocatedCity();
   const request = buildPostCreateRequest(draft);
   return createPost(request).then(
     (result) => {

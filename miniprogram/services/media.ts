@@ -1,13 +1,14 @@
 import { deleteMediaImage, uploadMediaImage } from "../api/media";
-import type { MediaAsset } from "../types";
+import type { MediaAsset, MediaUploadPurpose } from "../types";
 
 const CLEANUP_QUEUE_KEY = "roamly_media_cleanup_v1";
 let cleanupPromise: Promise<void> | null = null;
 
 export async function uploadTemporaryImage(
   filePath: string,
+  purpose: MediaUploadPurpose,
 ): Promise<MediaAsset> {
-  const result = await uploadMediaImage(filePath);
+  const result = await uploadMediaImage(filePath, purpose);
   if (!result.data) throw new Error("上传结果缺少媒体资产");
   return result.data;
 }

@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { validatePostImage } from "../miniprogram/utils/post-media";
+import {
+  choosePostImages,
+  validatePostImage,
+} from "../miniprogram/utils/post-media";
 
 function mediaFile(
   tempFilePath: string,
@@ -33,5 +36,18 @@ describe("post image validation", () => {
     await expect(
       validatePostImage(mediaFile("wxfile://tmp_1")),
     ).resolves.toBeNull();
+  });
+
+  it("keeps the original file on first selection and defers editing to the thumbnail", async () => {
+    const chooseMedia = vi.fn().mockResolvedValue({
+      tempFiles: [{ tempFilePath: "wxfile://photo.jpg", size: 1024 }],
+    });
+    vi.stubGlobal("wx", { chooseMedia });
+
+    const result = await choosePostImages(9);
+
+    expect(result.files).toHaveLength(1);
+    expect(result.files[0]?.tempFilePath).toBe("wxfile://photo.jpg");
+    expect(chooseMedia).toHaveBeenCalledOnce();
   });
 });

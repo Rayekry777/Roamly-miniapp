@@ -5,6 +5,8 @@ export interface FeedQuery {
   cursor?: number;
   offset?: number;
   size?: number;
+  longitude?: number;
+  latitude?: number;
 }
 
 export interface RecommendedFeedQuery extends FeedQuery {
@@ -32,5 +34,9 @@ function compactFeedQuery(query: FeedQuery): Record<string, unknown> {
   if (query.cursor !== undefined) result.cursor = query.cursor;
   if (query.offset !== undefined) result.offset = query.offset;
   if (query.size !== undefined) result.size = query.size;
+  if (query.longitude !== undefined && query.latitude !== undefined) {
+    result.longitude = query.longitude;
+    result.latitude = query.latitude;
+  }
   return result;
 }

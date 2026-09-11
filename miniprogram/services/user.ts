@@ -22,7 +22,7 @@ export const signCount = userApi.signCount;
 export async function replaceAvatar(
   filePath: string,
 ): Promise<CurrentUserProfile> {
-  const media = await uploadTemporaryImage(filePath);
+  const media = await uploadTemporaryImage(filePath, "USER_AVATAR");
   try {
     const result = await userApi.updateAvatar(media.id);
     if (!result.data) throw new Error("头像保存结果为空");

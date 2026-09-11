@@ -13,7 +13,16 @@ import { authStore } from "../../../store/auth";
 import type { ShopReview, ReviewSort, UploadedMedia } from "../../../types";
 import { requireLogin } from "../../../utils/navigation";
 import { ApiError } from "../../../utils/request";
-import { choosePostImages } from "../../../utils/post-media";
+import {
+  editImageForUpload,
+  imageFileSize,
+  isImageEditCanceled,
+} from "../../../utils/image";
+import { imageUrl, resolveRenderableImage } from "../../../utils/media";
+import {
+  choosePostImages,
+  validatePostImage,
+} from "../../../utils/post-media";
 import { createRequestScope } from "../../../utils/scope";
 
 const PAGE_SIZE = 10;
@@ -180,7 +189,7 @@ Page({
   async uploadOne(localPath: string) {
     this.updateMedia(localPath, { status: "UPLOADING", error: undefined });
     try {
-      const asset = await uploadTemporaryImage(localPath);
+      const asset = await uploadTemporaryImage(localPath, "SHOP_REVIEW");
       const stillExists = this.data.media.some(
         (item) => item.localPath === localPath,
       );
@@ -198,6 +207,44 @@ Page({
   },
   retryImage(event: WechatMiniprogram.CustomEvent<{ path: string }>) {
     void this.uploadOne(event.detail.path);
+  },
+  async editImage(event: WechatMiniprogram.CustomEvent<{ path: string }>) {
+    if (this.data.submitting) return;
+    const localPath = event.detail.path;
+    const index = this.data.media.findIndex(
+      (item) => item.localPath === localPath,
+    );
+    const previous = this.data.media[index];
+    if (!previous) return;
+    try {
+      const editablePath = previous.bound
+        ? await resolveRenderableImage(imageUrl(previous.asset?.url))
+        : localPath;
+      const editedPath = await editImageForUpload(editablePath);
+      const validation = await validatePostImage({
+        tempFilePath: editedPath,
+        size: imageFileSize(editedPath),
+      } as WechatMiniprogram.MediaFile);
+      if (validation) {
+        wx.showToast({ title: validation, icon: "none" });
+        return;
+      }
+      const asset = await uploadTemporaryImage(editedPath, "SHOP_REVIEW");
+      const media = [...this.data.media];
+      if (media[index]?.localPath !== localPath) {
+        await deleteTemporaryImage(asset.id).catch(() => undefined);
+        return;
+      }
+      media[index] = { localPath: editedPath, asset, status: "DONE" };
+      this.setData({ media });
+      if (previous.asset && !previous.bound) {
+        await deleteTemporaryImage(previous.asset.id).catch(() => undefined);
+      }
+    } catch (error) {
+      if (!isImageEditCanceled(error)) {
+        wx.showToast({ title: this.errorMessage(error), icon: "none" });
+      }
+    }
   },
   async removeImage(event: WechatMiniprogram.CustomEvent<{ path: string }>) {
     const path = event.detail.path;

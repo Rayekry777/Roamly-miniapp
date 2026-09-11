@@ -36,6 +36,8 @@ export interface VoucherProductResponse {
   subtitle?: string;
   cover?: MediaAsset | string;
   payAmount: number;
+  merchantSubsidyAmount?: number;
+  platformDiscountAmount?: number;
   originalAmount?: number;
   stock?: number;
   soldCount?: number;
@@ -121,6 +123,8 @@ export interface VoucherProduct {
   subtitle: string;
   cover: string;
   payAmount: number;
+  merchantSubsidyAmount?: number;
+  platformDiscountAmount?: number;
   originalAmount?: number;
   payAmountText: string;
   stock?: number;
@@ -225,6 +229,8 @@ export interface VoucherOrderResponse {
   unitAmount: number;
   totalAmount: number;
   payAmount: number;
+  merchantSubsidyAmount?: number;
+  platformDiscountAmount?: number;
   status: VoucherOrderStatus;
   createdTime: string;
   paidTime?: string;
@@ -246,6 +252,8 @@ export interface VoucherOrder {
   unitAmount: number;
   totalAmount: number;
   payAmount: number;
+  merchantSubsidyAmount?: number;
+  platformDiscountAmount?: number;
   unitAmountText: string;
   totalAmountText: string;
   payAmountText: string;
@@ -365,6 +373,8 @@ export interface VoucherOrderConfirmationResponse {
   maxQuantity: number;
   totalAmount: number;
   payAmount: number;
+  merchantSubsidyAmount?: number;
+  platformDiscountAmount?: number;
   availableStock: number;
   serverTime: string;
   paymentExpireTime: string;

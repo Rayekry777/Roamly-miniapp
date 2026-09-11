@@ -41,7 +41,7 @@
     <view class="review-editor__head"><text>{{editing ? "编辑点评" : "写下你的点评"}}</text><t-icon name="close" size="38rpx" bind:tap="closeForm" /></view>
     <view class="score-picker"><text>评分</text><view class="score-picker__stars"><text wx:for="{{[1, 2, 3, 4, 5]}}" wx:key="*this" class="score-star {{item <= score ? 'score-star--active' : ''}}" data-score="{{item}}" bind:tap="selectScore">★</text></view><text wx:if="{{score}}">{{score}} 分</text></view>
     <t-textarea value="{{content}}" maxlength="2000" autosize="{{ { minHeight: 180 } }}" placeholder="说说你的真实体验…" disabled="{{submitting}}" bind:change="onContent" />
-    <draft-media-grid media="{{media}}" disabled="{{submitting}}" bind:add="addImages" bind:retry="retryImage" bind:remove="removeImage" />
+    <draft-media-grid media="{{media}}" disabled="{{submitting}}" bind:add="addImages" bind:retry="retryImage" bind:edit="editImage" bind:remove="removeImage" />
     <view wx:if="{{formError}}" class="form-error">{{formError}}</view>
     <view class="review-editor__actions"><t-button wx:if="{{editing}}" theme="danger" variant="text" loading="{{submitting}}" bind:tap="deleteReview">删除点评</t-button><t-button theme="primary" shape="round" loading="{{submitting}}" bind:tap="submit">提交点评</t-button></view>
   </view>

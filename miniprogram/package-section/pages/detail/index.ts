@@ -1,5 +1,5 @@
 import {
-  ensureSelectedCity,
+  ensureLocatedCity,
   loadAvailableCities,
 } from "../../../services/city";
 import { setAuthorFollowing, setPostLiked } from "../../../services/feed";
@@ -119,7 +119,7 @@ Page({
     void this.refreshPage();
   },
   async initializePage() {
-    const cityPromise = this.scope?.run(ensureSelectedCity());
+    const cityPromise = this.scope?.run(ensureLocatedCity());
     const detailPromise = sectionStore.shouldLoadDetail(this.sectionId)
       ? this.scope?.run(loadSectionDetail(this.sectionId))
       : Promise.resolve(sectionStore.getDetail(this.sectionId));

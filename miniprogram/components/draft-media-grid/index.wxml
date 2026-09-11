@@ -5,7 +5,8 @@
       src="{{item.displayUrl}}"
       mode="aspectFill"
       data-index="{{index}}"
-      bind:tap="onPreview"
+      bind:tap="onImageTap"
+      bind:error="onImageError"
     />
     <view wx:if="{{item.status !== 'DONE'}}" class="draft-media__status">
       <text>{{item.status === "FAILED" ? item.error || "上传失败" : "上传中"}}</text>

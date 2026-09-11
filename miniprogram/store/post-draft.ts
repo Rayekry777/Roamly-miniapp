@@ -93,6 +93,14 @@ export class PostDraftStore {
     });
   }
 
+  replaceMedia(localPath: string, replacement: UploadedMedia): void {
+    this.update({
+      media: this.draft.media.map((item) =>
+        item.localPath === localPath ? replacement : item,
+      ),
+    });
+  }
+
   removeMedia(localPath: string): UploadedMedia | undefined {
     const removed = this.draft.media.find(
       (item) => item.localPath === localPath,

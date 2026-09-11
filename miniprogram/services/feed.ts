@@ -25,6 +25,8 @@ export async function loadFeedPage(
           cursor: options.cursor,
           offset: options.offset,
           size: options.size,
+          longitude: options.longitude,
+          latitude: options.latitude,
         })
       : await listFollowingPosts(options);
 

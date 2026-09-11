@@ -37,7 +37,7 @@
     <view class="publish-section__heading">
       <view>
         <view class="publish-section__title">添加图片</view>
-        <view class="publish-section__description">支持 JPEG、PNG、WebP，单张不超过 10MB</view>
+        <view class="publish-section__description">支持 JPEG、PNG、WebP，单张不超过 10MB；点击图片可编辑尺寸</view>
       </view>
       <text>{{draft.media.length}} / 9</text>
     </view>
@@ -46,6 +46,7 @@
       disabled="{{draft.submitting}}"
       bind:add="addImages"
       bind:retry="retryImage"
+      bind:edit="editImage"
       bind:remove="removeImage"
       bind:move="moveImage"
     />

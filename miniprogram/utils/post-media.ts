@@ -14,12 +14,13 @@ export async function choosePostImages(
     count: Math.max(0, Math.min(9, count)),
     mediaType: ["image"],
     sourceType: ["album", "camera"],
-    sizeType: ["compressed"],
   });
   const files: WechatMiniprogram.MediaFile[] = [];
   const rejectedMessages: string[] = [];
 
   for (const file of response.tempFiles) {
+    // 首次选图直接加入草稿并上传；编辑由缩略图点击事件显式触发，避免
+    // 用户每次选图都被强制带进微信编辑器。
     const error = await validatePostImage(file);
     if (error) rejectedMessages.push(error);
     else files.push(file);

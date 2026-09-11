@@ -1,6 +1,11 @@
 import { getEnvironment } from "../config/env";
 import { authStore } from "../store/auth";
-import type { ErrorResult, MediaAsset, Result } from "../types";
+import type {
+  ErrorResult,
+  MediaAsset,
+  MediaUploadPurpose,
+  Result,
+} from "../types";
 import { navigateToLogin } from "../utils/navigation";
 import { ApiError, request } from "../utils/request";
 import { session } from "../utils/session";
@@ -16,6 +21,7 @@ interface MediaAssetWire {
 
 export function uploadMediaImage(
   filePath: string,
+  purpose: MediaUploadPurpose,
 ): Promise<Result<MediaAsset>> {
   const token = session.getToken();
   if (!token) {
@@ -27,6 +33,7 @@ export function uploadMediaImage(
       url: `${getEnvironment().apiBaseUrl}/v1/media/images`,
       filePath,
       name: "file",
+      formData: { purpose },
       timeout: 30000,
       header: { Authorization: `Bearer ${token}` },
       success(response) {

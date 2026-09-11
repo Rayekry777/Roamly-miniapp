@@ -1,4 +1,5 @@
 export type MediaUploadStatus = "WAITING" | "UPLOADING" | "DONE" | "FAILED";
+export type MediaUploadPurpose = "USER_AVATAR" | "POST" | "SHOP_REVIEW";
 
 export interface MediaAsset {
   id: string;

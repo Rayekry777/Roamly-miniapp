@@ -7,6 +7,10 @@ import {
 import { signOut } from "../../../services/auth";
 import { authStore } from "../../../store/auth";
 import type { CurrentUserProfile, UserGender } from "../../../types";
+import {
+  cropAvatarImage,
+  isImageEditCanceled,
+} from "../../../utils/image";
 
 const GENDER_OPTIONS: Array<{ label: string; value: UserGender }> = [
   { label: "保密", value: "UNDISCLOSED" },
@@ -114,9 +118,19 @@ Page({
       sourceType: ["album", "camera"],
       success: (result) => {
         const path = result.tempFiles[0]?.tempFilePath;
-        if (path) void this.saveAvatar(path);
+        if (path) void this.editAndSaveAvatar(path);
       },
     });
+  },
+  async editAndSaveAvatar(filePath: string) {
+    try {
+      const croppedPath = await cropAvatarImage(filePath);
+      await this.saveAvatar(croppedPath);
+    } catch (error) {
+      if (!isImageEditCanceled(error)) {
+        wx.showToast({ title: "头像编辑失败，请重试", icon: "none" });
+      }
+    }
   },
   async saveAvatar(filePath: string) {
     this.setData({ savingAvatar: true });

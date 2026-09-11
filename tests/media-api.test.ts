@@ -18,7 +18,7 @@ describe("media asset API", () => {
             message: "操作成功",
             data: {
               id: "9223372036854775807",
-              path: "/blogs/example.webp",
+              path: "/media/user/post/7/2026/09/example.webp",
               width: 1200,
               height: 900,
               mimeType: "image/webp",
@@ -31,14 +31,17 @@ describe("media asset API", () => {
   });
 
   it("uploads to the media endpoint with Bearer authorization", async () => {
-    const result = await uploadMediaImage("temp/example.webp");
+    const result = await uploadMediaImage("temp/example.webp", "POST");
 
     expect(result.data?.id).toBe("9223372036854775807");
-    expect(result.data?.url).toBe("/blogs/example.webp");
+    expect(result.data?.url).toBe(
+      "/media/user/post/7/2026/09/example.webp",
+    );
     expect(vi.mocked(wx.uploadFile).mock.calls[0]?.[0]).toMatchObject({
       url: "http://127.0.0.1:8081/v1/media/images",
       filePath: "temp/example.webp",
       name: "file",
+      formData: { purpose: "POST" },
       header: { Authorization: "Bearer token-value" },
     });
   });
@@ -49,7 +52,9 @@ describe("media asset API", () => {
       uploadFile: vi.fn(),
     });
 
-    await expect(uploadMediaImage("temp/example.webp")).rejects.toMatchObject({
+    await expect(
+      uploadMediaImage("temp/example.webp", "POST"),
+    ).rejects.toMatchObject({
       statusCode: 401,
       code: "UNAUTHORIZED",
     });

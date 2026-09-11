@@ -112,6 +112,9 @@ export interface PostCreateRequest {
   shopVisit: boolean;
   sectionId?: string;
   shopId?: string;
+  longitude?: number;
+  latitude?: number;
+  locationLabel?: string;
 }
 
 export type PostUpdateRequest = PostCreateRequest;
