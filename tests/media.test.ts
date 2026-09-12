@@ -4,6 +4,7 @@ import {
   imageUrl,
   splitImages,
 } from "../miniprogram/utils/media";
+import { getEnvironment } from "../miniprogram/config/env";
 
 describe("imageUrl", () => {
   beforeEach(() =>
@@ -60,7 +61,7 @@ describe("imageUrl", () => {
       getDeviceInfo: () => ({ platform: "android" }),
     });
     expect(imageUrl("/blogs/a.webp")).toBe(
-      "http://192.168.2.105:8081/blogs/a.webp",
+      getEnvironment().assetBaseUrl + "/blogs/a.webp",
     );
   });
 });

@@ -1,0 +1,87 @@
+.ticket-page {
+  padding: 24rpx;
+}
+
+.ticket-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22rpx;
+}
+
+.ticket-head view {
+  display: grid;
+  gap: 6rpx;
+}
+
+.ticket-head strong {
+  font-size: 34rpx;
+}
+
+.ticket-head text {
+  color: var(--roamly-muted);
+  font-size: 22rpx;
+}
+
+.ticket-head button {
+  padding: 0 24rpx;
+  color: #fff;
+  background: var(--roamly-primary);
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  line-height: 64rpx;
+}
+
+.ticket-list {
+  display: grid;
+  gap: 18rpx;
+}
+
+.ticket-card {
+  position: relative;
+  padding: 26rpx;
+}
+
+.ticket-card__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.ticket-card__head strong {
+  overflow: hidden;
+  font-size: 28rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-card__head text,
+.ticket-card__unread {
+  color: var(--roamly-primary);
+  font-size: 22rpx;
+}
+
+.ticket-card__no,
+.ticket-card__copy {
+  margin-top: 10rpx;
+  color: var(--roamly-muted);
+  font-size: 22rpx;
+}
+
+.ticket-card__copy {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-card__unread {
+  margin-top: 12rpx;
+  font-weight: 700;
+}
+
+.state {
+  display: grid;
+  min-height: 320rpx;
+  color: var(--roamly-muted);
+  place-items: center;
+}

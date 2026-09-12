@@ -24,6 +24,9 @@
         "pages/login/index",
         "pages/profile/index",
         "pages/account/index",
+        "pages/customer-service/index",
+        "pages/customer-service/create",
+        "pages/customer-service/detail",
         "pages/phone-change/index",
         "pages/password-change/index"
       ]

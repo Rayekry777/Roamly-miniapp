@@ -17,7 +17,7 @@
       <view wx:if="{{shop.openHours}}" class="usage-shop__hours"><t-icon name="time" size="28rpx" /><text class="open-state">营业中</text><text>{{shop.openHours}}</text></view>
     </view>
 
-    <view wx:if="{{order.status === 'REFUNDING' || order.status === 'REFUNDED'}}" class="refund-progress roamly-panel {{order.status === 'REFUNDED' ? 'refund-progress--success' : ''}}"><view class="refund-progress__title"><t-icon name="{{order.status === 'REFUNDED' ? 'check-circle-filled' : 'time'}}" size="32rpx" />{{order.status === 'REFUNDED' ? '退款成功' : '退款处理中'}}<text wx:if="{{refundId}}" class="refund-progress__link" bind:tap="openRefundDetail">查看退款详情 ›</text></view><view class="refund-progress__text">{{order.status === 'REFUNDED' ? '退款已完成，资金将按原支付渠道退回。' : '退款申请已提交，券码暂不可使用；处理完成后可在退款账单中查看结果。'}}</view></view>
+    <view wx:if="{{refundId}}" class="refund-progress roamly-panel {{refundSucceeded ? 'refund-progress--success' : ''}}"><view class="refund-progress__title"><t-icon name="{{refundSucceeded ? 'check-circle-filled' : 'time'}}" size="32rpx" />{{refundStatusText}}<text class="refund-progress__link" bind:tap="openRefundDetail">查看退款详情 ›</text></view><view class="refund-progress__text">退款进度以审核和 Mock 渠道执行结果为准，不影响订单交易状态。</view></view>
 
     <view wx:if="{{vouchers.length}}" class="voucher-list roamly-panel">
       <view class="order-product" bind:tap="openProduct"><app-image src="{{product.cover}}" custom-class="order-product__image" /><view class="order-product__copy"><view class="order-product__title">{{product.title || order.productTitle}} ›</view><view class="order-product__meta">{{product.validityText || '到店使用'}} · {{product.reservationRequired ? '需预约' : '免预约'}}</view><view class="order-product__price">实付 ¥{{order.payAmountText}} × {{order.quantity}}</view></view></view>
@@ -32,7 +32,7 @@
     <view wx:if="{{order.status === 'PENDING_PAYMENT'}}" class="action-row"><t-button block theme="danger" loading="{{paying}}" bind:tap="pay">模拟支付</t-button><t-button block variant="outline" loading="{{cancelling}}" bind:tap="cancel">取消订单</t-button></view>
 
     <view wx:if="{{shop && order.status !== 'PAID'}}" class="shop-summary roamly-panel"><text>订单门店</text><text>{{shop.name}} · {{shop.address || '门店信息'}}</text></view>
-    <view class="order-meta"><view>订单号 <text>{{order.orderNo}}</text></view><view>创建时间 <text>{{order.createdTime}}</text></view></view>
+    <view class="order-meta"><view>订单号 <text>{{order.orderNo}}</text></view><view>创建时间 <text>{{order.createdTime}}</text></view><view bind:tap="openCustomerService">遇到问题 <text>联系平台客服 ›</text></view></view>
   </block>
 </view>
 <view wx:if="{{order && order.status !== 'PENDING_PAYMENT' && order.status !== 'CANCELED'}}" class="reuse-bar"><view class="reuse-action" bind:tap="openProduct">再来一单</view></view>

@@ -53,4 +53,8 @@ Page({
     if (requireLogin())
       wx.navigateTo({ url: "/package-voucher/pages/wallet/index" });
   },
+  openCustomerService() {
+    if (requireLogin())
+      wx.navigateTo({ url: "/package-user/pages/customer-service/index" });
+  },
 });

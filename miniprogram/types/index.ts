@@ -50,6 +50,7 @@ export interface PublicUserProfile extends UserDTO {
 }
 
 export * from "./city";
+export * from "./customer-service";
 export * from "./comment";
 export * from "./draft";
 export * from "./media";

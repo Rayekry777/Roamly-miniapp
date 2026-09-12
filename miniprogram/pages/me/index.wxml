@@ -24,6 +24,7 @@
       <view class="quick-item pressable" bind:tap="openWallet"><view class="quick-icon"><t-icon name="coupon" size="42rpx" /></view><text>我的券包</text></view>
       <view class="quick-item pressable" bind:tap="publish"><view class="quick-icon"><t-icon name="edit-2" size="42rpx" /></view><text>发布动态</text></view>
       <view class="quick-item pressable" bind:tap="myPosts"><view class="quick-icon"><t-icon name="chat" size="42rpx" /></view><text>我的动态</text></view>
+      <view class="quick-item pressable" bind:tap="openCustomerService"><view class="quick-icon"><t-icon name="service" size="42rpx" /></view><text>平台客服</text></view>
     </view>
 
   </block>

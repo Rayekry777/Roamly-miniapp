@@ -25,6 +25,8 @@ Page({
     hasUsableVoucher: false,
     hasRefundableVoucher: false,
     refundId: "",
+    refundStatusText: "",
+    refundSucceeded: false,
     voucherExpireText: "",
     loading: true,
     error: "",
@@ -51,21 +53,31 @@ Page({
       const detail = await this.scope?.run(loadMyOrder(this.orderId));
       if (detail) {
         let refundId = "";
-        if (
-          detail.order.status === "REFUNDING" ||
-          detail.order.status === "REFUNDED"
-        ) {
-          try {
-            const refunds = await this.scope?.run(
-              listMyRefunds({ page: 1, size: 20 }),
-            );
-            const matched = refunds?.data?.items?.find(
-              (refund) => String(refund.orderId) === String(detail.order.id),
-            );
-            if (matched?.id !== undefined) refundId = String(matched.id);
-          } catch {
-            // The order remains usable when the optional refund timeline request fails.
+        let refundStatusText = "";
+        let refundSucceeded = false;
+        try {
+          const refunds = await this.scope?.run(
+            listMyRefunds({ page: 1, size: 20 }),
+          );
+          const matched = refunds?.data?.items?.find(
+            (refund) => String(refund.orderId) === String(detail.order.id),
+          );
+          if (matched?.id !== undefined) {
+            refundId = String(matched.id);
+            refundSucceeded = matched.executionStatus === "SUCCESS";
+            refundStatusText = refundSucceeded
+              ? "退款成功"
+              : matched.decisionStatus === "REJECTED"
+                ? "退款已拒绝"
+                : matched.executionStatus === "FAILED" ||
+                    matched.executionStatus === "MANUAL_REQUIRED"
+                  ? "退款处理异常"
+                  : matched.decisionStatus === "PENDING_REVIEW"
+                    ? "退款待审核"
+                    : "退款处理中";
           }
+        } catch {
+          // 退款补充信息失败不影响订单主体继续使用。
         }
         this.setData({
           order: detail.order,
@@ -81,6 +93,8 @@ Page({
             (voucher) => voucher.status === "UNUSED",
           ),
           refundId,
+          refundStatusText,
+          refundSucceeded,
           voucherExpireText: detail.vouchers[0]?.expireTime || "",
           loading: false,
         });
@@ -181,6 +195,15 @@ Page({
   openProduct() {
     if (this.data.product?.id)
       wx.navigateTo({ url: voucherProductUrl(this.data.product.id) });
+  },
+  openCustomerService() {
+    wx.navigateTo({
+      url:
+        "/package-user/pages/customer-service/create?orderId=" +
+        encodeURIComponent(this.orderId) +
+        "&subject=" +
+        encodeURIComponent("订单问题咨询"),
+    });
   },
   orderId: "",
   scope: undefined as ReturnType<typeof createRequestScope> | undefined,

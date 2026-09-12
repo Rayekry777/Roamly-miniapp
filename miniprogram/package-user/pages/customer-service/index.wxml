@@ -1,0 +1,15 @@
+<app-navbar title="平台客服" back />
+<view class="ticket-page page-enter">
+  <view class="ticket-head"><view><strong>我的工单</strong><text>平台客服统一处理订单、退款和核销问题</text></view><button bind:tap="create">发起咨询</button></view>
+  <view wx:if="{{loading && !items.length}}" class="state"><t-loading size="42rpx" /> 正在加载工单</view>
+  <view wx:elif="{{error && !items.length}}" class="state"><text>{{error}}</text><button bind:tap="retry">重新加载</button></view>
+  <app-empty wx:elif="{{!items.length}}" description="还没有客服工单" action-text="发起咨询" bind:action="create" />
+  <view wx:else class="ticket-list">
+    <view wx:for="{{items}}" wx:key="id" class="ticket-card roamly-panel pressable" data-id="{{item.id}}" bind:tap="open">
+      <view class="ticket-card__head"><strong>{{item.subject}}</strong><text>{{item.statusText}}</text></view>
+      <view class="ticket-card__no">{{item.ticketNo}} · {{item.timeText}}</view>
+      <view class="ticket-card__copy">{{item.description || '点击查看客服会话'}}</view>
+      <view wx:if="{{item.unreadCount}}" class="ticket-card__unread">{{item.unreadCount}} 条新消息</view>
+    </view>
+  </view>
+</view>

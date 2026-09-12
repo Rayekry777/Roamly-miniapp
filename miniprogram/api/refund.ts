@@ -1,4 +1,9 @@
-import type { PageResult, Result, VoucherRefundResponse } from "../types";
+import type {
+  PageResult,
+  RefundTimelineEvent,
+  Result,
+  VoucherRefundResponse,
+} from "../types";
 import { request } from "../utils/request";
 
 export function requestVoucherRefund(
@@ -64,4 +69,11 @@ export function getMyRefund(refundId: string) {
     auth: "required",
     showError: false,
   });
+}
+
+export function getMyRefundTimeline(refundId: string) {
+  return request<RefundTimelineEvent[]>(
+    "/v1/users/me/refunds/" + refundId + "/timeline",
+    { auth: "required", showError: false },
+  );
 }

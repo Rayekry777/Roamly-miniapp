@@ -361,6 +361,40 @@ export interface VoucherRefundResponse {
   paymentChannel?: string;
   refundNo?: string;
   merchantOrderNo?: string;
+  decisionStatus?: string;
+  executionStatus?: string;
+  rejectReason?: string;
+  failureCode?: string;
+  failureMessage?: string;
+  providerRefundNo?: string;
+  executionStartedTime?: string;
+  lastFailureTime?: string;
+  retryCount?: number;
+  reviewNote?: string;
+  items?: VoucherRefundItem[];
+}
+
+export interface VoucherRefundItem {
+  id: string;
+  voucherId: string;
+  redeemed: boolean;
+  customerPaidAmount: number;
+  platformSubsidyAmount: number;
+  merchantSubsidyAmount: number;
+  serviceFeeAmount: number;
+  refundableAmount: number;
+  refundAmount: number;
+  status: string;
+  reversedIncomeAmount: number;
+  refundedServiceFeeAmount: number;
+}
+
+export interface RefundTimelineEvent {
+  type: string;
+  title: string;
+  status: string;
+  description?: string;
+  occurredAt?: string;
 }
 
 export interface VoucherOrderConfirmationResponse {
