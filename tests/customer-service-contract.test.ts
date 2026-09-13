@@ -43,4 +43,17 @@ describe("阶段 41 消费者客服契约", () => {
     expect(source).toContain("executionStatus");
     expect(source).toContain("getMyRefundTimeline");
   });
+
+  it("咨询主题输入框使用固定行高避免文字被裁切", () => {
+    const styles = readFileSync(
+      "miniprogram/package-user/pages/customer-service/create.wxss",
+      "utf8",
+    );
+    expect(styles).toMatch(
+      /\.field input,\s*\.picker \{[\s\S]*height: 80rpx;[\s\S]*padding: 0;[\s\S]*line-height: 80rpx;/,
+    );
+    expect(styles).toMatch(
+      /\.field textarea \{[\s\S]*height: 220rpx;[\s\S]*padding: 22rpx 0;/,
+    );
+  });
 });
