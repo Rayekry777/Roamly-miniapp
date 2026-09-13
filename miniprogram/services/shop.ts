@@ -12,12 +12,46 @@ import { splitImages } from "../utils/media";
 import { adaptPostCard } from "./post-card";
 
 export const listShopTypes = shopApi.listShopTypes;
+export const listShopTypeTree = shopApi.listShopTypeTree;
 
 export async function loadShopPage(
   query: ShopListQuery,
 ): Promise<PageResult<Shop>> {
   if (!query.cityCode) throw new Error("当前暂无可用城市");
   const normalizedQuery = normalizeShopQuery(query);
+  if (query.categoryId && !query.productId) {
+    const result = await shopApi.discoverShops(normalizedQuery);
+    if (!result.data || !Array.isArray(result.data.items))
+      throw new Error("店铺列表返回格式异常");
+    return {
+      ...result.data,
+      items: result.data.items.map((item) => ({
+        ...adaptShop(item.shop),
+        categoryId: item.categoryId,
+        typeName: item.typeName,
+        soldCount: item.soldCount,
+        availableVoucherCount: item.availableVoucherCount,
+        vouchers: item.vouchers.map((voucher) => ({
+          ...voucher,
+          priceText: (voucher.payAmount / 100).toFixed(2).replace(/\.?0+$/, ""),
+          originalText:
+            voucher.originalAmount && voucher.originalAmount > voucher.payAmount
+              ? (voucher.originalAmount / 100).toFixed(2).replace(/\.?0+$/, "")
+              : "",
+          typeLabel:
+            voucher.productType === "MULTI_USE"
+              ? `${voucher.totalUseCount || 1}次卡 · 总价`
+              : (
+                  {
+                    PACKAGE: "套餐",
+                    CASH: "代金券",
+                    DISCOUNT: "折扣券",
+                  } as Record<string, string>
+                )[voucher.productType] || "优惠券",
+        })),
+      })),
+    };
+  }
   const result = await shopApi.listShops(normalizedQuery);
   if (!result.data || !Array.isArray(result.data.items)) {
     throw new Error("商户列表返回格式异常，请稍后重试");

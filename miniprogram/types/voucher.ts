@@ -10,11 +10,6 @@ export type VoucherSaleStatus =
   | "SOLD_OUT"
   | "ENDED";
 export type VoucherProductStatus = VoucherSaleStatus | "DRAFT";
-export type VoucherProductSort =
-  | "RECOMMENDED"
-  | "SALES"
-  | "DISTANCE"
-  | "PRICE_ASC";
 export type VoucherOrderStatus =
   | "PENDING_PAYMENT"
   | "PAID"
@@ -182,12 +177,6 @@ export interface VoucherProduct {
   multiUseRule?: VoucherProductResponse["multiUseRule"];
 }
 
-export interface VoucherProductListItemResponse {
-  product: VoucherProductResponse;
-  shop: ShopSummary;
-  distance?: number;
-}
-
 export interface VoucherProductListItem {
   product: VoucherProduct;
   shop: ShopSummary;
@@ -195,17 +184,6 @@ export interface VoucherProductListItem {
   distanceText: string;
   /** Stable primitive key for wx:for; nested keys such as product.id are not supported by WXML. */
   itemKey: string;
-}
-
-export interface VoucherProductListQuery {
-  cityCode: string;
-  typeId?: string;
-  keyword?: string;
-  sort: VoucherProductSort;
-  page?: number;
-  size?: number;
-  longitude?: number;
-  latitude?: number;
 }
 
 export interface VoucherProductDetailResponse {

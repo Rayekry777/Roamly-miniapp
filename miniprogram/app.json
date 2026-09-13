@@ -71,7 +71,7 @@
     ]
   },
   "permission": {
-    "scope.userLocation": { "desc": "用于查询您附近的团购商品并计算距离" }
+    "scope.userLocation": { "desc": "用于查询您附近的店铺并计算距离" }
   },
   "requiredPrivateInfos": ["getLocation"],
   "lazyCodeLoading": "requiredComponents",

@@ -5,6 +5,7 @@ import type {
   Result,
   ShopListQuery,
   ShopResponse,
+  ShopDiscoveryResponse,
   ShopType,
 } from "../types";
 import { request } from "../utils/request";
@@ -81,4 +82,30 @@ function hasCoordinates(
     latitude >= -90 &&
     latitude <= 90
   );
+}
+
+export const listShopTypeTree = (): Promise<Result<ShopType[]>> =>
+  request("/v1/shop-types/tree", { auth: "public" });
+
+export function discoverShops(
+  query: ShopListQuery,
+): Promise<Result<PageResult<ShopDiscoveryResponse>>> {
+  const data: Record<string, unknown> = {
+    cityCode: query.cityCode,
+    categoryId: query.categoryId,
+    sort: query.sort,
+    page: query.page || 1,
+    size: query.size || 10,
+  };
+  if (query.typeId) data.typeId = query.typeId;
+  if (query.keyword?.trim()) data.keyword = query.keyword.trim();
+  if (hasCoordinates(query.longitude, query.latitude)) {
+    data.longitude = query.longitude;
+    data.latitude = query.latitude;
+  }
+  return request("/v1/shops/discovery", {
+    data,
+    auth: "public",
+    showError: false,
+  });
 }

@@ -2,38 +2,33 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("nearby and shop page contract", () => {
-  it("renders nearby loading, error, empty, filtering and pagination states", () => {
-    const view = readFileSync("miniprogram/pages/nearby/index.wxml", "utf8");
-    const logic = readFileSync("miniprogram/pages/nearby/index.ts", "utf8");
-
-    expect(view).toContain("product-skeletons");
+  it("renders category discovery loading, error, empty and pagination states", () => {
+    const view = readFileSync(
+      "miniprogram/package-shop/pages/list/index.wxml",
+      "utf8",
+    );
+    const logic = readFileSync(
+      "miniprogram/package-shop/pages/list/index.ts",
+      "utf8",
+    );
+    expect(view).toContain("shop-skeleton");
     expect(view).toContain('description="{{error}}"');
-    expect(view).toContain("当前筛选下没有找到可购买的商品");
-    expect(view).not.toContain('bind:tap="openNearbyShops"');
-    expect(view).toContain('bind:tap="retryLocation"');
-    expect(
-      readFileSync("miniprogram/pages/nearby/index.wxss", "utf8"),
-    ).toContain("background: var(--roamly-bg)");
-    expect(view).toContain('data-sort="DISTANCE"');
-    expect(view).toContain('bind:tap="selectType"');
-    expect(
-      readFileSync(
-        "miniprogram/components/voucher-product-card/index.wxml",
-        "utf8",
-      ),
-    ).toContain("product-card__cover-wrap");
+    expect(view).toContain("没有找到相关商户");
+    expect(view).toContain("category-grid");
     expect(logic).toContain("requestSequence");
-    expect(logic).toContain("searchTimer");
-    expect(logic).toContain("mergeProducts");
+    expect(logic).toContain("mergeShops");
   });
 
-  it("downgrades location failures instead of sending partial coordinates", () => {
-    const nearby = readFileSync("miniprogram/pages/nearby/index.ts", "utf8");
-    const service = readFileSync("miniprogram/services/shop.ts", "utf8");
-
-    expect(nearby).toContain('result.status === "DENIED"');
-    expect(nearby).toContain('this.setData({ sort: "RECOMMENDED" })');
-    expect(service).toContain('query.sort === "DISTANCE" && !hasLocation');
+  it("uses the home location without requesting location in the category page", () => {
+    const list = readFileSync(
+      "miniprogram/package-shop/pages/list/index.ts",
+      "utf8",
+    );
+    expect(list).toContain('selectionMode === "REAL_LOCATION"');
+    expect(list).toContain("请先在首页开启定位");
+    expect(list).not.toContain("locateForNearby");
+    expect(list).not.toContain("openCityPicker");
+    expect(list).toContain("locationFingerprint");
   });
 
   it("loads detail modules only after their sections become visible", () => {

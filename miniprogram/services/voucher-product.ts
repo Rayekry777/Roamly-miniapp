@@ -2,10 +2,7 @@ import * as voucherApi from "../api/voucher-product";
 import type {
   VoucherProduct,
   VoucherProductDetail,
-  VoucherProductListItem,
-  VoucherProductListQuery,
   VoucherProductResponse,
-  PageResult,
 } from "../types";
 import { imageUrl } from "../utils/media";
 import { adaptShopSummary } from "./post-card";
@@ -34,33 +31,6 @@ export const loadVoucherProduct = async (
   return {
     product,
     shop,
-  };
-};
-
-export const loadVoucherProductPage = async (
-  query: VoucherProductListQuery,
-): Promise<PageResult<VoucherProductListItem>> => {
-  const result = await voucherApi.listPublicVoucherProducts(query);
-  if (!result.data || !Array.isArray(result.data.items)) {
-    throw new Error("团购商品列表响应格式异常，请稍后重试");
-  }
-  return {
-    ...result.data,
-    items: result.data.items.map((item) => {
-      const shop = adaptShopSummary(item.shop);
-      const product = normalizeVoucherProduct(item.product);
-      if (!item.product.cover && shop.cover)
-        product.cover = imageUrl(shop.cover);
-      const distance =
-        item.distance === undefined ? undefined : Number(item.distance);
-      return {
-        product,
-        shop,
-        distance,
-        distanceText: formatDistance(distance),
-        itemKey: product.id,
-      };
-    }),
   };
 };
 
@@ -184,13 +154,6 @@ function benefitText(
   if (type === "MULTI_USE" && value.totalUseCount)
     return `${value.totalUseCount}次到店可用`;
   return value.validityTypeLabel || "到店团购";
-}
-
-function formatDistance(distance?: number): string {
-  if (distance === undefined || !Number.isFinite(distance)) return "";
-  return distance < 1000
-    ? `${Math.max(1, Math.round(distance))}m`
-    : `${(distance / 1000).toFixed(distance < 10000 ? 1 : 0)}km`;
 }
 
 function dayLabel(day: string): string {

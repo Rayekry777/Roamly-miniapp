@@ -1,43 +1,60 @@
 import {
   ensureDiscoveryContext,
-  loadAvailableCities,
-  locateForNearby,
   locationFailureMessage,
-  syncCityPreference,
 } from "../../../services/city";
-import { listShopTypes, loadShopPage } from "../../../services/shop";
+import { listShopTypeTree, loadShopPage } from "../../../services/shop";
 import { cityStore } from "../../../store/city";
 import type { Shop, ShopSort, ShopType } from "../../../types";
 import { shopDetailUrl } from "../../../utils/routes";
 import { createRequestScope } from "../../../utils/scope";
 import { syncTabBar } from "../../../utils/navigation";
 
+import { discoveryState } from "../../../store/shop-discovery";
+import { voucherProductUrl } from "../../../utils/routes";
 const PAGE_SIZE = 10;
+function locationFingerprint() {
+  const state = cityStore.getState();
+  return `${state.selectionMode}:${state.selectedCity?.code}:${state.longitude ?? ""}:${state.latitude ?? ""}`;
+}
 
 Page({
   data: {
     title: "发现好店",
+    categoryId: "",
+    productId: "",
+    categoriesExpanded: false,
     keyword: "",
     types: [] as ShopType[],
     shops: [] as Shop[],
     typeId: "",
-    sort: "POPULAR" as ShopSort,
+    sort: "RECOMMENDED" as ShopSort,
     sortOptions: [
-      { value: "POPULAR", label: "热门" },
-      { value: "DISTANCE", label: "距离" },
+      { value: "RECOMMENDED", label: "综合推荐" },
+      { value: "SALES", label: "销量" },
+      { value: "DISTANCE", label: "离我最近" },
       { value: "SCORE", label: "评分" },
     ] as Array<{ value: ShopSort; label: string }>,
     page: 1,
     loading: true,
     hasMore: true,
     error: "",
-    selectedCity: null as { code: string; name: string } | null,
-    cityPickerVisible: false,
-    cityLoading: false,
-    cities: [] as Array<{ code: string; name: string }>,
   },
   onLoad(options) {
     this.scope = createRequestScope();
+    const categoryId = String(options.categoryId || "");
+    if (!options.productId && categoryId !== "1" && categoryId !== "2") {
+      wx.switchTab({ url: "/pages/nearby/index" });
+      return;
+    }
+    this.setData({
+      categoryId,
+      productId: String(options.productId || ""),
+      title: options.productId
+        ? "适用门店"
+        : categoryId === "1"
+          ? "美食"
+          : "休闲娱乐",
+    });
     this.setData({
       typeId: options.typeId || "",
       keyword: options.keyword ? decodeURIComponent(options.keyword) : "",
@@ -52,18 +69,89 @@ Page({
     if (
       this.initialized &&
       selectedCity &&
-      `${selectionMode}:${selectedCity.code}` !== this.locationKey
+      locationFingerprint() !== this.locationKey
     ) {
       this.cityCode = selectedCity.code;
-      this.locationKey = `${selectionMode}:${selectedCity.code}`;
+      this.locationKey = locationFingerprint();
       if (selectionMode !== "REAL_LOCATION" && this.data.sort === "DISTANCE") {
-        this.setData({ sort: "POPULAR" });
+        this.setData({ sort: "RECOMMENDED" });
       }
-      this.setData({ selectedCity });
       void this.loadShops(true);
+    } else if (this.initialized) {
+      void this.refreshVisible();
+    }
+  },
+  onHide() {
+    this.saveSnapshot();
+  },
+  saveSnapshot() {
+    if (!this.data.categoryId) return;
+    discoveryState.save(this.data.categoryId, {
+      locationKey: this.locationKey,
+      keyword: this.data.keyword,
+      typeId: this.data.typeId,
+      sort: this.data.sort,
+      shops: this.data.loading ? [] : this.data.shops,
+      page: this.data.loading ? 1 : this.data.page,
+      hasMore: this.data.hasMore,
+      scrollTop: this.scrollTop,
+    });
+  },
+  onPageScroll(event: WechatMiniprogram.Page.IPageScrollOption) {
+    this.scrollTop = event.scrollTop;
+  },
+  toggleCategories() {
+    this.setData({ categoriesExpanded: !this.data.categoriesExpanded });
+  },
+  openVoucher(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
+    wx.navigateTo({ url: voucherProductUrl(event.detail.id) });
+  },
+  async refreshVisible() {
+    if (!this.cityCode || this.data.loading) return;
+    const sequence = ++this.requestSequence;
+    const state = cityStore.getState();
+    const pages = Math.max(1, this.data.page - 1);
+    this.setData({ loading: true });
+    try {
+      const results = await Promise.all(
+        Array.from({ length: pages }, (_, index) =>
+          loadShopPage({
+            cityCode: this.cityCode,
+            categoryId: this.data.categoryId || undefined,
+            productId: this.productId || undefined,
+            typeId: this.data.typeId || undefined,
+            keyword: this.data.keyword,
+            sort: this.productId ? "POPULAR" : this.data.sort,
+            page: index + 1,
+            size: PAGE_SIZE,
+            ...(state.selectionMode === "REAL_LOCATION"
+              ? { longitude: state.longitude, latitude: state.latitude }
+              : {}),
+          }),
+        ),
+      );
+      if (sequence !== this.requestSequence) return;
+      const shops = mergeShops(
+        [],
+        results.flatMap((result) => result.items),
+      );
+      this.setData({
+        shops,
+        hasMore: shops.length < (results[0]?.total || 0),
+        error: "",
+      });
+    } catch (error) {
+      if (sequence === this.requestSequence)
+        this.setData({
+          error: error instanceof Error ? error.message : "刷新失败",
+        });
+    } finally {
+      if (sequence === this.requestSequence) this.setData({ loading: false });
     }
   },
   onUnload() {
+    this.saveSnapshot();
+    ++this.requestSequence;
     this.scope?.close();
     if (this.searchTimer) clearTimeout(this.searchTimer);
   },
@@ -76,7 +164,7 @@ Page({
   async initialize() {
     const [cityResult, typeResult] = await Promise.allSettled([
       this.scope?.run(ensureDiscoveryContext()),
-      this.scope?.run(listShopTypes()),
+      this.scope?.run(listShopTypeTree()),
     ]);
     if (cityResult.status !== "fulfilled" || !cityResult.value) {
       this.setData({
@@ -88,18 +176,41 @@ Page({
       return;
     }
     const city = cityResult.value;
+    if (
+      !this.productId &&
+      (typeResult.status !== "fulfilled" || !typeResult.value)
+    ) {
+      this.setData({ loading: false, error: "分类加载失败，请重试" });
+      return;
+    }
     this.cityCode = city.code;
-    this.locationKey = `${city.selectionMode || "DEFAULT_CITY"}:${city.code}`;
+    this.locationKey = locationFingerprint();
     this.setData({
-      selectedCity: { code: city.code, name: city.name },
       types:
         typeResult.status === "fulfilled" && typeResult.value
-          ? typeResult.value.data || []
+          ? typeResult.value.data?.find(
+              (type) => type.id === this.data.categoryId,
+            )?.children || []
           : [],
       loading: false,
     });
     this.initialized = true;
-    await this.loadShops(true);
+    const cached = discoveryState.read(this.data.categoryId, this.locationKey);
+    if (cached) {
+      this.scrollTop = cached.scrollTop;
+      this.setData({
+        keyword: cached.keyword,
+        typeId: cached.typeId,
+        sort: cached.sort,
+        shops: cached.shops,
+        page: cached.page,
+        hasMore: cached.hasMore,
+      });
+      await this.refreshVisible();
+      wx.pageScrollTo({ scrollTop: cached.scrollTop, duration: 0 });
+    } else {
+      await this.loadShops(true);
+    }
   },
   async loadShops(reset: boolean) {
     if (!this.cityCode || (!reset && this.data.loading)) return;
@@ -115,10 +226,11 @@ Page({
       const result = await this.scope?.run(
         loadShopPage({
           cityCode: this.cityCode,
+          categoryId: this.data.categoryId || undefined,
           productId: this.productId || undefined,
           typeId: this.data.typeId || undefined,
           keyword: this.data.keyword,
-          sort: this.data.sort,
+          sort: this.productId ? "POPULAR" : this.data.sort,
           page,
           size: PAGE_SIZE,
           ...coordinates,
@@ -145,6 +257,7 @@ Page({
     }
   },
   onKeyword(event: WechatMiniprogram.CustomEvent) {
+    ++this.requestSequence;
     const detail = event.detail as unknown as string | { value: string };
     this.setData({
       keyword: typeof detail === "string" ? detail : detail.value,
@@ -165,90 +278,23 @@ Page({
   async selectSort(event: WechatMiniprogram.TouchEvent) {
     const sort = String(event.currentTarget.dataset.sort) as ShopSort;
     if (sort === this.data.sort) return;
-    if (sort === "DISTANCE") {
-      if (cityStore.getState().selectionMode !== "REAL_LOCATION") {
-        wx.showToast({ title: "恢复定位后可使用距离排序", icon: "none" });
-        return;
-      }
-      const location = cityStore.getState();
-      const ready =
-        location.locationStatus === "READY" &&
-        location.longitude !== undefined &&
-        location.latitude !== undefined;
-      const result = ready
-        ? { status: "READY" as const }
-        : await locateForNearby();
-      if (result.status !== "READY") {
-        this.setData({ sort: "POPULAR" });
-        wx.showToast({
-          title:
-            result.status === "DENIED"
-              ? "请在设置中开启定位权限"
-              : "定位失败，已切换综合排序",
-          icon: "none",
-        });
-        return;
-      }
+    const location = cityStore.getState();
+    if (
+      sort === "DISTANCE" &&
+      (location.selectionMode !== "REAL_LOCATION" ||
+        location.locationStatus !== "READY" ||
+        location.longitude === undefined ||
+        location.latitude === undefined)
+    ) {
+      wx.showToast({ title: "请先在首页开启定位", icon: "none" });
+      return;
     }
     this.setData({ sort });
     await this.loadShops(true);
   },
   retry() {
-    void this.loadShops(true);
-  },
-  async openCityPicker() {
-    if (this.data.cityLoading) return;
-    this.setData({ cityLoading: true });
-    try {
-      const cities = await this.scope?.run(loadAvailableCities());
-      if (cities) {
-        const location = cityStore.getState();
-        this.setData({
-          cities: cities.map((city) => ({
-            ...city,
-            isCurrentLocation:
-              location.selectionMode === "REAL_LOCATION" &&
-              location.selectedCity?.code === city.code,
-          })),
-          cityPickerVisible: true,
-        });
-      }
-    } catch (error) {
-      wx.showToast({
-        title: error instanceof Error ? error.message : "城市列表加载失败",
-        icon: "none",
-      });
-    } finally {
-      this.setData({ cityLoading: false });
-    }
-  },
-  closeCityPicker() {
-    this.setData({ cityPickerVisible: false });
-  },
-  noop() {},
-  selectCity(event: WechatMiniprogram.TouchEvent) {
-    const code = String(event.currentTarget.dataset.code || "");
-    const city = this.data.cities.find((item) => item.code === code);
-    if (!city) return;
-    const currentLocation = cityStore.getState();
-    // 再次选择当前真实定位城市时保持 REAL_LOCATION，继续支持距离能力。
-    if (
-      currentLocation.selectionMode === "REAL_LOCATION" &&
-      currentLocation.selectedCity?.code === city.code
-    ) {
-      this.setData({ cityPickerVisible: false });
-      return;
-    }
-    cityStore.select(city);
-    syncCityPreference(city.code);
-    this.cityCode = city.code;
-    this.locationKey = `${cityStore.getState().selectionMode}:${city.code}`;
-    this.setData({
-      selectedCity: city,
-      cityPickerVisible: false,
-      ...(this.data.sort === "DISTANCE" ? { sort: "POPULAR" } : {}),
-    });
-    void this.loadShops(true);
+    if (!this.initialized) void this.initialize();
+    else void this.loadShops(true);
   },
   openShop(event: WechatMiniprogram.CustomEvent<{ id: string }>) {
     wx.navigateTo({ url: shopDetailUrl(event.detail.id) });
@@ -270,6 +316,7 @@ Page({
   initialized: false,
   locationKey: "",
   requestSequence: 0,
+  scrollTop: 0,
   searchTimer: undefined as ReturnType<typeof setTimeout> | undefined,
 });
 

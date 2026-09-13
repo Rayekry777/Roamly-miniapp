@@ -2,12 +2,16 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("团购改版页面契约", () => {
-  it("附近页使用商品流和四种排序", () => {
+  it("附近页只提供分类入口，分类页使用店铺卡片", () => {
     const view = readFileSync("miniprogram/pages/nearby/index.wxml", "utf8");
-    const logic = readFileSync("miniprogram/pages/nearby/index.ts", "utf8");
-    expect(view).toContain("voucher-product-card");
-    expect(view).toContain('data-sort="PRICE_ASC"');
-    expect(logic).toContain("loadVoucherProductPage");
+    const shops = readFileSync(
+      "miniprogram/package-shop/pages/list/index.wxml",
+      "utf8",
+    );
+    expect(view).toContain("openCategory");
+    expect(view).not.toContain("voucher-product-card");
+    expect(shops).toContain("shop-card");
+    expect(shops).toContain("openVoucher");
   });
 
   it("详情和确认页保留固定购买/提交栏及错误重试", () => {
@@ -33,8 +37,8 @@ describe("团购改版页面契约", () => {
     expect(confirm).toContain("应付金额");
     expect(confirm).not.toContain("活动优惠");
     expect(confirm).toContain("payment-card");
-    expect(detailLogic).toContain("orderConfirmUrl");
-    expect(detailLogic).toContain("确认订单页打开失败，请重试");
+    expect(detailLogic).toContain("confirmOpen: true");
+    expect(detailLogic).toContain("refreshConfirmation(1)");
     expect(detailLogic).toContain("shopListUrl({ productId");
     expect(detailLogic).toContain("voucherNoticeUrl");
     expect(notice).toContain("购买须知");

@@ -1,21 +1,18 @@
-<view
-  class="shop-card {{compact ? 'shop-card--compact' : ''}} pressable"
-  bind:tap="onSelect"
-  aria-role="button"
-  aria-label="查看{{shop.name}}商户详情"
->
-  <view wx:if="{{!compact}}" class="cover-wrap">
-    <app-image wx:if="{{shop.cover}}" src="{{shop.cover}}" custom-class="cover" mode="aspectFill" />
-    <view wx:else class="cover cover--empty"><t-icon name="shop" size="44rpx" /></view>
-  </view>
-  <view class="content">
-    <view class="title">{{shop.name}}</view>
-    <view class="rating">
-      <text class="stars">{{scoreStars}}</text>
-      {{scoreText}} 分
+<view class="shop-card" bind:tap="onSelect" aria-role="button" aria-label="查看{{shop.name}}店铺详情">
+  <view class="shop-main">
+    <view class="shop-cover-wrap"><app-image src="{{shop.cover}}" custom-class="shop-cover" mode="aspectFill" /></view>
+    <view class="shop-content">
+      <view class="shop-title">{{shop.name}}</view>
+      <view class="shop-rating"><text>{{shop.comments ? scoreText + '分' : '暂无评分'}}</text><text class="shop-sales">已售{{shop.soldCount === undefined ? shop.sold : shop.soldCount}}份</text></view>
+      <view class="shop-meta">{{shop.typeName || ''}} {{shop.area || shop.address || '地址待补充'}}</view>
+      <view class="shop-bottom"><text>{{shop.distance === undefined ? '' : '直线 ' + shop.distanceText}}</text><view wx:if="{{shop.longitude != null && shop.latitude != null}}" catch:tap="onNavigate" class="shop-navigation">导航 ›</view></view>
     </view>
-    <view class="meta">{{shop.address || shop.area || "地址信息暂缺"}}</view>
-    <view class="meta">{{shop.openHours || "营业时间暂未提供"}}{{shop.distanceText ? ' · ' + shop.distanceText : ''}}</view>
   </view>
-  <view wx:if="{{shop.longitude != null && shop.latitude != null}}" class="shop-actions"><view catch:tap="onNavigate"><t-icon name="location" size="42rpx" /><text>导航</text></view></view>
+  <view wx:if="{{shop.vouchers !== undefined}}" class="shop-vouchers">
+    <view wx:for="{{shop.vouchers}}" wx:key="id" class="voucher-row" data-id="{{item.id}}" catch:tap="onVoucher" aria-role="button" aria-label="查看{{item.title}}">
+      <text class="voucher-kind">{{item.typeLabel}}</text><text class="voucher-price">¥{{item.priceText}}</text><text wx:if="{{item.originalText}}" class="voucher-original">¥{{item.originalText}}</text><text class="voucher-title">{{item.title}}</text>
+    </view>
+    <view wx:if="{{!shop.vouchers.length}}" class="no-vouchers">暂无在售优惠</view>
+    <view wx:if="{{shop.availableVoucherCount > 2}}" class="more-vouchers">全部{{shop.availableVoucherCount}}款优惠 ›</view>
+  </view>
 </view>

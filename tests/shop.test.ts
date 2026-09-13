@@ -1,11 +1,38 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getShop, listShopPosts, listShops } from "../miniprogram/api/shop";
+import {
+  discoverShops,
+  getShop,
+  listShopPosts,
+  listShops,
+} from "../miniprogram/api/shop";
 
 const requestMock = vi.hoisted(() => vi.fn());
 
 vi.mock("../miniprogram/utils/request", () => ({ request: requestMock }));
 
 describe("shop requests", () => {
+  it("omits absent discovery filters instead of serializing undefined", async () => {
+    await discoverShops({
+      cityCode: "330100",
+      categoryId: "1",
+      sort: "RECOMMENDED",
+      typeId: undefined,
+      keyword: "  ",
+      longitude: undefined,
+      latitude: undefined,
+    });
+    expect(requestMock).toHaveBeenCalledWith("/v1/shops/discovery", {
+      data: {
+        cityCode: "330100",
+        categoryId: "1",
+        sort: "RECOMMENDED",
+        page: 1,
+        size: 10,
+      },
+      auth: "public",
+      showError: false,
+    });
+  });
   beforeEach(() => {
     requestMock.mockReset();
     requestMock.mockResolvedValue({

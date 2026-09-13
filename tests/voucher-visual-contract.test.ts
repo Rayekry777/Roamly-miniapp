@@ -16,18 +16,19 @@ function appearsInOrder(source: string, ...markers: string[]) {
 }
 
 describe("团购券参考图视觉层级契约", () => {
-  it("附近页按头部、筛选、商品流顺序排列", () => {
-    const nearby = read("miniprogram/pages/nearby/index.wxml");
+  it("附近目录先标题后分类，店铺页先分类后列表", () => {
     appearsInOrder(
-      nearby,
-      "nearby-header",
-      "type-scroll",
-      "nearby-filter-row",
-      "product-list",
+      read("miniprogram/pages/nearby/index.wxml"),
+      "services-heading",
+      "services-grid",
     );
-    expect(nearby).not.toContain('bind:tap="openNearbyShops"');
-    expect(nearby).toContain('bind:tap="retryLocation"');
-    expect(nearby).toContain('<app-image src="{{item.icon}}" kind="category"');
+    appearsInOrder(
+      read("miniprogram/package-shop/pages/list/index.wxml"),
+      "shop-list-toolbar",
+      "category-grid",
+      "sort-row",
+      'wx:else class="shop-list"',
+    );
   });
 
   it("商品详情按首图、摘要、须知、门店和购买栏排列", () => {

@@ -21,6 +21,11 @@ Component({
     },
   },
   methods: {
+    onVoucher(event: WechatMiniprogram.TouchEvent) {
+      this.triggerEvent("voucher", {
+        id: String(event.currentTarget.dataset.id),
+      });
+    },
     onSelect() {
       this.triggerEvent("select", { id: (this.data.shop as Shop).id });
     },

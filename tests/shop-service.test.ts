@@ -8,6 +8,8 @@ import {
 const shopApiMock = vi.hoisted(() => ({
   listShops: vi.fn(),
   listShopTypes: vi.fn(),
+  listShopTypeTree: vi.fn(),
+  discoverShops: vi.fn(),
   listVouchers: vi.fn(),
   getShop: vi.fn(),
   listShopPosts: vi.fn(),

@@ -35,7 +35,10 @@ Page({
     void this.loadShop();
   },
   onShow() {
-    if (this.loaded && this.shopId) void this.loadShop();
+    if (this.loaded && this.shopId) {
+      void this.loadShop();
+      if (this.data.voucherStatus !== "IDLE") void this.loadVouchers();
+    }
   },
   onUnload() {
     this.scope?.close();

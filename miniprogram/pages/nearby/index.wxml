@@ -1,102 +1,14 @@
-<app-navbar title="" back="{{false}}" transparent="{{true}}" />
-
-<view class="nearby-page page-enter">
-  <view class="nearby-header">
-    <view class="nearby-location-placeholder" aria-hidden="true"></view>
-    <view class="nearby-location-a11y" bind:tap="retryLocation" aria-role="button" aria-label="重新定位">重新定位</view>
-    <view class="nearby-search">
-      <t-search value="{{keyword}}" shape="round" placeholder="搜索商品或商户" bind:change="onKeyword" bind:submit="search" />
-      <view class="nearby-scan" aria-label="扫码"><t-icon name="scan" size="34rpx" /></view>
-      <view class="nearby-search-button" bind:tap="search">搜索</view>
+<app-navbar title="附近" back="{{false}}" />
+<view class="services-page">
+  <view class="services-heading">发现身边好店</view>
+  <view class="services-caption">吃点好的，找点好玩的</view>
+  <view wx:if="{{loading}}" class="services-loading">正在加载…</view>
+  <app-empty wx:elif="{{error}}" description="{{error}}" action-text="重试" bind:action="load" />
+  <view wx:else class="services-grid">
+    <view wx:for="{{categories}}" wx:key="id" class="service-entry" data-id="{{item.id}}" bind:tap="openCategory" aria-role="button" aria-label="进入{{item.name}}">
+      <view class="service-icon {{item.id === '1' ? 'service-icon--food' : 'service-icon--play'}}"><app-image src="{{item.icon}}" kind="category" mode="aspectFit" custom-class="service-image" /></view>
+      <view class="service-name">{{item.name}}</view>
+      <view class="service-hint">{{item.id === '1' ? '餐厅 · 小吃 · 咖啡' : '放松 · 聚会 · 玩乐'}}</view>
     </view>
-  </view>
-
-  <scroll-view class="type-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-    <view class="chip-row">
-      <view
-        class="chip {{!typeId ? 'chip--active' : ''}}"
-        data-id=""
-        bind:tap="selectType"
-      >
-        <app-image src="" kind="category" mode="aspectFit" custom-class="chip-icon" />
-        <text>全部</text>
-      </view>
-      <view
-        wx:for="{{types}}"
-        wx:key="id"
-        class="chip {{item.id === typeId ? 'chip--active' : ''}}"
-        data-id="{{item.id}}"
-        bind:tap="selectType"
-      >
-        <app-image src="{{item.icon}}" kind="category" mode="aspectFit" custom-class="chip-icon" />
-        <text>{{item.name}}</text>
-      </view>
-    </view>
-  </scroll-view>
-
-  <view class="nearby-filter-row">
-    <view
-      class="nearby-sort {{sort === 'RECOMMENDED' ? 'nearby-sort--active' : ''}}"
-      data-sort="RECOMMENDED"
-      bind:tap="selectSort"
-    >
-      综合
-    </view>
-    <view
-      class="nearby-sort {{sort === 'SALES' ? 'nearby-sort--active' : ''}}"
-      data-sort="SALES"
-      bind:tap="selectSort"
-    >
-      销量
-    </view>
-    <view
-      class="nearby-sort {{sort === 'DISTANCE' ? 'nearby-sort--active' : ''}}"
-      data-sort="DISTANCE"
-      bind:tap="selectSort"
-    >
-      距离
-    </view>
-    <view
-      class="nearby-sort {{sort === 'PRICE_ASC' ? 'nearby-sort--active' : ''}}"
-      data-sort="PRICE_ASC"
-      bind:tap="selectSort"
-    >
-      价格最低
-    </view>
-  </view>
-
-  <view wx:if="{{loading && !products.length}}" class="product-skeletons">
-    <view wx:for="{{[1, 2, 3]}}" wx:key="*this" class="shop-skeleton roamly-panel">
-      <t-skeleton theme="avatar" row-col="{{[1, 1, 1]}}" loading />
-    </view>
-  </view>
-
-  <app-empty
-    wx:elif="{{error && !products.length}}"
-    description="{{error}}"
-    action-text="重新加载"
-    bind:action="retry"
-  />
-
-  <app-empty
-    wx:elif="{{!products.length}}"
-    description="当前筛选下没有找到可购买的商品"
-  />
-
-  <view wx:else class="product-list">
-    <voucher-product-card
-      wx:for="{{products}}"
-      wx:key="itemKey"
-      item="{{item}}"
-      bind:select="openProduct"
-    />
-    <view wx:if="{{loading}}" class="list-footer">
-      <t-loading size="38rpx" />
-      正在加载更多
-    </view>
-    <view wx:elif="{{error}}" class="list-footer list-footer--error" bind:tap="retry">
-      {{error}}，点击重试
-    </view>
-    <view wx:elif="{{!hasMore}}" class="list-footer">已经逛到底了</view>
   </view>
 </view>
