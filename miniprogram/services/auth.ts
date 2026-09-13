@@ -51,11 +51,6 @@ export async function requestAuthCode(
   await userApi.sendCode(phone, scene);
 }
 
-/** 兼容旧页面调用，默认申请登录验证码。 */
-export function requestLoginCode(phone: string): Promise<void> {
-  return requestAuthCode(phone, "LOGIN");
-}
-
 export async function signOut(): Promise<void> {
   try {
     await userApi.logout();

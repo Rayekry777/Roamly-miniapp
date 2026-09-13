@@ -4,9 +4,7 @@ import type {
   PostCardResponse,
   PostCreateRequest,
   PostDetailResponse,
-  PostUpdateRequest,
   Result,
-  UserSummary,
 } from "../types";
 import { request } from "../utils/request";
 
@@ -25,19 +23,6 @@ export const getPost = (postId: string): Promise<Result<PostDetailResponse>> =>
     auth: "optional",
     showError: false,
   });
-
-export const updatePost = (
-  postId: string,
-  data: PostUpdateRequest,
-): Promise<Result<PostDetailResponse>> =>
-  request(`/v1/posts/${postId}`, {
-    method: "PUT",
-    data,
-    dedupe: false,
-  });
-
-export const deletePost = (postId: string): Promise<Result<null>> =>
-  request(`/v1/posts/${postId}`, { method: "DELETE", dedupe: false });
 
 export const listMyPosts = (
   page = 1,
@@ -62,14 +47,4 @@ export const unlikePost = (postId: string): Promise<Result<null>> =>
   request(`/v1/posts/${postId}/like`, {
     method: "DELETE",
     dedupe: false,
-  });
-
-export const listPostLikes = (
-  postId: string,
-  page = 1,
-  size = 10,
-): Promise<Result<PageResult<UserSummary>>> =>
-  request(`/v1/posts/${postId}/likes`, {
-    data: { page, size },
-    auth: "public",
   });

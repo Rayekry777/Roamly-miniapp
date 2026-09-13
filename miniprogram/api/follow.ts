@@ -1,4 +1,4 @@
-import type { Result, UserDTO } from "../types";
+import type { Result } from "../types";
 import { request } from "../utils/request";
 export async function checkFollow(id: string): Promise<Result<boolean>> {
   const r = await request<{ following: boolean }>(
@@ -14,5 +14,3 @@ export const followUser = (
     method: follow ? "PUT" : "DELETE",
     dedupe: false,
   });
-export const commonFollows = (id: string): Promise<Result<UserDTO[]>> =>
-  request(`/v1/users/${id}/common-following`);

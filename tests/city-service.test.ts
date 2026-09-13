@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { locateForNearby } from "../miniprogram/services/city";
+import { ensureRealLocation } from "../miniprogram/services/city";
 import { cityStore } from "../miniprogram/store/city";
 
-describe("nearby location service", () => {
+describe("homepage location service", () => {
   beforeEach(() => {
     vi.stubGlobal("wx", {
       setStorageSync: vi.fn(),
@@ -42,8 +42,8 @@ describe("nearby location service", () => {
       return undefined as never;
     });
 
-    await expect(locateForNearby()).resolves.toEqual({
-      status: "READY",
+    await expect(ensureRealLocation(true)).resolves.toMatchObject({
+      selectionMode: "REAL_LOCATION",
       longitude: 120.1,
       latitude: 30.2,
     });
@@ -61,7 +61,9 @@ describe("nearby location service", () => {
       return undefined as never;
     });
 
-    await expect(locateForNearby()).resolves.toEqual({ status: "DENIED" });
+    await expect(ensureRealLocation(true)).rejects.toMatchObject({
+      errMsg: "getLocation:fail auth deny",
+    });
     expect(cityStore.getState()).toEqual({
       selectedCity: { code: "330100", name: "杭州" },
       locationStatus: "DENIED",
@@ -75,7 +77,7 @@ describe("nearby location service", () => {
       return undefined as never;
     });
 
-    await expect(locateForNearby()).resolves.toEqual({ status: "FAILED" });
+    await expect(ensureRealLocation(true)).rejects.toBeDefined();
     expect(cityStore.getState().locationStatus).toBe("FAILED");
   });
 
@@ -86,14 +88,14 @@ describe("nearby location service", () => {
       return undefined as never;
     });
 
-    const locating = locateForNearby();
+    const locating = ensureRealLocation(true);
     cityStore.select({ code: "310100", name: "上海" });
     success?.({
       longitude: 120.1,
       latitude: 30.2,
     } as WechatMiniprogram.GetLocationSuccessCallbackResult);
 
-    await expect(locating).resolves.toEqual({ status: "FAILED" });
+    await expect(locating).rejects.toBeDefined();
     expect(cityStore.getState()).toEqual({
       selectedCity: { code: "310100", name: "上海" },
       locationStatus: "IDLE",

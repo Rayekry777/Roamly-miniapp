@@ -151,9 +151,6 @@ export async function ensureRealLocation(
   return locatingPromise;
 }
 
-/** 兼容旧调用方；新发现页面应使用 ensureDiscoveryContext。 */
-export const ensureLocatedCity = ensureRealLocation;
-
 export async function loadAvailableCities(): Promise<City[]> {
   const result = await listCities();
   if (!Array.isArray(result.data)) {
@@ -165,25 +162,6 @@ export async function loadAvailableCities(): Promise<City[]> {
 export function syncCityPreference(cityCode: string): void {
   if (!authStore.isLoggedIn() || !cityCode) return;
   void updateCityPreference(cityCode).catch(() => undefined);
-}
-
-export async function locateForNearby(): Promise<{
-  status: "READY" | "DENIED" | "FAILED";
-  longitude?: number;
-  latitude?: number;
-}> {
-  try {
-    const context = await ensureRealLocation(true);
-    return {
-      status: "READY",
-      longitude: context.longitude,
-      latitude: context.latitude,
-    };
-  } catch (error) {
-    const denied = isLocationDenied(error);
-    const status = denied ? "DENIED" : "FAILED";
-    return { status };
-  }
 }
 
 function requestLocation(): Promise<{

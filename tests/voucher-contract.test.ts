@@ -9,7 +9,7 @@ import {
   listMyOrders,
   prepareMyOrderPayment,
 } from "../miniprogram/api/order";
-import { requestVoucherRefund } from "../miniprogram/api/refund";
+import { requestOrderRefund } from "../miniprogram/api/refund";
 import {
   loadVoucherProduct,
   normalizeVoucherProduct,
@@ -113,16 +113,25 @@ describe("voucher, order and wallet contracts", () => {
     });
   });
 
-  it("forces refund requests to the single-voucher contract", async () => {
-    await requestVoucherRefund(
-      "voucher-1",
-      { reasonCode: "OTHER", description: "说明", quantity: 9 },
+  it("uses selected vouchers for the current order refund contract", async () => {
+    await requestOrderRefund(
+      {
+        orderId: "order-1",
+        voucherIds: ["voucher-1"],
+        reasonCode: "OTHER",
+        description: "说明",
+      },
       "refund-contract-1",
     );
     expect(requestMock).toHaveBeenCalledWith(
-      "/v1/users/me/vouchers/voucher-1/refunds",
+      "/v1/users/me/refunds",
       expect.objectContaining({
-        data: { reasonCode: "OTHER", description: "说明", quantity: 1 },
+        data: {
+          orderId: "order-1",
+          voucherIds: ["voucher-1"],
+          reasonCode: "OTHER",
+          description: "说明",
+        },
       }),
     );
   });

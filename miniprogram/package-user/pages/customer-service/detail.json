@@ -3,7 +3,6 @@
   "usingComponents": {
     "app-navbar": "../../../components/app-navbar/index",
     "app-empty": "../../../components/app-empty/index",
-    "t-loading": "tdesign-miniprogram/loading/loading",
-    "t-icon": "tdesign-miniprogram/icon/icon"
+    "t-loading": "tdesign-miniprogram/loading/loading"
   }
 }

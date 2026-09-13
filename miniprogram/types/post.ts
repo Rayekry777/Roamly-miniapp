@@ -116,5 +116,3 @@ export interface PostCreateRequest {
   latitude?: number;
   locationLabel?: string;
 }
-
-export type PostUpdateRequest = PostCreateRequest;
