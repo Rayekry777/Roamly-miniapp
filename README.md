@@ -65,3 +65,5 @@ npm run verify
 `build:npm` 会生成微信运行所需的 `miniprogram/miniprogram_npm`。仓库中的 `project.config.json` 使用游客 AppID，真实 AppID 写入被 Git 忽略的 `project.private.config.json`，不要提交真实值。
 
 真机联调时，手机和电脑需在同一局域网；开发版可访问本机 `8081` 服务，并在开发者工具中关闭合法域名校验。开发环境地址或网络变化后，同步调整 `deviceDevelopEnvironment`。
+
+计费与补贴计算统一见 [计费、补贴与结算计算细节](../Roamly/docs/project-details/计费、补贴与结算计算细节.md)，页面操作说明继续维护在本项目对应细节文档。
