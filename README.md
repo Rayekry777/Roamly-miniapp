@@ -14,7 +14,7 @@ Roamly 消费者端是原生微信小程序，负责内容浏览、本地生活�
 
 ## 核心解决方案
 
-### 分层与统一数据契约
+### 分层与统一数据模型
 
 - `api` 只负责 `/v1` HTTP 调用，`services` 负责业务编排和请求参数归一化，`store` 管理跨页面状态，页面只处理交互和展示。
 - 请求层统一注入 `Authorization: Bearer <token>`，将成功响应转换为 `Result` 数据，将错误转换为带业务码的 `ApiError`；204 统一转换为 `data: null`。
@@ -52,7 +52,7 @@ miniprogram
 └─ package-*       用户、内容、门店、订单、券包等业务分包
 ```
 
-详细页面边界、接口消费约定和验收标准见[消费者小程序契约](docs/MINIAPP_DEVELOPMENT.md)；跨端接口与交易规则见[后端 README](../Roamly/README.md)，整体实施顺序见[四端交付路线图](../Roamly/docs/roadmap/FOUR_END_DELIVERY_ROADMAP.md)。
+详细页面边界、接口消费和验收标准见[消费者端功能细节说明](docs/消费者端功能细节说明.md)，团购页面视觉参考见[团购券页面视觉对比说明](docs/团购券页面视觉对比说明.md)；跨端接口与交易规则见[后端 README](../Roamly/README.md)。
 
 ## 本地开发与验证
 
