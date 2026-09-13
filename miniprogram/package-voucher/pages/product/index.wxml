@@ -67,7 +67,7 @@
 <view wx:if="{{product}}" class="purchase-bar">
   <view class="store-action pressable" bind:tap="openShop"><t-icon name="shop" size="38rpx" /><text>门店</text></view>
   <view class="buy-action pressable {{product.status !== 'ON_SALE' ? 'buy-action--disabled' : ''}}" aria-disabled="{{product.status !== 'ON_SALE'}}" bind:tap="openConfirm">
-    <text class="buy-action__label">{{product.status === 'ON_SALE' ? (navigating ? '正在前往…' : '立即购买') : product.saleStatusLabel}}</text>
+    <text class="buy-action__label">{{product.status === 'ON_SALE' ? '立即购买' : product.saleStatusLabel}}</text>
     <text wx:if="{{product.status === 'ON_SALE'}}" class="buy-action__price">¥{{product.payAmountText}}</text>
   </view>
 </view>
@@ -92,10 +92,12 @@
       <view class="confirm-amount">
         <view class="confirm-amount__row confirm-amount__row--total"><text>商品总价 <text class="confirm-subtle">(共{{confirmation ? confirmation.quantity : confirmQuantity}}件)</text></text><text>¥{{confirmation ? confirmation.totalAmountText : product.payAmountText}}</text></view>
         <view class="confirm-divider"></view>
-        <view class="confirm-dropdown" bind:tap="toggleConfirmSection" data-section="promotion"><text>活动优惠</text><view><text>暂无可用</text><t-icon name="{{confirmExpandedSection === 'promotion' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view></view>
-        <view wx:if="{{confirmExpandedSection === 'promotion'}}" class="confirm-dropdown__detail">当前没有可用活动优惠</view>
-        <view class="confirm-dropdown" bind:tap="toggleConfirmSection" data-section="coupon"><text>优惠券</text><view><text>暂无可用</text><t-icon name="{{confirmExpandedSection === 'coupon' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view></view>
-        <view wx:if="{{confirmExpandedSection === 'coupon'}}" class="confirm-dropdown__detail">当前没有可用优惠券</view>
+        <view class="confirm-dropdown" bind:tap="toggleConfirmSection" data-section="promotion"><text>活动优惠</text><view><text>{{confirmation ? (confirmation.hasPromotion ? '-¥' + confirmation.promotionAmountText : '暂无优惠') : '待确认'}}</text><t-icon name="{{confirmExpandedSection === 'promotion' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view></view>
+        <view wx:if="{{confirmExpandedSection === 'promotion' && confirmation}}" class="confirm-dropdown__detail">
+          <view wx:if="{{confirmation.merchantSubsidyAmount > 0}}" class="confirm-dropdown"><text>商家补贴</text><text>-¥{{confirmation.merchantSubsidyAmountText}}</text></view>
+          <view wx:if="{{confirmation.platformDiscountAmount > 0}}" class="confirm-dropdown"><text>平台补贴</text><text>-¥{{confirmation.platformDiscountAmountText}}</text></view>
+          <text wx:if="{{!confirmation.hasPromotion}}">暂无活动优惠</text>
+        </view>
         <view class="confirm-amount__subtotal"><text>小计</text><text>¥{{confirmation ? confirmation.payAmountText : product.payAmountText}}</text></view>
       </view>
       <view class="confirm-payment" bind:tap="toggleConfirmSection" data-section="payment"><text>支付方式</text><view><text>Mock 支付</text><t-icon name="{{confirmExpandedSection === 'payment' ? 'chevron-up' : 'chevron-down'}}" size="28rpx" /></view></view>

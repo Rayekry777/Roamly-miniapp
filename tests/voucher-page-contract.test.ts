@@ -35,7 +35,12 @@ describe("团购改版页面契约", () => {
     expect(detail).toContain("购买须知");
     expect(confirm).toContain("submit-bar");
     expect(confirm).toContain("应付金额");
-    expect(confirm).not.toContain("活动优惠");
+    for (const view of [confirm, detail]) {
+      expect(view).not.toContain('data-section="coupon"');
+      expect(view).toContain("商家补贴");
+      expect(view).toContain("平台补贴");
+      expect(view).toContain("confirmation.promotionAmountText");
+    }
     expect(confirm).toContain("payment-card");
     expect(detailLogic).toContain("confirmOpen: true");
     expect(detailLogic).toContain("refreshConfirmation(1)");

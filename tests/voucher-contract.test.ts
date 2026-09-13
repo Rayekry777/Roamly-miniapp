@@ -15,6 +15,7 @@ import {
   normalizeVoucherProduct,
 } from "../miniprogram/services/voucher-product";
 import {
+  confirmOrder,
   loadMyOrders,
   loadMyOrder,
   normalizeOrder,
@@ -30,6 +31,39 @@ describe("voucher, order and wallet contracts", () => {
     requestMock.mockResolvedValue({ code: "OK", message: "ok", data: null });
   });
 
+  it("shows quantity-total subsidy breakdown without changing server payment", async () => {
+    requestMock.mockResolvedValue({
+      data: {
+        productId: "1",
+        shopId: "2",
+        quantity: 2,
+        totalAmount: 20000,
+        payAmount: 17000,
+        merchantSubsidyAmount: 2000,
+        platformDiscountAmount: 1000,
+      },
+    });
+    const result = await confirmOrder("1", 2);
+    expect(result).toMatchObject({
+      merchantSubsidyAmountText: "20.00",
+      platformDiscountAmountText: "10.00",
+      promotionAmountText: "30.00",
+      payAmountText: "170.00",
+      hasPromotion: true,
+    });
+    requestMock.mockResolvedValue({
+      data: {
+        productId: "1",
+        shopId: "2",
+        totalAmount: 10000,
+        payAmount: 10000,
+      },
+    });
+    expect(await confirmOrder("1", 1)).toMatchObject({
+      hasPromotion: false,
+      promotionAmountText: "0.00",
+    });
+  });
 
   it("uses target voucher product paths and public auth", async () => {
     await listVoucherProducts("9007199254740993");

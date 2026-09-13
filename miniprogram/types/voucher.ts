@@ -402,6 +402,12 @@ export interface VoucherOrderConfirmation {
   maxQuantity: number;
   totalAmount: number;
   payAmount: number;
+  merchantSubsidyAmount: number;
+  platformDiscountAmount: number;
+  merchantSubsidyAmountText: string;
+  platformDiscountAmountText: string;
+  promotionAmountText: string;
+  hasPromotion: boolean;
   availableStock: number;
   serverTime: string;
   paymentExpireTime: string;

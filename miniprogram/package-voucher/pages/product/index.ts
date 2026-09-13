@@ -25,7 +25,6 @@ Page({
     related: [] as VoucherProductListItem[],
     loading: true,
     error: "",
-    navigating: false,
     confirmOpen: false,
     confirmLoading: false,
     confirmError: "",
@@ -34,7 +33,7 @@ Page({
       | import("../../../types").VoucherOrderConfirmation
       | null,
     confirmQuantity: 1,
-    confirmExpandedSection: "" as "promotion" | "coupon" | "payment" | "",
+    confirmExpandedSection: "" as "promotion" | "payment" | "",
     confirmSubmitting: false,
   },
   onLoad(options) {
@@ -45,9 +44,6 @@ Page({
       return;
     }
     void this.loadProduct();
-  },
-  onShow() {
-    this.setData({ navigating: false });
   },
   onUnload() {
     this.scope?.close();
@@ -94,10 +90,7 @@ Page({
   },
   openConfirm() {
     const product = this.data.product;
-    if (this.data.navigating || !product || product.status !== "ON_SALE")
-      return;
-    // 购买确认现在以内嵌底部面板呈现，深链仍可直接打开 orderConfirmUrl 页面。
-    // 旧版路由失败提示“确认订单页打开失败，请重试”仅保留在深链场景。
+    if (!product || product.status !== "ON_SALE") return;
     if (!requireLogin()) return;
     this.setData({
       confirmOpen: true,
@@ -144,12 +137,12 @@ Page({
   },
   toggleConfirmSection(event: WechatMiniprogram.TouchEvent) {
     const section = String(event.currentTarget.dataset.section || "");
-    if (!["promotion", "coupon", "payment"].includes(section)) return;
+    if (!["promotion", "payment"].includes(section)) return;
     this.setData({
       confirmExpandedSection:
         this.data.confirmExpandedSection === section
           ? ""
-          : (section as "promotion" | "coupon" | "payment"),
+          : (section as "promotion" | "payment"),
     });
   },
   confirmDecrease() {

@@ -58,6 +58,16 @@ function normalizeConfirmation(
     maxQuantity: Number(value.maxQuantity) || 1,
     totalAmount,
     payAmount,
+    merchantSubsidyAmount: Number(value.merchantSubsidyAmount) || 0,
+    platformDiscountAmount: Number(value.platformDiscountAmount) || 0,
+    merchantSubsidyAmountText: formatAmount(value.merchantSubsidyAmount || 0),
+    platformDiscountAmountText: formatAmount(value.platformDiscountAmount || 0),
+    promotionAmountText: formatAmount(
+      (value.merchantSubsidyAmount || 0) + (value.platformDiscountAmount || 0),
+    ),
+    hasPromotion:
+      (value.merchantSubsidyAmount || 0) + (value.platformDiscountAmount || 0) >
+      0,
     availableStock: Number(value.availableStock) || 0,
     unitAmountText: formatAmount(value.unitAmount),
     totalAmountText: formatAmount(totalAmount),

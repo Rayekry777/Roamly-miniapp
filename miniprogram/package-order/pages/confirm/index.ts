@@ -29,7 +29,7 @@ Page({
     error: "",
     confirmationErrorTitle: "",
     promotionLabel: "活动优惠",
-    expandedSection: "" as "promotion" | "coupon" | "payment" | "",
+    expandedSection: "" as "promotion" | "payment" | "",
     fallbackTotalAmountText: "0.00",
     fallbackPayAmountText: "0.00",
   },
@@ -123,12 +123,12 @@ Page({
   },
   toggleSection(event: WechatMiniprogram.TouchEvent) {
     const section = String(event.currentTarget.dataset.section || "");
-    if (!["promotion", "coupon", "payment"].includes(section)) return;
+    if (!["promotion", "payment"].includes(section)) return;
     this.setData({
       expandedSection:
         this.data.expandedSection === section
           ? ""
-          : (section as "promotion" | "coupon" | "payment"),
+          : (section as "promotion" | "payment"),
     });
   },
   openShop() {
