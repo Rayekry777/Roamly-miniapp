@@ -28,4 +28,6 @@ page { min-height: 100%; color: var(--roamly-text); background: var(--roamly-bg)
 .city-picker__close { color: var(--roamly-muted); }
 .city-picker__list { max-height: 56vh; margin-top: 20rpx; padding-bottom: calc(24rpx + env(safe-area-inset-bottom)); box-sizing: border-box; }
 .city-picker__item { padding: 24rpx 8rpx; border-bottom: 1rpx solid var(--roamly-border); color: var(--roamly-text); font-size: 28rpx; }
+.city-picker__item--disabled { color: var(--roamly-muted); }
+.city-picker__current { display: flex; align-items: center; gap: 6rpx; color: var(--roamly-muted); font-size: 22rpx; }
 @keyframes roamly-page-in { from { transform: translateY(12rpx); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

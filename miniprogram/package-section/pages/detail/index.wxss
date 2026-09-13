@@ -228,3 +228,5 @@
   color: var(--roamly-primary);
   font-weight: 700;
 }
+.city-picker__item--disabled { color: var(--roamly-muted); }
+.city-picker__current { display: flex; align-items: center; gap: 6rpx; margin-left: auto; margin-right: 16rpx; color: var(--roamly-muted); font-size: 22rpx; }

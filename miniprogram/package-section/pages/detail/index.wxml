@@ -152,11 +152,12 @@
       <view
         wx:for="{{cities}}"
         wx:key="code"
-        class="city-picker__item {{item.code === selectedCity.code ? 'city-picker__item--active' : ''}}"
+        class="city-picker__item {{item.code === selectedCity.code ? 'city-picker__item--active' : ''}} {{item.isCurrentLocation ? 'city-picker__item--disabled' : ''}}"
         data-code="{{item.code}}"
         bind:tap="selectCity"
       >
         <text>{{item.name}}</text>
+        <view wx:if="{{item.isCurrentLocation}}" class="city-picker__current"><t-icon name="location" size="24rpx" />当前定位</view>
         <t-icon wx:if="{{item.code === selectedCity.code}}" name="check" size="32rpx" />
       </view>
     </scroll-view>

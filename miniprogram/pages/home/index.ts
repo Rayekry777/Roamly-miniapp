@@ -291,7 +291,20 @@ Page({
     this.setData({ cityLoading: true });
     try {
       const cities = await this.scope?.run(loadAvailableCities());
-      if (cities) this.setData({ cities, cityPickerVisible: true });
+      if (cities) {
+        const location = cityStore.getState();
+        this.setData({
+          cities: cities
+            .map((city) => ({
+              ...city,
+              isCurrentLocation:
+                location.selectionMode === "REAL_LOCATION" &&
+                location.selectedCity?.code === city.code,
+            }))
+            .sort((a, b) => Number(b.isCurrentLocation) - Number(a.isCurrentLocation)),
+          cityPickerVisible: true,
+        });
+      }
     } catch (error) {
       wx.showToast({
         title: error instanceof Error ? error.message : "城市列表加载失败",

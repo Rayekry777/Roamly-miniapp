@@ -96,7 +96,7 @@
       <view class="city-picker__close pressable" bind:tap="closeCityPicker"><t-icon name="close" size="36rpx" /></view>
     </view>
     <scroll-view class="city-picker__list" scroll-y>
-      <view wx:for="{{cities}}" wx:key="code" class="city-picker__item" data-code="{{item.code}}" bind:tap="selectCity"><text>{{item.name}}</text></view>
+      <view wx:for="{{cities}}" wx:key="code" class="city-picker__item {{item.isCurrentLocation ? 'city-picker__item--disabled' : ''}}" data-code="{{item.code}}" bind:tap="selectCity"><text>{{item.name}}</text><view wx:if="{{item.isCurrentLocation}}" class="city-picker__current"><t-icon name="location" size="24rpx" />当前定位</view></view>
     </scroll-view>
   </view>
 </view>

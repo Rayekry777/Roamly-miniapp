@@ -6,7 +6,7 @@
 .home-location {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 16rpx;
   padding: 18rpx 32rpx 4rpx;
   color: var(--roamly-text);
   font-size: 24rpx;
