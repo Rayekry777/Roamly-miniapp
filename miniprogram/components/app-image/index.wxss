@@ -1,1 +1,3 @@
 .app-image { display: block; width: 100%; height: 100%; background: #ececf3; }
+
+.app-image--category { background: transparent; }

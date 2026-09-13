@@ -29,6 +29,24 @@ const categoryNameIcons: Array<[RegExp, string]> = [
   [/派对|聚会|轰趴/, "party"],
   [/SPA|spa|水疗/, "spa"],
 ];
+const categoryLabelIcons: Record<string, string> = {
+  美食: "food",
+  休闲娱乐: "party",
+  餐厅正餐: "restaurant",
+  小吃快餐: "fastfood",
+  火锅烧烤: "hotpot",
+  奶茶咖啡: "drinks",
+  甜品烘焙: "bakery",
+  其他美食: "food-more",
+  足疗洗浴: "wellness",
+  KTV酒吧: "ktv",
+  桌游棋牌: "boardgame",
+  影院电竞: "cinema",
+  密室剧本: "escape",
+  亲子手作: "craft",
+  运动户外: "outdoor",
+  其他休闲: "leisure-more",
+};
 const downloadedImages = new Map<string, string>();
 
 export function splitImages(value?: string): string[] {
@@ -64,6 +82,8 @@ export function categoryIconUrl(value?: string, label?: string): string {
   const raw = `${value || ""} ${label || ""}`.toLowerCase();
   const key = value?.split("/").pop()?.split(".")[0]?.toLowerCase() || "";
   const icon =
+    categoryLabelIcons[label || ""] ||
+    categoryLabelIcons[value || ""] ||
     categoryIcons[key] ||
     categoryNameIcons.find(([pattern]) => pattern.test(raw))?.[1];
   return icon ? `/assets/images/category-${icon}.svg` : fallbacks.category;

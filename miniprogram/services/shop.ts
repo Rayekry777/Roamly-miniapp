@@ -4,15 +4,24 @@ import type {
   PageResult,
   PostCard,
   Shop,
+  ShopType,
   ShopListQuery,
   ShopResponse,
   ShopSummary,
 } from "../types";
-import { splitImages } from "../utils/media";
+import { categoryIconUrl, splitImages } from "../utils/media";
 import { adaptPostCard } from "./post-card";
 
 export const listShopTypes = shopApi.listShopTypes;
-export const listShopTypeTree = shopApi.listShopTypeTree;
+export async function listShopTypeTree() {
+  const result = await shopApi.listShopTypeTree();
+  const withIcon = (type: ShopType): ShopType => ({
+    ...type,
+    icon: categoryIconUrl(type.icon, type.name),
+    children: type.children?.map(withIcon),
+  });
+  return { ...result, data: result.data?.map(withIcon) };
+}
 
 export async function loadShopPage(
   query: ShopListQuery,

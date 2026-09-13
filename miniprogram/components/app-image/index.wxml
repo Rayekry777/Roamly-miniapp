@@ -1,1 +1,1 @@
-<image class="app-image {{customClass}}" src="{{resolved}}" mode="{{mode}}" lazy-load="{{lazy}}" binderror="onError" />
+<image class="app-image {{kind === 'category' ? 'app-image--category' : ''}} {{customClass}}" src="{{resolved}}" mode="{{mode}}" lazy-load="{{lazy}}" binderror="onError" />

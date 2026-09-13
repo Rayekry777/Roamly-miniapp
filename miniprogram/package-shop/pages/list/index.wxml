@@ -14,7 +14,7 @@
   </view>
 
   <view wx:if="{{!productId}}" class="category-grid {{categoriesExpanded ? 'category-grid--expanded' : ''}}">
-    <view class="category-cell {{!typeId ? 'category-cell--active' : ''}}" data-id="" bind:tap="selectType"><view class="category-all">全</view><text>全部</text></view>
+    <view class="category-cell {{!typeId ? 'category-cell--active' : ''}}" data-id="" bind:tap="selectType"><view class="category-icon"><app-image src="/assets/images/category-all.svg" kind="category" mode="aspectFit" custom-class="category-image" /></view><text>全部</text></view>
     <view wx:for="{{types}}" wx:key="id" class="category-cell {{typeId === item.id ? 'category-cell--active' : ''}}" data-id="{{item.id}}" bind:tap="selectType">
       <view class="category-icon"><app-image src="{{item.icon}}" kind="category" mode="aspectFit" custom-class="category-image" /></view><text>{{item.name}}</text>
     </view>

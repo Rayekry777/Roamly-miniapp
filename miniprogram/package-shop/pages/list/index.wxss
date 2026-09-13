@@ -44,5 +44,3 @@
 .category-toggle { text-align: center; color: #89858c; padding: 18rpx; font-size: 22rpx; }
 .sort-row { display: flex; justify-content: space-between; gap: 12rpx; padding: 22rpx 0; position: sticky; top: 0; z-index: 2; background: #f6f6f8; }
 .sort-item--active { color: #ff603e; }
-
-.category-all { display: flex; align-items: center; justify-content: center; border-radius: 26rpx; background: #fff0e5; font-size: 36rpx; width: 78rpx; height: 78rpx; }
